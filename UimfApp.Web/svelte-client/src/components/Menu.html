@@ -1,0 +1,83 @@
+{{#if menus != null}}
+<ul>
+	{{#each menus as menu}}
+	<li>
+		<MenuItem menu="{{menu}}">
+	</li>
+	{{/each}}
+</ul>
+{{/if}}
+
+<script>
+	import MenuItem from "components/MenuItem";
+
+	function nestedSort(array, comparison) {
+		array.sort(comparison);
+
+		for (let item of array) {
+			if (item.items != null) {
+				nestedSort(item.items, comparison);
+			}
+		}
+	}
+
+	export default {
+		oncreate() {
+			var forms = this.get("forms");
+			var getMenu = this.get("getMenu");
+			var makeUrl = this.get("makeUrl");
+
+			var menus = [];
+			var tree = [];
+
+			for (let form of forms) {
+				let formMenu = getMenu(form);
+				if (formMenu != null) {
+					var currentFolder = {
+						items: tree
+					};
+
+					// If it's a "folder" menu.
+					if (formMenu.name !== "") {
+						var path = formMenu.name.split("/");
+
+						for (let folder of path) {
+							let subfolder = currentFolder.items.find(t => t.id == folder);
+
+							if (subfolder == null) {
+								subfolder = {
+									id: folder,
+									orderIndex: formMenu.orderIndex,
+									items: []
+								};
+
+								currentFolder.items.push(subfolder);
+								currentFolder = subfolder;
+							}
+							else {
+								currentFolder = subfolder;
+							}
+						}
+					}
+
+					currentFolder.items.push({
+						label: form.label,
+						url: makeUrl(form.id),
+						// Make sure we respect both parent menu sorting order and then leaf-level menu sorting order.
+						orderIndex: (formMenu.orderIndex * 100000) + form.customProperties.menuOrderIndex
+					});
+				}
+			}
+
+			nestedSort(tree, (a, b) => {
+				return a.orderIndex - b.orderIndex;
+			});
+
+			this.set({ menus: tree });
+		},
+		components: {
+			MenuItem
+		}
+	}
+
+</script>

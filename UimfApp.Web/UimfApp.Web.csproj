@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="svelte-client\**" />
+    <Content Remove="svelte-client\**" />
+    <EmbeddedResource Remove="svelte-client\**" />
+    <None Remove="svelte-client\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CPermissions" Version="1.1.0" />
+    <PackageReference Include="filer.entityframeworkcore" Version="0.0.8-beta2" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="3.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
+    <PackageReference Include="nofy.entityframeworkcore" Version="0.1.0-beta" />
+    <PackageReference Include="structuremap.aspnetcore" Version="1.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.0" />
+    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UimfApp.Core\UimfApp.Core.csproj" />
+    <ProjectReference Include="..\UimfApp.DataSeed\UimfApp.DataSeed.csproj" />
+    <ProjectReference Include="..\UimfApp.Infrastructure\UimfApp.Infrastructure.csproj" />
+    <ProjectReference Include="..\UimfApp.Users\UimfApp.Users.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,24 @@
+{{#if menu.url != null}}
+<a href="{{menu.url}}">{{menu.label}}</a>
+{{else}}
+<label for="menu{{id}}" class="toggle-sub" onclick="">{{menu.id}}</label>
+<input type="checkbox" id="menu{{id}}" class="sub-nav-check"/>
+{{#if menu.items.length > 0}}
+<ul class="sub-nav">
+	{{#each menu.items as submenu}}
+	<li><:Self menu="{{submenu}}" /></li>
+	{{/each}}
+</ul>
+{{/if}}
+{{/if}}
+
+<script>
+let id = 0;
+export default {
+	data() {
+		return {
+			id: id++
+		};
+	}
+}
+</script>
