@@ -16,3 +16,7 @@ This project is a starter template for buildings apps with UI Metadata Framework
 1. Run *UimfApp.Web*
 2. Navigate to *~/system/seed* to seed sample data.
 3. You can now login with username `admin@example.com` and password `Password1`.
+
+## How to rename project and all its files?
+
+Use [rename-project.ps1](./rename-project.ps1) powershell script to rename all folders and files to match your app's name. The script will also replace text inside all files to use your app's name.
