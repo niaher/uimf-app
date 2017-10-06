@@ -117,7 +117,7 @@
 					.Use(ctx => GetDocumentSecurityRuleCollection(ctx.GetInstance<AppDependencyInjectionContainer>()));
 
 				// UimfApp.Users
-				var connectionString = this.Configuration.GetConnectionString("uimfapp");
+				var connectionString = this.Configuration.GetConnectionString("UimfApp");
 				var appDbContextOptions = new DbContextOptionsBuilder().UseSqlServer(connectionString).Options;
 				config.For<ApplicationDbContext>().Use(ctx => new ApplicationDbContext(appDbContextOptions));
 

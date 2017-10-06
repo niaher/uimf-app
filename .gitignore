@@ -188,6 +188,7 @@ ClientBin/
 node_modules/
 orleans.codegen.cs
 bower_components/
+*.jfm
 
 # RIA/Silverlight projects
 Generated_Code/

@@ -11,11 +11,12 @@ This project is a starter template for buildings apps with UI Metadata Framework
 
 1. Publish *UimfApp.Database* to an Sql Server instance.
 
-## To create sample data
+## To run project
 
-1. Run *UimfApp.Web*
-2. Navigate to *~/system/seed* to seed sample data.
-3. You can now login with username `admin@example.com` and password `Password1`.
+1. Inside *UimfApp.Web/svelte-client* run `npm install`, then `npm run dev`.
+2. Run *UimfApp.Web*
+3. Navigate to *~/system/seed* to seed sample data.
+4. You can now login with username `admin@example.com` and password `Password1`.
 
 ## How to rename project and all its files?
 

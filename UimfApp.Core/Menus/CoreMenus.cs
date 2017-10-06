@@ -3,9 +3,9 @@ namespace UimfApp.Core.Menus
 	using System.Collections.Generic;
 	using UimfApp.Infrastructure.Forms.Menu;
 
-	public sealed class GranteeMenus : IMenuContainer
+	public sealed class CoreMenus : IMenuContainer
 	{
-		public const string Main = "Grantees";
+		public const string Main = "";
 
 		public IList<MenuMetadata> GetMenuMetadata()
 		{
