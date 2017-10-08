@@ -7,7 +7,7 @@
 	{
 		public CoreDbContext CreateDbContext(string[] args)
 		{
-			const string ConnectionString = "Server=(localdb)\\mssqllocaldb;Database=uimfapp;Trusted_Connection=True;MultipleActiveResultSets=true";
+			const string ConnectionString = "Server=(localdb)\\mssqllocaldb;Database=UimfApp;Trusted_Connection=True;MultipleActiveResultSets=true";
 			var dbContextOptions = new DbContextOptionsBuilder().UseSqlServer(ConnectionString).Options;
 			return new CoreDbContext(dbContextOptions);
 		}

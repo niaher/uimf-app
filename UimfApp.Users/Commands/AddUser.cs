@@ -1,15 +1,17 @@
 namespace UimfApp.Users.Commands
 {
-	using System.Linq;
 	using System.Threading.Tasks;
+	using System.Web;
 	using CPermissions;
 	using MediatR;
 	using Microsoft.AspNetCore.Identity;
-	using Microsoft.EntityFrameworkCore.Internal;
-	using UimfApp.Infrastructure;
+	using Microsoft.Extensions.Options;
+	using UimfApp.Infrastructure.Configuration;
 	using UimfApp.Infrastructure.Forms;
+	using UimfApp.Infrastructure.Messages;
 	using UimfApp.Infrastructure.Security;
 	using UimfApp.Users.Pickers;
+	using UimfApp.Users.Security;
 	using UiMetadataFramework.Basic.Input.Typeahead;
 	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core.Binding;
@@ -18,13 +20,21 @@ namespace UimfApp.Users.Commands
 	[MyForm(Id = "add-user", Label = "Add user")]
 	public class AddUser : IMyAsyncForm<AddUser.Request, AddUser.Response>, ISecureHandler
 	{
+		private readonly AppConfig appConfig;
+		private readonly IEmailSender emailSender;
 		private readonly RoleManager<ApplicationRole> roleManager;
 		private readonly UserManager<ApplicationUser> userManager;
 
-		public AddUser(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+		public AddUser(
+			UserManager<ApplicationUser> userManager,
+			RoleManager<ApplicationRole> roleManager,
+			IEmailSender emailSender,
+			IOptions<AppConfig> appConfig)
 		{
 			this.userManager = userManager;
 			this.roleManager = roleManager;
+			this.emailSender = emailSender;
+			this.appConfig = appConfig.Value;
 		}
 
 		public async Task<Response> Handle(Request message)
@@ -37,7 +47,9 @@ namespace UimfApp.Users.Commands
 
 			var identityResult = await this.userManager.CreateAsync(applicationUser);
 
-			EnforceSuccess(identityResult);
+			await this.SendConfirmationEmail(applicationUser);
+
+			identityResult.EnforceSuccess("Account was not created.");
 
 			if (message.Roles?.Items?.Count > 0)
 			{
@@ -45,14 +57,14 @@ namespace UimfApp.Users.Commands
 				identityResult = await this.userManager.AddToRolesAsync(applicationUser, message.Roles.Items);
 			}
 
-			EnforceSuccess(identityResult);
+			identityResult.EnforceSuccess("Account was not created.");
 
 			return new Response();
 		}
 
 		public UserAction GetPermission()
 		{
-			return SystemAction.ManageUsers;
+			return UserActions.ManageUsers;
 		}
 
 		public static FormLink Button()
@@ -64,12 +76,18 @@ namespace UimfApp.Users.Commands
 			};
 		}
 
-		private static void EnforceSuccess(IdentityResult identityResult)
+		private async Task SendConfirmationEmail(ApplicationUser applicationUser)
 		{
-			if (!identityResult.Succeeded)
-			{
-				throw new BusinessException("Account was not created. Errors:\n" + identityResult.Errors.Select(t => $"* {t.Description}").Join("\n"));
-			}
+			var code = await this.userManager.GenerateEmailConfirmationTokenAsync(applicationUser);
+
+			var confirmAccountUrl = $"{this.appConfig.SiteRoot}#/form/confirm-account" +
+				$"?{nameof(ConfirmAccount.Request.Token)}={HttpUtility.UrlEncode(code)}" +
+				$"&{nameof(ConfirmAccount.Request.Id)}={applicationUser.Id}";
+
+			await this.emailSender.SendEmailAsync(
+				applicationUser.Email,
+				"Confirm your account",
+				$"Please confirm your account by clicking this link: <a href=\"{confirmAccountUrl}\">{confirmAccountUrl}</a>");
 		}
 
 		public class Request : IRequest<Response>

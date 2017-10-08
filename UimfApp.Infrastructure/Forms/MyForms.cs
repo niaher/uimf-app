@@ -17,14 +17,21 @@
 		private readonly DependencyInjectionContainer container;
 		private readonly FormRegister formRegister;
 		private readonly MenuRegister menuRegister;
+		private readonly SystemPermissionManager permissionManager;
 		private readonly UserContext userContext;
 
-		public MyForms(DependencyInjectionContainer container, UserContext userContext, FormRegister formRegister, MenuRegister menuRegister)
+		public MyForms(
+			DependencyInjectionContainer container,
+			UserContext userContext,
+			FormRegister formRegister,
+			MenuRegister menuRegister,
+			SystemPermissionManager permissionManager)
 		{
 			this.container = container;
 			this.userContext = userContext;
 			this.formRegister = formRegister;
 			this.menuRegister = menuRegister;
+			this.permissionManager = permissionManager;
 		}
 
 		public Response Handle(Request message)
@@ -41,8 +48,7 @@
 				var formInstance = this.container.GetInstance(metadata.FormType);
 				var permission = metadata.FormType.GetTypeInfo().GetMethod(nameof(ISecureHandler.GetPermission)).Invoke(formInstance, null);
 
-				var permissionManager = new SystemPermissionManager();
-				var canDo = permissionManager.CanDo((SystemAction)permission, this.userContext);
+				var canDo = this.permissionManager.CanDo((SystemAction)permission, this.userContext);
 
 				if (canDo)
 				{

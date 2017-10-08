@@ -2,6 +2,9 @@ namespace UimfApp.Infrastructure.Security
 {
 	using System;
 
+	/// <summary>
+	/// Represents a role that can be assigned to a user.
+	/// </summary>
 	public abstract class Role
 	{
 		private readonly string typeName;

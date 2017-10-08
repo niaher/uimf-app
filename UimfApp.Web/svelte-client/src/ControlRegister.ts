@@ -8,6 +8,7 @@ import { PaginatorInputController } from "core-ui/inputs/PaginatorInputControlle
 import { MultiSelectInputController } from "core-ui/inputs/MultiSelectInputController";
 import { TypeaheadInputController } from "core-ui/inputs/TypeaheadInputController";
 import { PasswordInputController } from "core-ui/inputs/PasswordInputController";
+import { TextareaInputController } from "core-ui/inputs/TextareaInputController";
 
 import TextInput from "core-ui/inputs/Text";
 import NumberInput from "core-ui/inputs/Number";
@@ -16,6 +17,7 @@ import DropdownInput from "core-ui/inputs/Dropdown";
 import BooleanInput from "core-ui/inputs/Boolean";
 import MultiSelectInput from "core-ui/inputs/MultiSelect";
 import Password from "core-ui/inputs/Password";
+import Textarea from "core-ui/inputs/Textarea";
 
 import TextOutput from "core-ui/outputs/Text";
 import NumberOutput from "core-ui/outputs/Number";
@@ -27,6 +29,7 @@ import Paginator from "core-ui/outputs/Paginator";
 import ActionList from "core-ui/outputs/ActionList";
 import InlineForm from "core-ui/outputs/InlineForm";
 import TextValue from "core-ui/outputs/TextValue";
+import DownloadableFile from "core-ui/outputs/DownloadableFile";
 
 import { BindToOutputProcessor } from "core-ui/inputProcessors/BindToOutput";
 
@@ -40,6 +43,7 @@ controlRegister.registerInputFieldControl("paginator", null, PaginatorInputContr
 controlRegister.registerInputFieldControl("typeahead", MultiSelectInput, TypeaheadInputController);
 controlRegister.registerInputFieldControl("multiselect", MultiSelectInput, MultiSelectInputController);
 controlRegister.registerInputFieldControl("password", Password, PasswordInputController);
+controlRegister.registerInputFieldControl("textarea", Textarea, TextareaInputController, { block: true });
 
 controlRegister.registerOutputFieldControl("text", TextOutput);
 controlRegister.registerOutputFieldControl("number", NumberOutput);
@@ -51,6 +55,7 @@ controlRegister.registerOutputFieldControl("paginated-data", Paginator, { block:
 controlRegister.registerOutputFieldControl("action-list", ActionList, { alwaysHideLabel: true, block: true });
 controlRegister.registerOutputFieldControl("inline-form", InlineForm, { alwaysHideLabel: true, block: true });
 controlRegister.registerOutputFieldControl("text-value", TextValue);
+controlRegister.registerOutputFieldControl("downloadable-file", DownloadableFile);
 
 controlRegister.registerInputFieldProcessor("bind-to-output", new BindToOutputProcessor());
 

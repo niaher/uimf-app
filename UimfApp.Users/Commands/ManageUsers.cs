@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Users.Commands
+namespace UimfApp.Users.Commands
 {
 	using System.Collections.Generic;
 	using System.Linq;
@@ -11,6 +11,7 @@
 	using UimfApp.Infrastructure.Forms;
 	using UimfApp.Infrastructure.Security;
 	using UimfApp.Users.Pickers;
+	using UimfApp.Users.Security;
 	using UiMetadataFramework.Basic.Input;
 	using UiMetadataFramework.Basic.Input.Typeahead;
 	using UiMetadataFramework.Basic.Output;
@@ -52,14 +53,14 @@
 				query = query.Where(u => u.UserName.Contains(message.Name));
 			}
 
-			if (!string.IsNullOrEmpty(message.Id))
+			if (message.Id != null)
 			{
 				query = query.Where(u => u.Id.Equals(message.Id));
 			}
 
 			if (message.Roles?.Items?.Count > 0)
 			{
-				query = query.Where(u => u.Roles.Any(t => message.Roles.Items.Contains(t.RoleId)));
+				query = query.Where(u => u.Roles.Any(t => message.Roles.Items.Contains(t.Role.Name)));
 			}
 
 			var result = query
@@ -69,7 +70,7 @@
 			return new Response
 			{
 				Users = result,
-				Actions = this.permissionManager.CanDo(SystemAction.ManageUsers, this.userContext)
+				Actions = this.permissionManager.CanDo(UserActions.ManageUsers, this.userContext)
 					? new ActionList(AddUser.Button())
 					: null
 			};
@@ -77,16 +78,21 @@
 
 		public UserAction GetPermission()
 		{
-			return SystemAction.ManageUsers;
+			return UserActions.ManageUsers;
 		}
 
-		private ActionList GetActions(int userId)
+		private ActionList GetActions(ApplicationUser user)
 		{
 			var result = new ActionList();
 
-			if (this.permissionManager.CanDo(SystemAction.ManageUsers, this.userContext))
+			if (this.permissionManager.CanDo(UserActions.ManageUsers, this.userContext))
 			{
-				result.Actions.Add(EditUser.Button(userId));
+				result.Actions.Add(EditUser.Button(user.Id));
+
+				if (!user.HasLoggedIn)
+				{
+					result.Actions.Add(DeleteUser.Button(user.Id));
+				}
 			}
 
 			return result;
@@ -98,7 +104,7 @@
 			public string Email { get; set; }
 
 			[InputField(OrderIndex = 0)]
-			public string Id { get; set; }
+			public int? Id { get; set; }
 
 			[InputField(OrderIndex = 1)]
 			public string Name { get; set; }
@@ -106,7 +112,7 @@
 			public Paginator Paginator { get; set; }
 
 			[TypeaheadInputField(typeof(RoleTypeaheadInlineSource))]
-			public MultiSelect<int> Roles { get; set; }
+			public MultiSelect<string> Roles { get; set; }
 		}
 
 		public class Response : FormResponse
@@ -125,11 +131,15 @@
 				this.Id = t.Id;
 				this.Email = t.Email;
 				this.Name = t.UserName;
+				this.Activated = t.HasLoggedIn;
 				this.Roles = t.Roles.Select(a => a.Role.Name).ToList();
-				this.Actions = cmd.GetActions(t.Id);
+				this.Actions = cmd.GetActions(t);
 			}
 
-			[OutputField(OrderIndex = 5)]
+			[OutputField(OrderIndex = 10, Label = "Activated")]
+			public bool Activated { get; set; }
+
+			[OutputField(OrderIndex = 20)]
 			public ActionList Actions { get; set; }
 
 			[OutputField(OrderIndex = 3)]

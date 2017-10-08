@@ -8,12 +8,20 @@
 
 	public class SecurityGuard<TRequest, TResponse> : IRequestHandlerDecorator<TRequest, TResponse> where TRequest : IRequest<TResponse>
 	{
+		private readonly DependencyInjectionContainer dependencyInjectionContainer;
+		private readonly SystemPermissionManager permissionManager;
 		private readonly UserContext userContext;
 
-		public SecurityGuard(IRequestHandler<TRequest, TResponse> innerCommand, UserContext userContext)
+		public SecurityGuard(
+			IRequestHandler<TRequest, TResponse> innerCommand,
+			UserContext userContext,
+			SystemPermissionManager permissionManager,
+			DependencyInjectionContainer dependencyInjectionContainer)
 		{
 			this.InnerCommand = innerCommand;
 			this.userContext = userContext;
+			this.permissionManager = permissionManager;
+			this.dependencyInjectionContainer = dependencyInjectionContainer;
 		}
 
 		public IRequestHandler<TRequest, TResponse> InnerCommand { get; }
@@ -36,7 +44,7 @@
 				var permission = type.GetTypeInfo().GetMethod(nameof(ISecureHandler.GetPermission)).Invoke(this.InnerCommand, null);
 
 				// Get context.
-				var context = SecurityGuardCollection.GetContext(contextType, (ISecureHandlerRequest)message);
+				var context = SecurityMapRegister.GetContext(contextType, (ISecureHandlerRequest)message);
 
 				// Get context's base type (otherwise we might end up with EF proxy).
 				var contextBaseType = GetBaseType(context);
@@ -51,8 +59,7 @@
 			{
 				var permission = type.GetTypeInfo().GetMethod(nameof(ISecureHandler.GetPermission)).Invoke(this.InnerCommand, null);
 
-				var permissionManager = new SystemPermissionManager();
-				permissionManager.EnforceCanDo((SystemAction)permission, this.userContext);
+				this.permissionManager.EnforceCanDo((SystemAction)permission, this.userContext);
 			}
 
 			var response = this.InnerCommand.Handle(message);
@@ -73,15 +80,22 @@
 
 		private void EnforceContextPermission(Type contextBaseType, object permission, object context)
 		{
-			ContextSecurityGuard guard;
-			if (SecurityGuardCollection.Guards.TryGetValue(contextBaseType, out guard))
+			if (SecurityMapRegister.Guards.TryGetValue(contextBaseType, out var guard))
 			{
 				if (guard == null)
 				{
 					throw new BusinessException($"Guard for context type '{contextBaseType.Name}' is missing.");
 				}
 
-				guard.EnforcePermission(this.userContext, permission, context);
+				var pm = this.dependencyInjectionContainer.GetInstance(guard.PermissionManager);
+				var enforceCanDo = guard.PermissionManager.GetTypeInfo().GetMethod(nameof(SystemPermissionManager.EnforceCanDo));
+
+				enforceCanDo.Invoke(pm, new[]
+				{
+					permission,
+					this.userContext,
+					context
+				});
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Infrastructure.Security
+namespace UimfApp.Infrastructure.Security
 {
 	using CPermissions;
 	using MediatR;

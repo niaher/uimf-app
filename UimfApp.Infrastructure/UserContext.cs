@@ -4,17 +4,16 @@
 
 	public class UserContext
 	{
-		public UserContext()
+		public UserContext(string userName, params string[] roles)
 		{
+			this.UserName = userName;
+			this.Roles = roles;
 		}
 
-		public UserContext(string userId)
-		{
-			this.UserId = userId;
-		}
+		public IEnumerable<string> Roles { get; }
 
-		public IEnumerable<string> Roles { get; set; } = new List<string>();
+		public string UserName { get; }
 
-		public string UserId { get; set; }
+		public bool IsAuthenticated => !string.IsNullOrWhiteSpace(this.UserName);
 	}
 }

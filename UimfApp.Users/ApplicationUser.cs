@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Users
+namespace UimfApp.Users
 {
 	using System.Collections.Generic;
 	using Microsoft.AspNetCore.Identity;
@@ -19,5 +19,7 @@
 		/// Navigation property for this users login accounts.
 		/// </summary>
 		public virtual ICollection<ApplicationUserLogin> Logins { get; } = new List<ApplicationUserLogin>();
+
+		public bool HasLoggedIn => this.EmailConfirmed || this.PasswordHash != null;
 	}
 }

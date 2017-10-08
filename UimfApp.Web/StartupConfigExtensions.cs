@@ -5,8 +5,10 @@
 	using Microsoft.Extensions.Configuration;
 	using Microsoft.Extensions.DependencyInjection;
 	using Newtonsoft.Json.Converters;
+	using UimfApp.Infrastructure.Configuration;
+	using UimfApp.Infrastructure.Messages;
 	using UimfApp.Users;
-	using UimfApp.Web.Configuration;
+	using UimfApp.Web.Email;
 
 	public static class StartupConfigExtensions
 	{

@@ -84,7 +84,4 @@
     <Build Include="nofy\Tables\NotificationAction.sql" />
     <Build Include="core\Tables\LeaveRequest.sql" />
   </ItemGroup>
-  <ItemGroup>
-    <Build Include="core\Tables\LeaveType.sql" />
-  </ItemGroup>
 </Project>

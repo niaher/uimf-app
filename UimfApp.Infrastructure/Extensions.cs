@@ -7,6 +7,7 @@
 	using System.Reflection;
 	using UimfApp.Infrastructure.Forms.Menu;
 	using UimfApp.Infrastructure.Forms.Typeahead;
+	using UimfApp.Infrastructure.Security;
 	using UiMetadataFramework.Basic.Input.Typeahead;
 	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core.Binding;
@@ -84,6 +85,9 @@
 
 		public static void RegisterUiMetadata(this DependencyInjectionContainer dependencyInjectionContainer, Assembly assembly)
 		{
+			var actionRegister = dependencyInjectionContainer.GetInstance<ActionRegister>();
+			actionRegister.RegisterAssembly(assembly);
+
 			var metadataBinder = dependencyInjectionContainer.GetInstance<MetadataBinder>();
 			metadataBinder.RegisterAssembly(assembly);
 
@@ -92,6 +96,17 @@
 
 			var menuRegister = dependencyInjectionContainer.GetInstance<MenuRegister>();
 			menuRegister.RegisterAssembly(assembly);
+		}
+
+		public static T SingleOrException<T>(this IQueryable<T> queryable, Expression<Func<T, bool>> where)
+		{
+			var item = queryable.SingleOrDefault(where);
+			if (item == null)
+			{
+				throw new BusinessException("Item not found.");
+			}
+
+			return item;
 		}
 	}
 }

@@ -2,12 +2,11 @@ namespace UimfApp.Core.Filing.Managers
 {
 	using System.Collections.Generic;
 	using UiMetadataFramework.Basic.Output;
-//using UimfApp.Core.Commands.Files;
 
 	[EntityFileManager(EntityType = Key)]
-	public class LeaveRequestFileManager : IEntityFileManager
+	public class SomeThingFileManager : IEntityFileManager
 	{
-		public const string Key = "leave-request";
+		public const string Key = "something";
 
 		public bool CanDeleteFiles(object entityId, string metTag)
 		{

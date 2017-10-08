@@ -7,7 +7,7 @@
 		oncreate() {
 			var app = this.get("app");
 			var field = this.get("field");
-			
+			debugger;
 			var formInstance = app.getFormInstance(field.data.form, true);	
 			
 			formInstance.initializeInputFields(field.data.inputFieldValues).then(() => {

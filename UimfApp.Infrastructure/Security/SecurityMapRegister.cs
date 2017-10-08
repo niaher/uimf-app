@@ -7,15 +7,23 @@ namespace UimfApp.Infrastructure.Security
 	using CPermissions;
 	using UimfApp.Infrastructure.Decorators;
 
-	public static class SecurityGuardCollection
+	/// <summary>
+	/// Represents a collection of <see cref="SecurityMap"/> objects.
+	/// </summary>
+	public static class SecurityMapRegister
 	{
-		public static ConcurrentDictionary<Type, ContextSecurityGuard> Guards = new ConcurrentDictionary<Type, ContextSecurityGuard>();
+		public static ConcurrentDictionary<Type, SecurityMap> Guards = new ConcurrentDictionary<Type, SecurityMap>();
 
-		static SecurityGuardCollection()
+		static SecurityMapRegister()
 		{
-			RegisterAssembly(typeof(SecurityGuardCollection).GetTypeInfo().Assembly);
+			RegisterAssembly(typeof(SecurityMapRegister).GetTypeInfo().Assembly);
 		}
 
+		/// <summary>
+		/// Scans assembly for <see cref="IPermissionManager{TUserAction,TUser,TContext}"/> and adds keeps
+		/// the result for future reference.
+		/// </summary>
+		/// <param name="assembly"></param>
 		public static void RegisterAssembly(Assembly assembly)
 		{
 			var permissionManagers = assembly.ExportedTypes
@@ -33,7 +41,7 @@ namespace UimfApp.Infrastructure.Security
 
 			foreach (var permissionManager in permissionManagers)
 			{
-				var guard = new ContextSecurityGuard(permissionManager);
+				var guard = new SecurityMap(permissionManager);
 				Guards.TryAdd(guard.ContextType, guard);
 			}
 
@@ -46,7 +54,7 @@ namespace UimfApp.Infrastructure.Security
 						!typeInfo.IsAbstract &&
 						!typeInfo.IsGenericType;
 				})
-				.Where(t => t.GetTypeInfo().GetInterfaces().Any(i => i == typeof(ISecurityGuardRepository)))
+				.Where(t => t.GetTypeInfo().GetInterfaces().Any(i => i == typeof(IEntityRepository)))
 				.ToList();
 
 			foreach (var repository in repositories)
@@ -62,18 +70,17 @@ namespace UimfApp.Infrastructure.Security
 				throw new BusinessException($"Context of type `{contextType.Name}` was not registered with the `SecurityGuard`.");
 			}
 
-			var repository = (ISecurityGuardRepository)Activator.CreateInstance(guard.Repository);
+			var repository = (IEntityRepository)Activator.CreateInstance(guard.Repository);
 			return repository.Find(request.ContextId);
 		}
 
 		private static void RegisterRepository(Type repository)
 		{
-			var entityType = repository.GetTypeInfo().GetCustomAttribute<SecurityGuardRepositoryAttribute>().EntityType;
+			var entityType = repository.GetTypeInfo().GetCustomAttribute<EntityRepositoryAttribute>().EntityType;
 
-			ContextSecurityGuard guard;
-			if (Guards.TryGetValue(entityType, out guard))
+			if (Guards.TryGetValue(entityType, out var map))
 			{
-				guard.Repository = repository;
+				map.Repository = repository;
 			}
 		}
 	}

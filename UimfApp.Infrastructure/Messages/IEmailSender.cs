@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Users
+namespace UimfApp.Infrastructure.Messages
 {
 	using System.Threading.Tasks;
 

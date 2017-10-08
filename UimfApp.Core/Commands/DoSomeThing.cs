@@ -7,7 +7,7 @@
 	using UiMetadataFramework.MediatR;
 
 	[MyForm(Menu = CoreMenus.Main)]
-	public class CreateRequest : IForm<CreateRequest.Request, CreateRequest.Response>
+	public class DoSomeThing : IForm<DoSomeThing.Request, DoSomeThing.Response>
 	{
 		public Response Handle(Request message)
 		{

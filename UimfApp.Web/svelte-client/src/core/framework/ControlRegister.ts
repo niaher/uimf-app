@@ -10,6 +10,7 @@ interface InputFieldControllerConstructor {
 class InputControlEntry {
     controller: InputFieldControllerConstructor;
     component: any;
+    constants: any;
 }
 
 export class ControlRegister {
@@ -46,10 +47,11 @@ export class ControlRegister {
             : this.inputs["text"];
     }
 
-    registerInputFieldControl(name: string, svelteComponent: any, controller: InputFieldControllerConstructor) {
+    registerInputFieldControl(name: string, svelteComponent: any, controller: InputFieldControllerConstructor, constants: any = null) {
         this.inputs[name] = {
             controller: controller,
-            component: svelteComponent
+            component: svelteComponent,
+            constants: constants
         };
     }
 

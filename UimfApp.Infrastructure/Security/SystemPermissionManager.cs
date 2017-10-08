@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Infrastructure.Security
+namespace UimfApp.Infrastructure.Security
 {
 	using System.Collections.Generic;
 	using System.Linq;
@@ -6,37 +6,40 @@
 
 	public class SystemPermissionManager : PermissionManager<UserContext, SystemRole>
 	{
-		public SystemPermissionManager() : base(new SystemRoleChecker())
+		private readonly ActionRegister actionRegister;
+
+		public SystemPermissionManager(ActionRegister actionRegister) : base(new SystemRoleChecker(actionRegister))
 		{
+			this.actionRegister = actionRegister;
 		}
 
 		public override IEnumerable<UserAction> GetAllowedUserActions(SystemRole role)
 		{
-			if (role.Equals(SystemRole.UnauthenticatedUser))
+			if (role == null)
 			{
-				yield return SystemAction.Login;
+				return new UserAction[0];
 			}
 
-			if (role.Equals(SystemRole.User))
-			{
-				var allowed = SystemAction.List.Except(this.GetAllowedUserActions(SystemRole.UnauthenticatedUser));
-				foreach (var action in allowed)
-				{
-					yield return action;
-				}
-			}
+			return this.actionRegister.GetActions(role.Name);
 		}
 
 		public class SystemRoleChecker : IRoleChecker<UserContext, SystemRole>
 		{
+			private readonly ActionRegister actionRegister;
+
+			public SystemRoleChecker(ActionRegister actionRegister)
+			{
+				this.actionRegister = actionRegister;
+			}
+
 			public IEnumerable<SystemRole> GetRoles(UserContext user)
 			{
-				if (user.UserId == null)
+				if (user == null)
 				{
-					return new[] { SystemRole.UnauthenticatedUser };
+					return new SystemRole[0];
 				}
 
-				return user.Roles.Select(a => (SystemRole)a).ToList();
+				return user.Roles.Select(a => this.actionRegister.GetRoleByName(a)).ToList();
 			}
 		}
 	}

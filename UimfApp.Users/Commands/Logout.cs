@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Web.Forms
+namespace UimfApp.Users.Commands
 {
 	using System.Threading.Tasks;
 	using CPermissions;
@@ -7,10 +7,11 @@
 	using UimfApp.Infrastructure.Forms;
 	using UimfApp.Infrastructure.Security;
 	using UimfApp.Users;
+	using UimfApp.Users.Security;
 	using UiMetadataFramework.Basic.Response;
 	using UiMetadataFramework.MediatR;
 
-	[MyForm(Id = "logout", PostOnLoad = true, Label = "Logout", Menu = WebAppMenus.Account, MenuOrderIndex = 10)]
+	[MyForm(Id = "logout", PostOnLoad = true, Label = "Logout", Menu = UserMenus.Account, MenuOrderIndex = 10)]
 	public class Logout : IAsyncForm<Logout.Request, ReloadResponse>, ISecureHandler
 	{
 		private readonly SignInManager<ApplicationUser> signInManager;
@@ -32,7 +33,7 @@
 
 		public UserAction GetPermission()
 		{
-			return SystemAction.Logout;
+			return UserActions.Logout;
 		}
 
 		public class Request : IRequest<ReloadResponse>

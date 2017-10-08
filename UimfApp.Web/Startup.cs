@@ -28,7 +28,7 @@
 	using UimfApp.Infrastructure.Security;
 	using UimfApp.Users;
 	using UimfApp.Users.Commands;
-	using UimfApp.Web.Forms;
+	using UimfApp.Users.Security;
 	using UimfApp.Web.Middleware;
 	using UiMetadataFramework.Basic.Input;
 	using UiMetadataFramework.Core.Binding;
@@ -56,17 +56,17 @@
 
 			if (!httpContextUser.Identity.IsAuthenticated)
 			{
-				return new UserContext();
+				return new UserContext(null, UserManagementRoles.UnauthenticatedUser.Name);
 			}
 
-			return new UserContext
-			{
-				UserId = httpContextUser.Identity.Name,
-				Roles = httpContextUser.Claims.Where(t => t.Type == ClaimTypes.Role).Select(t => t.Value)
-					// Ensure that there is at least one role, otherwise "public" 
-					// actions won't work.
-					.Append(SystemRole.User.Name)
-			};
+			var roles = httpContextUser.Claims.Where(t => t.Type == ClaimTypes.Role).Select(t => t.Value)
+				// Ensure that there is at least one role, otherwise "public" 
+				// actions won't work.
+				.Append(UserManagementRoles.AuthenticatedUser.Name)
+				.Distinct()
+				.ToArray();
+
+			return new UserContext(httpContextUser.Identity.Name, roles);
 		}
 
 		private static EntityFileManagerCollection GetDocumentSecurityRuleCollection(AppDependencyInjectionContainer container)
@@ -92,7 +92,7 @@
 			services.ConfigureMvc(this.Configuration);
 
 			// Register all assemblies with IRequestHandler.
-			services.AddMediatR(typeof(CreateRequest));
+			services.AddMediatR(typeof(DoSomeThing));
 			services.AddMediatR(typeof(InvokeForm));
 			services.AddMediatR(typeof(MyForms));
 			services.AddMediatR(typeof(ManageUsers));
@@ -105,6 +105,7 @@
 				config.For<MetadataBinder>().Use(t => GetMetadataBinder(t)).Singleton();
 				config.For<FormRegister>().Singleton();
 				config.For<MenuRegister>().Singleton();
+				config.For<ActionRegister>().Singleton();
 
 				config.For<AppDependencyInjectionContainer>().Use(ctx => new AppDependencyInjectionContainer(ctx.GetInstance));
 				config.For<UimfDependencyInjectionContainer>().Use(t => new UimfDependencyInjectionContainer(t.GetInstance));

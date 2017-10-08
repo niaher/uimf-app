@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Users
+namespace UimfApp.Users
 {
 	using Microsoft.AspNetCore.Identity;
 

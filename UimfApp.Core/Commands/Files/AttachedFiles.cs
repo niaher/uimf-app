@@ -9,6 +9,7 @@
 	using Microsoft.EntityFrameworkCore;
 	using UimfApp.Core.Filing;
 	using UimfApp.Core.Forms.Outputs;
+	using UimfApp.Core.Security;
 	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Security;
 	using UiMetadataFramework.Basic.Output;
@@ -86,7 +87,7 @@
 
 		public UserAction GetPermission()
 		{
-			return SystemAction.ViewFiles;
+			return CoreActions.ViewFiles;
 		}
 
 		public static string ContextTypeOf<T>()

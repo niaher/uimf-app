@@ -6,6 +6,7 @@ namespace UimfApp.Core.Commands.Files
 	using MediatR;
 	using Microsoft.EntityFrameworkCore;
 	using UimfApp.Core.Filing;
+	using UimfApp.Core.Security;
 	using UimfApp.Infrastructure.Security;
 	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core;
@@ -23,16 +24,6 @@ namespace UimfApp.Core.Commands.Files
 			this.context = context;
 			this.documentSecurityRules = documentSecurityRule;
 		}
-
-		//public FormMetadata Metadata { get; } = new FormMetadata
-		//{
-		//	Type = FormType.Form,
-		//	Inputs =
-		//	{
-		//		new TextInput(nameof(Request.HashId)) { Required = true, Hidden = true },
-		//		new TextInput(nameof(Request.MetaTag)) { Hidden = true }
-		//	}
-		//};
 
 		public Response Handle(Request message)
 		{
@@ -55,7 +46,7 @@ namespace UimfApp.Core.Commands.Files
 
 		public UserAction GetPermission()
 		{
-			return SystemAction.ViewFiles;
+			return CoreActions.ViewFiles;
 		}
 
 		public static FormLink Button(string hashId)

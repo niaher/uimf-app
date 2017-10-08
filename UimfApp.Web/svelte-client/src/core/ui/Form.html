@@ -108,7 +108,7 @@
 
                             formInstance.runInputFieldProcessors("response", response, app.controlRegister).then(t => {                            
                                 enableForm(self);
-                                                            
+                                
                                 if (response.metadata.handler == "" || response.metadata.handler == null) {
                                     // Hide all inputs, to re-render them. This is needed due to the way that
                                     // Svelte *seems* to work - it doesn't re-render nested components, unless they are recreated.

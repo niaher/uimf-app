@@ -74,7 +74,7 @@
 							file.ContentType,
 							ReadFully(fileStream),
 							CompressionFormat.GZip,
-							this.userContext.UserId.ToInt());
+							this.userContext.UserName.ToInt());
 
 						var entity = await this.fileManager.GetById(fileId);
 

@@ -1,6 +1,6 @@
 <div>
     <label for="{{id}}">{{field.metadata.label}}</label>
-    <div ref:container class="inline"></div>
+    <div ref:container class="{{class}}"></div>
 </div>
 
 <script>
@@ -14,9 +14,9 @@
             let tabindex = this.get("tabindex");
             let app = this.get("app");
 
-            var input = app.controlRegister.getInput(field.metadata.type).component;
+            var input = app.controlRegister.getInput(field.metadata.type);
 
-            var i = new input({
+            var i = new input.component({
                 target: this.refs.container,
                 data: {
                     field: field,
@@ -25,6 +25,15 @@
                     app: app
                 }
             });
+
+            // Set correct css class based on the field type.
+            var outputDisplayConfig = input.constants || {};
+            if (outputDisplayConfig.block) {
+                this.set({ class: "block" });
+            }
+            else {
+                this.set({ class: "inline" });
+            }
         },
         data() {
             inputId += 1;

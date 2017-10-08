@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Users
+namespace UimfApp.Users
 {
 	using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 	using Microsoft.EntityFrameworkCore;
@@ -28,13 +28,16 @@
 				.HasForeignKey(e => e.UserId)
 				.IsRequired()
 				.OnDelete(DeleteBehavior.Cascade);
-
+			
 			builder.Entity<ApplicationUser>()
 				.HasMany(e => e.Roles)
 				.WithOne()
 				.HasForeignKey(e => e.UserId)
 				.IsRequired()
 				.OnDelete(DeleteBehavior.Cascade);
+
+			builder.Entity<ApplicationUser>()
+				.Ignore(t => t.HasLoggedIn);
 
 			builder.Entity<ApplicationUserRole>()
 				.HasOne(e => e.Role)

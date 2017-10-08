@@ -8,10 +8,18 @@
 
 	public class RoleTypeaheadInlineSource : ITypeaheadInlineSource<string>
 	{
+		private readonly ActionRegister actionRegister;
+
+		public RoleTypeaheadInlineSource(ActionRegister actionRegister)
+		{
+			this.actionRegister = actionRegister;
+		}
+
 		public IEnumerable<TypeaheadItem<string>> GetItems()
 		{
-			return SystemRole.List
-				.Where(t => !Equals(t, SystemRole.UnauthenticatedUser))
+			return this.actionRegister
+				.GetSystemRoles()
+				.Where(t => t.IsDynamicallyAssigned == false)
 				.ToList()
 				.AsTypeaheadResponse(t => t.Name, t => t.Name).Items;
 		}

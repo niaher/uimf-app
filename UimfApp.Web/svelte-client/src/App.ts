@@ -7,8 +7,8 @@ import { AppRouter } from "./AppRouter";
 import Menu from "components/Menu";
 
 var server = new UmfServer(
-    "http://localhost:58335/api/form/metadata",
-    "http://localhost:58335/api/form/run");
+    "/api/form/metadata",
+    "/api/form/run");
 
 var app = new UmfApp(server, controlRegister);
 

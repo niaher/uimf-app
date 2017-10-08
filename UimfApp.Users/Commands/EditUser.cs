@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Users.Commands
+namespace UimfApp.Users.Commands
 {
 	using System.Collections.Generic;
 	using System.Linq;
@@ -11,6 +11,7 @@
 	using UimfApp.Infrastructure.Forms.Record;
 	using UimfApp.Infrastructure.Security;
 	using UimfApp.Users.Pickers;
+	using UimfApp.Users.Security;
 	using UiMetadataFramework.Basic.Input.Typeahead;
 	using UiMetadataFramework.Basic.InputProcessors;
 	using UiMetadataFramework.Basic.Output;
@@ -27,6 +28,19 @@
 		{
 			this.userManager = userManager;
 			this.roleManager = roleManager;
+		}
+
+		public static FormLink Button(int userId)
+		{
+			return new FormLink
+			{
+				Form = typeof(EditUser).GetFormId(),
+				Label = "Edit",
+				InputFieldValues = new Dictionary<string, object>
+				{
+					{ nameof(Request.Id), userId }
+				}
+			};
 		}
 
 		public async Task<Response> Handle(Request message)
@@ -62,20 +76,7 @@
 
 		public UserAction GetPermission()
 		{
-			return SystemAction.ManageUsers;
-		}
-
-		public static FormLink Button(int userId)
-		{
-			return new FormLink
-			{
-				Form = typeof(EditUser).GetFormId(),
-				Label = "Edit",
-				InputFieldValues = new Dictionary<string, object>
-				{
-					{ nameof(Request.Id), userId }
-				}
-			};
+			return UserActions.ManageUsers;
 		}
 
 		public class Request : RecordRequest<Response>

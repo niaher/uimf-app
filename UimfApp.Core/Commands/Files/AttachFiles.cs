@@ -7,6 +7,7 @@ namespace UimfApp.Core.Commands.Files
 	using Filer.Core;
 	using MediatR;
 	using UimfApp.Core.Filing;
+	using UimfApp.Core.Security;
 	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Forms.Inputs;
 	using UimfApp.Infrastructure.Security;
@@ -33,7 +34,7 @@ namespace UimfApp.Core.Commands.Files
 			var rule = this.entityFileSecurityRuleCollection.GetManager(message.ContextType);
 			if (!rule.CanUploadFiles(message.ContextId))
 			{
-				throw new PermissionException("add documents", this.userContext.UserId);
+				throw new PermissionException("add documents", this.userContext.UserName);
 			}
 
 			var documents = message.Documents?.Items ?? new List<string>();
@@ -48,7 +49,7 @@ namespace UimfApp.Core.Commands.Files
 
 		public UserAction GetPermission()
 		{
-			return SystemAction.ViewFiles;
+			return CoreActions.ViewFiles;
 		}
 
 		public static FormLink Button(object id, string type, string meta = null, bool isMultiple = true)

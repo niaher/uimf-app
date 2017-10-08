@@ -43,7 +43,7 @@
 			}
 		}
 
-		private static void EnforceSuccess(this IdentityResult result, string message)
+		public static void EnforceSuccess(this IdentityResult result, string message)
 		{
 			if (!result.Succeeded)
 			{

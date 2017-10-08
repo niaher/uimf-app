@@ -8,14 +8,12 @@
 		{
 		}
 
-		public virtual DbSet<LeaveRequest> LeaveRequests { get; set; }
-		public virtual DbSet<LeaveType> LeaveTypes { get; set; }
+		public virtual DbSet<SomeThing> SomeThings { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
 			base.OnModelCreating(builder);
-			builder.ApplyConfiguration(new LeaveRequestMap());
-			builder.ApplyConfiguration(new LeaveTypeMap());
+			builder.ApplyConfiguration(new SomeThingMap());
 		}
 	}
 }
