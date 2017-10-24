@@ -11,7 +11,6 @@
 	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.Core.Binding;
-	using UiMetadataFramework.MediatR;
 
 	[MyForm(Id = "account", Label = "My account", PostOnLoad = true, Menu = UserMenus.Account)]
 	public class MyAccount : IMyForm<MyAccount.Request, MyAccount.Response>, ISecureHandler

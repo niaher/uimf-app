@@ -1,18 +1,20 @@
 ﻿namespace UimfApp.Users.Commands
 {
+	using System.Collections.Generic;
 	using System.Threading.Tasks;
 	using CPermissions;
 	using MediatR;
 	using Microsoft.AspNetCore.Identity;
 	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Forms;
+	using UimfApp.Infrastructure.Forms.ClientFunctions;
+	using UimfApp.Infrastructure.Forms.Outputs;
 	using UimfApp.Infrastructure.Security;
 	using UimfApp.Users.Security;
 	using UiMetadataFramework.Basic.Input;
 	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.Core.Binding;
-	using UiMetadataFramework.MediatR;
 
 	[MyForm(Id = "change-password", Label = "Change account password")]
 	public class ChangePassword : IMyAsyncForm<ChangePassword.Request, ChangePassword.Response>, ISecureHandler
@@ -39,7 +41,14 @@
 
 			return new Response
 			{
-				Result = "Password was changed successfully."
+				Result = Alert.Success("Password was changed successfully."),
+				Metadata = new MyFormResponseMetadata
+				{
+					FunctionsToRun = new List<ClientFunctionMetadata>
+					{
+						new GrowlNotification("Password was changed successfully.", GrowlNotification.Styles.Success).GetClientFunctionMetadata()
+					}
+				}
 			};
 		}
 
@@ -59,7 +68,7 @@
 
 		public class Response : FormResponse<MyFormResponseMetadata>
 		{
-			public string Result { get; set; }
+			public Alert Result { get; set; }
 		}
 
 		public class Request : IRequest<Response>

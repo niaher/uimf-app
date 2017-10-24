@@ -12,12 +12,11 @@ namespace UimfApp.Users.Commands
 	using UimfApp.Infrastructure.Security;
 	using UimfApp.Users.Pickers;
 	using UimfApp.Users.Security;
+	using UiMetadataFramework.Basic.EventHandlers;
 	using UiMetadataFramework.Basic.Input.Typeahead;
-	using UiMetadataFramework.Basic.InputProcessors;
 	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core.Binding;
-	using UiMetadataFramework.MediatR;
-
+	
 	[MyForm(Id = "edit-user", PostOnLoad = true, Label = "Edit user", SubmitButtonLabel = "Save changes")]
 	public class EditUser : IMyAsyncForm<EditUser.Request, EditUser.Response>, ISecureHandler
 	{

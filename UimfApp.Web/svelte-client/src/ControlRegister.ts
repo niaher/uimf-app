@@ -30,8 +30,16 @@ import ActionList from "core-ui/outputs/ActionList";
 import InlineForm from "core-ui/outputs/InlineForm";
 import TextValue from "core-ui/outputs/TextValue";
 import DownloadableFile from "core-ui/outputs/DownloadableFile";
+import Alert from "core-ui/outputs/Alert";
 
-import { BindToOutputProcessor } from "core-ui/inputProcessors/BindToOutput";
+import {
+	FormLogToConsole,
+	BindToOutput,
+	InputLogToConsole,
+	OutputLogToConsole
+} from "core-eventHandlers";
+
+import { Growl } from "core-functions";
 
 var controlRegister = new umf.ControlRegister();
 controlRegister.registerInputFieldControl("text", TextInput, umf.StringInputController);
@@ -56,7 +64,19 @@ controlRegister.registerOutputFieldControl("action-list", ActionList, { alwaysHi
 controlRegister.registerOutputFieldControl("inline-form", InlineForm, { alwaysHideLabel: true, block: true });
 controlRegister.registerOutputFieldControl("text-value", TextValue);
 controlRegister.registerOutputFieldControl("downloadable-file", DownloadableFile);
+controlRegister.registerOutputFieldControl("alert", Alert, { alwaysHideLabel: true, block: true });
 
-controlRegister.registerInputFieldProcessor("bind-to-output", new BindToOutputProcessor());
+// Form event handlers.
+controlRegister.registerFormEventHandler("log-to-console", new FormLogToConsole());
+
+// Input event handlers.
+controlRegister.registerInputFieldEventHandler("bind-to-output", new BindToOutput());
+controlRegister.registerInputFieldEventHandler("log-to-console", new InputLogToConsole());
+
+// Output event handlers.
+controlRegister.registerOutputFieldEventHandler("log-to-console", new OutputLogToConsole());
+
+// Functions.
+controlRegister.registerFunction("growl", new Growl());
 
 export default controlRegister;

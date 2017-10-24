@@ -51,8 +51,24 @@ var FormResponse = /** @class */ (function (_super) {
  */
 
 /**
- * Represents a function which can be run at a specific time during form's lifecycle to manipulate input field.
+ * Represents a function.
  */
+var ClientFunctionMetadata = /** @class */ (function () {
+    function ClientFunctionMetadata() {
+    }
+    return ClientFunctionMetadata;
+}());
+
+/**
+ * Represents a function which can be run at a specific time during form's lifecycle.
+ */
+var EventHandlerMetadata = /** @class */ (function (_super) {
+    __extends(EventHandlerMetadata, _super);
+    function EventHandlerMetadata() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return EventHandlerMetadata;
+}(ClientFunctionMetadata));
 
 /**
  * Metadata describing how to handle the response.
@@ -1645,9 +1661,60 @@ var FormInstance = /** @class */ (function () {
     function FormInstance(metadata, controllerRegister) {
         this.outputs = [];
         this.inputs = [];
+        this.formEventHandlers = [];
         this.metadata = metadata;
         this.inputs = controllerRegister.createInputControllers(this.metadata.inputFields);
     }
+    FormInstance.prototype.fire = function (eventName, parameters) {
+        var _this = this;
+        var promises = [];
+        // Run input event handlers.
+        for (var _i = 0, _a = this.inputs; _i < _a.length; _i++) {
+            var input = _a[_i];
+            if (input.metadata.eventHandlers != null) {
+                for (var _b = 0, _c = input.metadata.eventHandlers; _b < _c.length; _b++) {
+                    var eventHandlerMetadata = _c[_b];
+                    if (eventHandlerMetadata.runAt === eventName) {
+                        var handler = parameters.app.controlRegister.inputFieldEventHandlers[eventHandlerMetadata.id];
+                        if (handler == null) {
+                            throw new Error("Could not find input event handler '" + eventHandlerMetadata.id + "'.");
+                        }
+                        var promise = handler.run(input, eventHandlerMetadata, parameters);
+                        promises.push(promise);
+                    }
+                }
+            }
+        }
+        // Run output event handlers.
+        for (var _d = 0, _e = this.outputs; _d < _e.length; _d++) {
+            var output = _e[_d];
+            if (output.metadata.eventHandlers != null) {
+                for (var _f = 0, _g = output.metadata.eventHandlers; _f < _g.length; _f++) {
+                    var eventHandlerMetadata = _g[_f];
+                    if (eventHandlerMetadata.runAt === eventName) {
+                        var handler = parameters.app.controlRegister.outputFieldEventHandlers[eventHandlerMetadata.id];
+                        if (handler == null) {
+                            throw new Error("Could not find output event handler '" + eventHandlerMetadata.id + "'.");
+                        }
+                        var promise = handler.run(output, eventHandlerMetadata, parameters);
+                        promises.push(promise);
+                    }
+                }
+            }
+        }
+        // Run form event handlers.
+        this.metadata.eventHandlers
+            .filter(function (t) { return t.runAt === eventName; })
+            .forEach(function (t) {
+            var handler = parameters.app.controlRegister.formEventHandlers[t.id];
+            if (handler == null) {
+                throw new Error("Could not find form event handler '" + t.id + "'.");
+            }
+            var promise = handler.run(_this, t, parameters);
+            promises.push(promise);
+        });
+        return Promise.all(promises);
+    };
     FormInstance.prototype.initializeInputFields = function (data) {
         var promises = [];
         for (var _i = 0, _a = this.inputs; _i < _a.length; _i++) {
@@ -1738,6 +1805,10 @@ var FormInstance = /** @class */ (function () {
         return data;
     };
     FormInstance.prototype.setOutputFieldValues = function (response) {
+        if (response == null) {
+            this.outputs = [];
+            return;
+        }
         var fields = Array();
         var normalizedResponse = this.getNormalizedObject(response);
         for (var _i = 0, _a = this.metadata.outputFields; _i < _a.length; _i++) {
@@ -1751,33 +1822,6 @@ var FormInstance = /** @class */ (function () {
             return a.metadata.orderIndex - b.metadata.orderIndex;
         });
         this.outputs = fields;
-    };
-    FormInstance.prototype.runInputFieldProcessors = function (event, params, controlRegister) {
-        var promises = [];
-        for (var _i = 0, _a = this.inputs; _i < _a.length; _i++) {
-            var input = _a[_i];
-            if (input.metadata.processors != null) {
-                for (var _b = 0, _c = input.metadata.processors; _b < _c.length; _b++) {
-                    var processorMetadata = _c[_b];
-                    var processor = controlRegister.inputProcessors[processorMetadata.id];
-                    if (processor != null) {
-                        var promise = processor.process(input, processorMetadata, params);
-                        promises.push(promise);
-                    }
-                }
-            }
-        }
-        return Promise.all(promises);
-    };
-    FormInstance.prototype.hasInputFieldProcessorsAt = function (runAt) {
-        for (var _i = 0, _a = this.inputs; _i < _a.length; _i++) {
-            var input = _a[_i];
-            var processor = input.metadata.processors.find(function (t) { return t.runAt === runAt; });
-            if (processor != null) {
-                return true;
-            }
-        }
-        return false;
     };
     FormInstance.prototype.getNormalizedObject = function (response) {
         var normalizedResponse = {};
@@ -1799,6 +1843,8 @@ var UmfApp = /** @class */ (function () {
         this.server = server;
         this.controlRegister = inputRegister;
     }
+    UmfApp.prototype.runEventHandler = function (handler) {
+    };
     UmfApp.prototype.useRouter = function (router) {
         this.go = function (form, values) {
             return router.go(form, values);
@@ -1857,6 +1903,22 @@ var UmfApp = /** @class */ (function () {
         }
         return handler.handle(response, form);
     };
+    UmfApp.prototype.runFunctions = function (functionMetadata) {
+        if (functionMetadata == null) {
+            return Promise.resolve();
+        }
+        var promises = [];
+        for (var _i = 0, functionMetadata_1 = functionMetadata; _i < functionMetadata_1.length; _i++) {
+            var f = functionMetadata_1[_i];
+            var handler = this.controlRegister.functions[f.id];
+            if (handler == null) {
+                throw new Error("Could not find function '" + f.id + "'.");
+            }
+            var promise = handler.run(f);
+            promises.push(promise);
+        }
+        return Promise.all(promises);
+    };
     return UmfApp;
 }());
 
@@ -1895,13 +1957,16 @@ var StringInputController = /** @class */ (function (_super) {
     return StringInputController;
 }(InputController));
 
-var ControlRegister = /** @class */ (function () {
-    function ControlRegister() {
+var ControlRegister$$1 = /** @class */ (function () {
+    function ControlRegister$$1() {
         this.inputs = {};
         this.outputs = {};
-        this.inputProcessors = {};
+        this.inputFieldEventHandlers = {};
+        this.outputFieldEventHandlers = {};
+        this.formEventHandlers = {};
+        this.functions = {};
     }
-    ControlRegister.prototype.createInputControllers = function (fields) {
+    ControlRegister$$1.prototype.createInputControllers = function (fields) {
         var result = [];
         for (var _i = 0, fields_1 = fields; _i < fields_1.length; _i++) {
             var field = fields_1[_i];
@@ -1915,17 +1980,17 @@ var ControlRegister = /** @class */ (function () {
         });
         return result;
     };
-    ControlRegister.prototype.getOutput = function (field) {
+    ControlRegister$$1.prototype.getOutput = function (field) {
         return field != null
             ? this.outputs[field.metadata.type] || this.outputs["text"]
             : this.outputs["text"];
     };
-    ControlRegister.prototype.getInput = function (type) {
+    ControlRegister$$1.prototype.getInput = function (type) {
         return type != null
             ? this.inputs[type] || this.inputs["text"]
             : this.inputs["text"];
     };
-    ControlRegister.prototype.registerInputFieldControl = function (name, svelteComponent, controller, constants) {
+    ControlRegister$$1.prototype.registerInputFieldControl = function (name, svelteComponent, controller, constants) {
         if (constants === void 0) { constants = null; }
         this.inputs[name] = {
             controller: controller,
@@ -1933,17 +1998,26 @@ var ControlRegister = /** @class */ (function () {
             constants: constants
         };
     };
-    ControlRegister.prototype.registerOutputFieldControl = function (name, control, constants) {
+    ControlRegister$$1.prototype.registerOutputFieldControl = function (name, control, constants) {
         if (constants === void 0) { constants = null; }
         this.outputs[name] = {
             constructor: control,
             constants: constants
         };
     };
-    ControlRegister.prototype.registerInputFieldProcessor = function (name, processor) {
-        this.inputProcessors[name] = processor;
+    ControlRegister$$1.prototype.registerFormEventHandler = function (name, handler) {
+        this.formEventHandlers[name] = handler;
     };
-    return ControlRegister;
+    ControlRegister$$1.prototype.registerInputFieldEventHandler = function (name, handler) {
+        this.inputFieldEventHandlers[name] = handler;
+    };
+    ControlRegister$$1.prototype.registerOutputFieldEventHandler = function (name, handler) {
+        this.outputFieldEventHandlers[name] = handler;
+    };
+    ControlRegister$$1.prototype.registerFunction = function (name, fn) {
+        this.functions[name] = fn;
+    };
+    return ControlRegister$$1;
 }());
 
 var OutputFieldValue = /** @class */ (function () {
@@ -1952,10 +2026,22 @@ var OutputFieldValue = /** @class */ (function () {
     return OutputFieldValue;
 }());
 
-var InputFieldProcessor = /** @class */ (function () {
-    function InputFieldProcessor() {
+var FormEventHandler = /** @class */ (function () {
+    function FormEventHandler() {
     }
-    return InputFieldProcessor;
+    return FormEventHandler;
+}());
+
+var InputFieldEventHandler = /** @class */ (function () {
+    function InputFieldEventHandler() {
+    }
+    return InputFieldEventHandler;
+}());
+
+var OutputFieldEventHandler = /** @class */ (function () {
+    function OutputFieldEventHandler() {
+    }
+    return OutputFieldEventHandler;
 }());
 
 var MessageResponseHandler = /** @class */ (function () {
@@ -15918,136 +16004,153 @@ assign(SvelteComponent$19.prototype, proto);
 /* src\core\ui\Form.html generated by Svelte v1.40.1 */
 let tabindex = 1;
 
-function enableForm(form) {
-    form.set({
-        // Remove previous output, this is needed for repainting.
-        outputFieldValues: null,
-
-        // Enable post.
-        disabled: false
-    });
-}
-
 function data$3() {
-    return {
-        disabled: false,
-        tabindex: tabindex,
-        urlData: null,
-        initialized: false,
-        responseMetadata: {},
-        useUrl: true
-    };
+	return {
+		disabled: false,
+		tabindex: tabindex,
+		urlData: null,
+		initialized: false,
+		responseMetadata: {},
+		useUrl: true
+	};
 }
 
 var methods$2 = {
-    init: function() {
-        if (!this.get("initialized")) {
-            var form = this.get("form");
-            
-            this.set({ 
-                self: this,
-                initialized: true,
-                visibleInputFields: form.inputs.filter(t => t.metadata.hidden == false),
-                submitButtonLabel: form.metadata.customProperties != null && form.metadata.customProperties.submitButtonLabel 
-                    ? form.metadata.customProperties.submitButtonLabel 
-                    : "Submit"
-            });
+	init: function () {
+		if (!this.get("initialized")) {
+			var form = this.get("form");
 
-            tabindex += 1;
-            
-            // Auto-submit form if necessary.
-            if (form.metadata.postOnLoad) {
-                var app = this.get("app");
-                this.submit(app, form);
-            }
-        }
-    },
-    submit: function (app, formInstance, event, redirect) {
-        var self = this;
+			this.set({
+				self: this,
+				initialized: true,
+				visibleInputFields: form.inputs.filter(t => t.metadata.hidden == false),
+				submitButtonLabel: form.metadata.customProperties != null && form.metadata.customProperties.submitButtonLabel
+					? form.metadata.customProperties.submitButtonLabel
+					: "Submit"
+			});
 
-        if (event != null) {
-            event.preventDefault();
-        }
+			tabindex += 1;
 
-        var skipValidation = 
-            !formInstance.metadata.postOnLoadValidation &&
-            formInstance.metadata.postOnLoad &&
-            // if initialization of the form, i.e. - first post.
-            redirect == null;
+			var app = this.get("app");
 
-        formInstance.prepareForm(!skipValidation).then(data => {
-            // If not all required inputs are filled.
-            if (data == null) {
-                return;
-            }
+			form.fire("form:loaded", { app: app });
 
-            // Disable double-posts.
-            self.set({ disabled: true });
+			// Auto-submit form if necessary.
+			if (form.metadata.postOnLoad) {
+				this.submit(app, form);
+			}
+		}
+	},
+	enableForm: function() {
+		var formInstance = this.get("form");
 
-            // If postOnLoad == true, then the input field values should appear in the url.
-            // Reason is that postOnLoad == true is used by "report" pages, which need
-            // their filters to be saved in the url. This does not apply to forms
-            // with postOnLoad == false, because those forms are usually for creating new data
-            // and hence should not be tracked in browser's history based on parameters.
-            if (formInstance.metadata.postOnLoad && redirect && this.get("useUrl")) {
-                formInstance.getSerializedInputValues().then(urlParams => {
-                    // Update url in the browser.
-                    app.go(formInstance.metadata.id, urlParams);
-                });
+		// Hide all inputs, to re-render them. This is needed due to the way that
+		// Svelte *seems* to work - it doesn't re-render nested components, unless they are recreated.
+		this.set({ visibleInputFields: [] });
 
-                return;
-            }
+		this.set({
+			// Show inputs again.
+			visibleInputFields: formInstance.inputs.filter(t => t.metadata.hidden == false),
 
-            app.server.postForm(formInstance.metadata.id, data)
-                .then(response => {
-                    // If there was an error.
-                    if (response == null) {
-                        enableForm(self);
-                        return;
-                    }
+			disabled: false
+		});
+	},
+	renderResponse: function(response) {
+		var formInstance = this.get("form");
 
-                    formInstance.setOutputFieldValues(response);
+		// Force Svelte to re-render outputs.
+		this.set({
+			outputFieldValues: null
+		});
 
-                    formInstance.runInputFieldProcessors("response", response, app.controlRegister).then(t => {                            
-                        enableForm(self);
-                        
-                        if (response.metadata.handler == "" || response.metadata.handler == null) {
-                            // Hide all inputs, to re-render them. This is needed due to the way that
-                            // Svelte *seems* to work - it doesn't re-render nested components, unless they are recreated.
-                            self.set({ visibleInputFields: [] });
-                            
-                            self.set({
-                                // Show inputs again.
-                                visibleInputFields: formInstance.inputs.filter(t => t.metadata.hidden == false),
-                                outputFieldValues: formInstance.outputs,
-                                responseMetadata: response.metadata
-                            });
-                        }
-                        else {
-                            app.handleResponse(response, formInstance);
-                        }
+		this.set({
+			outputFieldValues: formInstance.outputs,
+			responseMetadata: response.metadata
+		});
+	},
+	submit: async function (app, formInstance, event, redirect) {
+		var self = this;
+		
+		if (event != null) {
+			event.preventDefault();
+		}
+		
+		var skipValidation =
+			!formInstance.metadata.postOnLoadValidation &&
+			formInstance.metadata.postOnLoad &&
+			// if initialization of the form, i.e. - first post.
+			redirect == null;
 
-                        self.fire("form:posted", {
-                            form: self,
-                            invokedByUser: event != null
-                        });
-                    });
-                })
-                .catch(response => {
-                    enableForm(self);
-                });
-        });
-    }
+		let data = await formInstance.prepareForm(!skipValidation);
+		
+		// If not all required inputs are filled.
+		if (data == null) {
+			return;
+		}
+
+		// Disable double-posts.
+		self.set({ disabled: true });
+
+		// If postOnLoad == true, then the input field values should appear in the url.
+		// Reason is that postOnLoad == true is used by "report" pages, which need
+		// their filters to be saved in the url. This does not apply to forms
+		// with postOnLoad == false, because those forms are usually for creating new data
+		// and hence should not be tracked in browser's history based on parameters.
+		if (formInstance.metadata.postOnLoad && redirect && this.get("useUrl")) {
+			let urlParams = await formInstance.getSerializedInputValues();
+			
+			// Update url in the browser.
+			app.go(formInstance.metadata.id, urlParams);
+			
+			return;
+		}
+
+		await formInstance.fire("form:posting", { response: null, app: app });
+		
+		try {
+			let response = await app.server.postForm(formInstance.metadata.id, data);
+			await formInstance.fire("form:responseReceived", { response: response, app: app });
+			
+			formInstance.setOutputFieldValues(response);
+
+			// Null response is treated as a server-side error.
+			if (response == null) {
+				throw new Error(`Received null response.`);
+			}
+			
+			await app.runFunctions(response.metadata.functionsToRun);
+		
+			if (response.metadata.handler == "" || response.metadata.handler == null) {
+				self.renderResponse(response);
+			}
+			else {
+				app.handleResponse(response, formInstance);
+			}
+			
+			await formInstance.fire("form:responseHandled", { response: response, app: app });
+		
+			self.enableForm();
+
+			// Signal event to child controls.
+			self.fire("form:responseHandled", {
+				form: self,
+				invokedByUser: event != null
+			});
+		}
+		catch(e) {
+			self.enableForm();
+		}				
+	}
 };
 
 function encapsulateStyles$8(node) {
-	setAttribute(node, "svelte-2467883786", "");
+	setAttribute(node, "svelte-4177434319", "");
 }
 
 function add_css$8() {
 	var style = createElement("style");
-	style.id = 'svelte-2467883786-style';
-	style.textContent = "[svelte-2467883786].response,[svelte-2467883786] .response{margin-top:50px}[svelte-2467883786].inline-form .response,[svelte-2467883786] .inline-form .response{margin-top:0;padding:10px 15px}[svelte-2467883786].inline-form h2,[svelte-2467883786] .inline-form h2{margin:0;background:#eee;padding:10px 15px 15px;font-size:15px}";
+	style.id = 'svelte-4177434319-style';
+	style.textContent = "[svelte-4177434319].response,[svelte-4177434319] .response{margin-top:50px}[svelte-4177434319].inline-form .response,[svelte-4177434319] .inline-form .response{margin-top:0;padding:10px 15px}[svelte-4177434319].inline-form h2,[svelte-4177434319] .inline-form h2{margin:0;background:#eee;padding:10px 15px 15px;font-size:15px}";
 	appendNode(style, document.head);
 }
 
@@ -16134,7 +16237,7 @@ function create_main_fragment$18(state, component) {
 	};
 }
 
-// (5:4) {{#each visibleInputFields as inputField}}
+// (5:1) {{#each visibleInputFields as inputField}}
 function create_each_block$6(state, visibleInputFields, inputField, inputField_index, component) {
 
 	var forminput = new SvelteComponent$19({
@@ -16175,7 +16278,7 @@ function create_each_block$6(state, visibleInputFields, inputField, inputField_i
 
 // (3:0) {{#if initialized && visibleInputFields.length > 0}}
 function create_if_block$5(state, component) {
-	var form_1, text, button, text_1;
+	var form, text, button, text_1;
 
 	function submit_handler(event) {
 		var state = component.get();
@@ -16192,35 +16295,35 @@ function create_if_block$5(state, component) {
 
 	return {
 		c: function create() {
-			form_1 = createElement("form");
+			form = createElement("form");
 
 			for (var i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].c();
 			}
 
-			text = createText("\r\n\r\n    ");
+			text = createText("\r\n\r\n\t");
 			button = createElement("button");
 			text_1 = createText(state.submitButtonLabel);
 			this.h();
 		},
 
 		h: function hydrate() {
-			encapsulateStyles$8(form_1);
-			addListener$1(form_1, "submit", submit_handler);
+			encapsulateStyles$8(form);
+			addListener$1(form, "submit", submit_handler);
 			button.type = "submit";
 			button.disabled = state.disabled;
 			button.tabIndex = "-1";
 		},
 
 		m: function mount(target, anchor) {
-			insertNode(form_1, target, anchor);
+			insertNode(form, target, anchor);
 
 			for (var i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].m(form_1, null);
+				each_blocks[i].m(form, null);
 			}
 
-			appendNode(text, form_1);
-			appendNode(button, form_1);
+			appendNode(text, form);
+			appendNode(button, form);
 			appendNode(text_1, button);
 		},
 
@@ -16234,7 +16337,7 @@ function create_if_block$5(state, component) {
 					} else {
 						each_blocks[i] = create_each_block$6(state, visibleInputFields, visibleInputFields[i], i, component);
 						each_blocks[i].c();
-						each_blocks[i].m(form_1, text);
+						each_blocks[i].m(form, text);
 					}
 				}
 
@@ -16255,7 +16358,7 @@ function create_if_block$5(state, component) {
 		},
 
 		u: function unmount() {
-			detachNode(form_1);
+			detachNode(form);
 
 			for (var i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].u();
@@ -16263,14 +16366,14 @@ function create_if_block$5(state, component) {
 		},
 
 		d: function destroy$$1() {
-			removeListener$1(form_1, "submit", submit_handler);
+			removeListener$1(form, "submit", submit_handler);
 
 			destroyEach(each_blocks);
 		}
 	};
 }
 
-// (15:4) {{#each outputFieldValues as outputField}}
+// (15:1) {{#each outputFieldValues as outputField}}
 function create_each_block_1$2(state, outputFieldValues, outputField, outputField_index, component) {
 	var if_block_anchor;
 
@@ -16314,7 +16417,7 @@ function create_each_block_1$2(state, outputFieldValues, outputField, outputFiel
 	};
 }
 
-// (16:4) {{#if outputField.metadata.hidden == false}}
+// (16:1) {{#if outputField.metadata.hidden == false}}
 function create_if_block_2$3(state, outputFieldValues, outputField, outputField_index, component) {
 
 	var formoutput = new SvelteComponent$12({
@@ -16430,7 +16533,7 @@ function SvelteComponent$18(options) {
 	init(this, options);
 	this._state = assign(data$3(), options.data);
 
-	if (!document.getElementById("svelte-2467883786-style")) add_css$8();
+	if (!document.getElementById("svelte-4177434319-style")) add_css$8();
 
 	if (!options._root) {
 		this._oncreate = [];
@@ -16507,8 +16610,8 @@ var methods$1 = {
 			f.init();
 
 			var self = this;
-			f.on("form:posted", e => {
-				if (e.invokedByUser) {
+			f.on("form:responseHandled", e => {
+				if (e.invokedByUser && formInstance.metadata.closeOnPostIfModal) {
 					self.close(true);
 				}
 			});
@@ -16538,13 +16641,13 @@ var methods$1 = {
 };
 
 function encapsulateStyles$7(node) {
-	setAttribute(node, "svelte-3868149080", "");
+	setAttribute(node, "svelte-605003387", "");
 }
 
 function add_css$7() {
 	var style = createElement("style");
-	style.id = 'svelte-3868149080-style';
-	style.textContent = "[svelte-3868149080].modal .card,[svelte-3868149080] .modal .card{max-width:85%;padding:10px 15px}[svelte-3868149080].hidden,[svelte-3868149080] .hidden{width:0;height:0;position:absolute;left:-1000px}[svelte-3868149080].actionlist,[svelte-3868149080] .actionlist{margin:10px 0;padding:0 5px;background:#f5f5f5;border-width:1px 0;border-style:solid;border-color:#e8e8e8;text-align:right}[svelte-3868149080].actionlist>li,[svelte-3868149080] .actionlist>li{list-style-type:none;display:inline-block}";
+	style.id = 'svelte-605003387-style';
+	style.textContent = "[svelte-605003387].modal .card,[svelte-605003387] .modal .card{max-width:85%;padding:10px 15px}[svelte-605003387].hidden,[svelte-605003387] .hidden{width:0;height:0;position:absolute;left:-1000px}[svelte-605003387].actionlist,[svelte-605003387] .actionlist{margin:10px 0;padding:0 5px;background:#f5f5f5;border-width:1px 0;border-style:solid;border-color:#e8e8e8;text-align:right}[svelte-605003387].actionlist>li,[svelte-605003387] .actionlist>li{list-style-type:none;display:inline-block}";
 	appendNode(style, document.head);
 }
 
@@ -16737,7 +16840,7 @@ function SvelteComponent$17(options) {
 	this.refs = {};
 	this._state = assign(data$2(), options.data);
 
-	if (!document.getElementById("svelte-3868149080-style")) add_css$7();
+	if (!document.getElementById("svelte-605003387-style")) add_css$7();
 
 	this._fragment = create_main_fragment$17(this._state, this);
 
@@ -16753,7 +16856,7 @@ assign(SvelteComponent$17.prototype, methods$1, proto);
 function oncreate$6() {
 	var app = this.get("app");
 	var field = this.get("field");
-	debugger;
+
 	var formInstance = app.getFormInstance(field.data.form, true);	
 	
 	formInstance.initializeInputFields(field.data.inputFieldValues).then(() => {
@@ -16774,13 +16877,13 @@ function oncreate$6() {
 }
 
 function encapsulateStyles$10(node) {
-	setAttribute(node, "svelte-1025115981", "");
+	setAttribute(node, "svelte-508887878", "");
 }
 
 function add_css$10() {
 	var style = createElement("style");
-	style.id = 'svelte-1025115981-style';
-	style.textContent = "[svelte-1025115981].inline-form,[svelte-1025115981] .inline-form{border-width:1px 1px 1px;border-style:solid;border-color:#ccc;margin:30px 0;padding:1px 1px;border-radius:5px}";
+	style.id = 'svelte-508887878-style';
+	style.textContent = "[svelte-508887878].inline-form,[svelte-508887878] .inline-form{border-width:1px 1px 1px;border-style:solid;border-color:#ccc;margin:30px 0;padding:1px 1px;border-radius:5px}";
 	appendNode(style, document.head);
 }
 
@@ -16820,7 +16923,7 @@ function SvelteComponent$20(options) {
 	this.refs = {};
 	this._state = options.data || {};
 
-	if (!document.getElementById("svelte-1025115981-style")) add_css$10();
+	if (!document.getElementById("svelte-508887878-style")) add_css$10();
 
 	var _oncreate = oncreate$6.bind(this);
 
@@ -16935,17 +17038,244 @@ function SvelteComponent$22(options) {
 
 assign(SvelteComponent$22.prototype, proto);
 
-var BindToOutputProcessor = /** @class */ (function (_super) {
-    __extends(BindToOutputProcessor, _super);
-    function BindToOutputProcessor() {
+/* src\core\ui\outputs\Alert.html generated by Svelte v1.40.1 */
+function encapsulateStyles$11(node) {
+	setAttribute(node, "svelte-112451367", "");
+}
+
+function add_css$11() {
+	var style = createElement("style");
+	style.id = 'svelte-112451367-style';
+	style.textContent = "[svelte-112451367].alert,[svelte-112451367] .alert{margin:5px 8px;padding:10px 15px;border:1px solid #bbb}[svelte-112451367].alert>.heading,[svelte-112451367] .alert>.heading{font-weight:bold;font-size:16px}[svelte-112451367].alert.success,[svelte-112451367] .alert.success{background:#EBFFF8}[svelte-112451367].alert.warning,[svelte-112451367] .alert.warning{background:#FDFFEB}[svelte-112451367].alert.danger,[svelte-112451367] .alert.danger{background:#FFEAEA}";
+	appendNode(style, document.head);
+}
+
+function create_main_fragment$23(state, component) {
+	var if_block_anchor;
+
+	var if_block = (state.field.data != null) && create_if_block$6(state, component);
+
+	return {
+		c: function create() {
+			if (if_block) if_block.c();
+			if_block_anchor = createComment();
+		},
+
+		m: function mount(target, anchor) {
+			if (if_block) if_block.m(target, anchor);
+			insertNode(if_block_anchor, target, anchor);
+		},
+
+		p: function update(changed, state) {
+			if (state.field.data != null) {
+				if (if_block) {
+					if_block.p(changed, state);
+				} else {
+					if_block = create_if_block$6(state, component);
+					if_block.c();
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				}
+			} else if (if_block) {
+				if_block.u();
+				if_block.d();
+				if_block = null;
+			}
+		},
+
+		u: function unmount() {
+			if (if_block) if_block.u();
+			detachNode(if_block_anchor);
+		},
+
+		d: function destroy$$1() {
+			if (if_block) if_block.d();
+		}
+	};
+}
+
+// (3:1) {{#if field.data.heading != null}}
+function create_if_block_1$6(state, component) {
+	var div, text_value = state.field.data.heading, text;
+
+	return {
+		c: function create() {
+			div = createElement("div");
+			text = createText(text_value);
+			this.h();
+		},
+
+		h: function hydrate() {
+			div.className = "heading";
+		},
+
+		m: function mount(target, anchor) {
+			insertNode(div, target, anchor);
+			appendNode(text, div);
+		},
+
+		p: function update(changed, state) {
+			if ((changed.field) && text_value !== (text_value = state.field.data.heading)) {
+				text.data = text_value;
+			}
+		},
+
+		u: function unmount() {
+			detachNode(div);
+		},
+
+		d: noop$1
+	};
+}
+
+// (7:1) {{#if field.data.message != null}}
+function create_if_block_2$4(state, component) {
+	var div, text_value = state.field.data.message, text;
+
+	return {
+		c: function create() {
+			div = createElement("div");
+			text = createText(text_value);
+			this.h();
+		},
+
+		h: function hydrate() {
+			div.className = "body";
+		},
+
+		m: function mount(target, anchor) {
+			insertNode(div, target, anchor);
+			appendNode(text, div);
+		},
+
+		p: function update(changed, state) {
+			if ((changed.field) && text_value !== (text_value = state.field.data.message)) {
+				text.data = text_value;
+			}
+		},
+
+		u: function unmount() {
+			detachNode(div);
+		},
+
+		d: noop$1
+	};
+}
+
+// (1:0) {{#if field.data != null}}
+function create_if_block$6(state, component) {
+	var div, div_class_value, text;
+
+	var if_block = (state.field.data.heading != null) && create_if_block_1$6(state, component);
+
+	var if_block_1 = (state.field.data.message != null) && create_if_block_2$4(state, component);
+
+	return {
+		c: function create() {
+			div = createElement("div");
+			if (if_block) if_block.c();
+			text = createText("\r\n\r\n\t");
+			if (if_block_1) if_block_1.c();
+			this.h();
+		},
+
+		h: function hydrate() {
+			encapsulateStyles$11(div);
+			div.className = div_class_value = "alert " + state.field.data.style;
+		},
+
+		m: function mount(target, anchor) {
+			insertNode(div, target, anchor);
+			if (if_block) if_block.m(div, null);
+			appendNode(text, div);
+			if (if_block_1) if_block_1.m(div, null);
+		},
+
+		p: function update(changed, state) {
+			if ((changed.field) && div_class_value !== (div_class_value = "alert " + state.field.data.style)) {
+				div.className = div_class_value;
+			}
+
+			if (state.field.data.heading != null) {
+				if (if_block) {
+					if_block.p(changed, state);
+				} else {
+					if_block = create_if_block_1$6(state, component);
+					if_block.c();
+					if_block.m(div, text);
+				}
+			} else if (if_block) {
+				if_block.u();
+				if_block.d();
+				if_block = null;
+			}
+
+			if (state.field.data.message != null) {
+				if (if_block_1) {
+					if_block_1.p(changed, state);
+				} else {
+					if_block_1 = create_if_block_2$4(state, component);
+					if_block_1.c();
+					if_block_1.m(div, null);
+				}
+			} else if (if_block_1) {
+				if_block_1.u();
+				if_block_1.d();
+				if_block_1 = null;
+			}
+		},
+
+		u: function unmount() {
+			detachNode(div);
+			if (if_block) if_block.u();
+			if (if_block_1) if_block_1.u();
+		},
+
+		d: function destroy$$1() {
+			if (if_block) if_block.d();
+			if (if_block_1) if_block_1.d();
+		}
+	};
+}
+
+function SvelteComponent$23(options) {
+	init(this, options);
+	this._state = options.data || {};
+
+	if (!document.getElementById("svelte-112451367-style")) add_css$11();
+
+	this._fragment = create_main_fragment$23(this._state, this);
+
+	if (options.target) {
+		this._fragment.c();
+		this._fragment.m(options.target, options.anchor || null);
+	}
+}
+
+assign(SvelteComponent$23.prototype, proto);
+
+var FormLogToConsole = /** @class */ (function (_super) {
+    __extends(FormLogToConsole, _super);
+    function FormLogToConsole() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    BindToOutputProcessor.prototype.process = function (input, processorMetadata, response) {
+    FormLogToConsole.prototype.run = function (form, eventHandlerMetadata, args) {
+        console.log("[" + eventHandlerMetadata.runAt + "] form event handler '" + eventHandlerMetadata.id + "' from '" + form.metadata.id + "'");
+        return Promise.resolve();
+    };
+    return FormLogToConsole;
+}(FormEventHandler));
+
+var BindToOutput = /** @class */ (function (_super) {
+    __extends(BindToOutput, _super);
+    function BindToOutput() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    BindToOutput.prototype.run = function (input, eventHandler, args) {
         var promises = [];
-        var lowercaseInputId = processorMetadata.customProperties.outputFieldId.toLowerCase();
-        for (var prop in response) {
-            if (response.hasOwnProperty(prop) && prop.toLowerCase() === lowercaseInputId) {
-                var serializedValue = input.serializeValue(response[prop]);
+        var lowercaseInputId = eventHandler.customProperties.outputFieldId.toLowerCase();
+        for (var prop in args.response) {
+            if (args.response.hasOwnProperty(prop) && prop.toLowerCase() === lowercaseInputId) {
+                var serializedValue = input.serializeValue(args.response[prop]);
                 var promise = input.init(serializedValue);
                 promises.push(promise);
                 break;
@@ -16953,10 +17283,45 @@ var BindToOutputProcessor = /** @class */ (function (_super) {
         }
         return Promise.all(promises);
     };
-    return BindToOutputProcessor;
-}(InputFieldProcessor));
+    return BindToOutput;
+}(InputFieldEventHandler));
 
-var controlRegister = new ControlRegister();
+var InputLogToConsole = /** @class */ (function (_super) {
+    __extends(InputLogToConsole, _super);
+    function InputLogToConsole() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    InputLogToConsole.prototype.run = function (input, eventHandlerMetadata, args) {
+        return input.serialize().then(function (t) {
+            console.log("[" + eventHandlerMetadata.runAt + "] input event handler '" + eventHandlerMetadata.id + "' from '" + input.metadata.id + "'");
+        });
+    };
+    return InputLogToConsole;
+}(InputFieldEventHandler));
+
+var OutputLogToConsole = /** @class */ (function (_super) {
+    __extends(OutputLogToConsole, _super);
+    function OutputLogToConsole() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    OutputLogToConsole.prototype.run = function (output, eventHandlerMetadata, args) {
+        console.log("[" + eventHandlerMetadata.runAt + "] output event handler '" + eventHandlerMetadata.id + "' from '" + output.metadata.id + "'");
+        return Promise.resolve();
+    };
+    return OutputLogToConsole;
+}(OutputFieldEventHandler));
+
+var Growl = /** @class */ (function () {
+    function Growl() {
+    }
+    Growl.prototype.run = function (metadata) {
+        window.alert(metadata.customProperties.message);
+        return Promise.resolve();
+    };
+    return Growl;
+}());
+
+var controlRegister = new ControlRegister$$1();
 controlRegister.registerInputFieldControl("text", SvelteComponent, StringInputController);
 controlRegister.registerInputFieldControl("datetime", SvelteComponent$2, DateInputController);
 controlRegister.registerInputFieldControl("number", SvelteComponent$1, NumberInputController);
@@ -16978,7 +17343,16 @@ controlRegister.registerOutputFieldControl("action-list", SvelteComponent$17, { 
 controlRegister.registerOutputFieldControl("inline-form", SvelteComponent$20, { alwaysHideLabel: true, block: true });
 controlRegister.registerOutputFieldControl("text-value", SvelteComponent$21);
 controlRegister.registerOutputFieldControl("downloadable-file", SvelteComponent$22);
-controlRegister.registerInputFieldProcessor("bind-to-output", new BindToOutputProcessor());
+controlRegister.registerOutputFieldControl("alert", SvelteComponent$23, { alwaysHideLabel: true, block: true });
+// Form event handlers.
+controlRegister.registerFormEventHandler("log-to-console", new FormLogToConsole());
+// Input event handlers.
+controlRegister.registerInputFieldEventHandler("bind-to-output", new BindToOutput());
+controlRegister.registerInputFieldEventHandler("log-to-console", new InputLogToConsole());
+// Output event handlers.
+controlRegister.registerOutputFieldEventHandler("log-to-console", new OutputLogToConsole());
+// Functions.
+controlRegister.registerFunction("growl", new Growl());
 
 var stateStringParser = function(stateString) {
 	return stateString.split('.').reduce(function(stateNames, latestNameChunk) {
@@ -19037,7 +19411,7 @@ function data$5() {
 	};
 }
 
-function create_main_fragment$24(state, component) {
+function create_main_fragment$25(state, component) {
 	var if_block_anchor;
 
 	var current_block_type = select_block_type$5(state);
@@ -19081,7 +19455,7 @@ function create_main_fragment$24(state, component) {
 function create_each_block$8(state, items, submenu, submenu_index, component) {
 	var li;
 
-	var sveltecomponent = new SvelteComponent$24({
+	var sveltecomponent = new SvelteComponent$25({
 		_root: component._root,
 		data: { menu: submenu }
 	});
@@ -19114,7 +19488,7 @@ function create_each_block$8(state, items, submenu, submenu_index, component) {
 }
 
 // (6:0) {{#if menu.items.length > 0}}
-function create_if_block_2$4(state, component) {
+function create_if_block_2$5(state, component) {
 	var ul;
 
 	var items = state.menu.items;
@@ -19184,7 +19558,7 @@ function create_if_block_2$4(state, component) {
 }
 
 // (1:0) {{#if menu.url != null}}
-function create_if_block$7(state, component) {
+function create_if_block$8(state, component) {
 	var a, a_href_value, text_value = state.menu.label, text;
 
 	return {
@@ -19222,10 +19596,10 @@ function create_if_block$7(state, component) {
 }
 
 // (3:0) {{else}}
-function create_if_block_1$6(state, component) {
+function create_if_block_1$7(state, component) {
 	var label, label_for_value, text_value = state.menu.id, text, text_1, input, input_id_value, text_2, if_block_anchor;
 
-	var if_block = (state.menu.items.length > 0) && create_if_block_2$4(state, component);
+	var if_block = (state.menu.items.length > 0) && create_if_block_2$5(state, component);
 
 	return {
 		c: function create() {
@@ -19275,7 +19649,7 @@ function create_if_block_1$6(state, component) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block_2$4(state, component);
+					if_block = create_if_block_2$5(state, component);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -19302,11 +19676,11 @@ function create_if_block_1$6(state, component) {
 }
 
 function select_block_type$5(state) {
-	if (state.menu.url != null) return create_if_block$7;
-	return create_if_block_1$6;
+	if (state.menu.url != null) return create_if_block$8;
+	return create_if_block_1$7;
 }
 
-function SvelteComponent$24(options) {
+function SvelteComponent$25(options) {
 	init(this, options);
 	this._state = assign(data$5(), options.data);
 
@@ -19316,7 +19690,7 @@ function SvelteComponent$24(options) {
 		this._aftercreate = [];
 	}
 
-	this._fragment = create_main_fragment$24(this._state, this);
+	this._fragment = create_main_fragment$25(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -19330,7 +19704,7 @@ function SvelteComponent$24(options) {
 	}
 }
 
-assign(SvelteComponent$24.prototype, proto);
+assign(SvelteComponent$25.prototype, proto);
 
 /* src\components\Menu.html generated by Svelte v1.40.1 */
 function nestedSort(array, comparison) {
@@ -19397,10 +19771,10 @@ function oncreate$7() {
 	this.set({ menus: tree });
 }
 
-function create_main_fragment$23(state, component) {
+function create_main_fragment$24(state, component) {
 	var if_block_anchor;
 
-	var if_block = (state.menus != null) && create_if_block$6(state, component);
+	var if_block = (state.menus != null) && create_if_block$7(state, component);
 
 	return {
 		c: function create() {
@@ -19418,7 +19792,7 @@ function create_main_fragment$23(state, component) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$6(state, component);
+					if_block = create_if_block$7(state, component);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -19444,7 +19818,7 @@ function create_main_fragment$23(state, component) {
 function create_each_block$7(state, menus, menu, menu_index, component) {
 	var li;
 
-	var menuitem = new SvelteComponent$24({
+	var menuitem = new SvelteComponent$25({
 		_root: component._root,
 		data: { menu: menu }
 	});
@@ -19477,7 +19851,7 @@ function create_each_block$7(state, menus, menu, menu_index, component) {
 }
 
 // (1:0) {{#if menus != null}}
-function create_if_block$6(state, component) {
+function create_if_block$7(state, component) {
 	var ul;
 
 	var menus = state.menus;
@@ -19541,7 +19915,7 @@ function create_if_block$6(state, component) {
 	};
 }
 
-function SvelteComponent$23(options) {
+function SvelteComponent$24(options) {
 	init(this, options);
 	this._state = options.data || {};
 
@@ -19555,7 +19929,7 @@ function SvelteComponent$23(options) {
 	 	this._root._oncreate.push(_oncreate);
 	 }
 
-	this._fragment = create_main_fragment$23(this._state, this);
+	this._fragment = create_main_fragment$24(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -19569,10 +19943,10 @@ function SvelteComponent$23(options) {
 	}
 }
 
-assign(SvelteComponent$23.prototype, proto);
+assign(SvelteComponent$24.prototype, proto);
 
 /* src\components\Home.html generated by Svelte v1.40.1 */
-function create_main_fragment$25(state, component) {
+function create_main_fragment$26(state, component) {
 	var text;
 
 	return {
@@ -19594,11 +19968,11 @@ function create_main_fragment$25(state, component) {
 	};
 }
 
-function SvelteComponent$25(options) {
+function SvelteComponent$26(options) {
 	init(this, options);
 	this._state = options.data || {};
 
-	this._fragment = create_main_fragment$25(this._state, this);
+	this._fragment = create_main_fragment$26(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -19606,7 +19980,7 @@ function SvelteComponent$25(options) {
 	}
 }
 
-assign(SvelteComponent$25.prototype, proto);
+assign(SvelteComponent$26.prototype, proto);
 
 var AppRouter = /** @class */ (function () {
     function AppRouter(element, app) {
@@ -19618,13 +19992,13 @@ var AppRouter = /** @class */ (function () {
             name: "home",
             data: {},
             route: "/home",
-            template: SvelteComponent$25
+            template: SvelteComponent$26
         });
         var self = this;
         this.stateRouter.addState({
             name: "menu",
             route: "/menu",
-            template: SvelteComponent$23,
+            template: SvelteComponent$24,
             resolve: function (data, parameters, cb) {
                 cb(false, {
                     forms: app.forms,
@@ -19733,7 +20107,7 @@ function buildMenu(app) {
     while (myNode.firstChild) {
         myNode.removeChild(myNode.firstChild);
     }
-    new SvelteComponent$23({
+    new SvelteComponent$24({
         target: document.getElementById("topmenu"),
         data: {
             forms: app.forms,

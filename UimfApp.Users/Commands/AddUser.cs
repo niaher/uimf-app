@@ -15,7 +15,6 @@ namespace UimfApp.Users.Commands
 	using UiMetadataFramework.Basic.Input.Typeahead;
 	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core.Binding;
-	using UiMetadataFramework.MediatR;
 
 	[MyForm(Id = "add-user", Label = "Add user")]
 	public class AddUser : IMyAsyncForm<AddUser.Request, AddUser.Response>, ISecureHandler

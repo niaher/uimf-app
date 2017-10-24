@@ -9,6 +9,7 @@ namespace UimfApp.Users.Commands
 	using UimfApp.Users;
 	using UimfApp.Users.Security;
 	using UiMetadataFramework.Basic.Response;
+	using UiMetadataFramework.Core.Binding;
 	using UiMetadataFramework.MediatR;
 
 	[MyForm(Id = "logout", PostOnLoad = true, Label = "Logout", Menu = UserMenus.Account, MenuOrderIndex = 10)]

@@ -6,13 +6,13 @@
 	using Microsoft.AspNetCore.Identity;
 	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Forms;
+	using UimfApp.Infrastructure.Forms.Outputs;
 	using UimfApp.Infrastructure.Security;
 	using UimfApp.Users.Security;
 	using UiMetadataFramework.Basic.Input;
 	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.Core.Binding;
-	using UiMetadataFramework.MediatR;
 
 	[MyForm(Id = "change-email", Label = "Change email address")]
 	public class ChangeEmail : IMyAsyncForm<ChangeEmail.Request, ChangeEmail.Response>, ISecureHandler
@@ -47,7 +47,7 @@
 
 			return new Response
 			{
-				Result = "Email address was changed successfully."
+				Result = Alert.Success("Email address was changed successfully.")
 			};
 		}
 
@@ -67,7 +67,7 @@
 
 		public class Response : FormResponse<MyFormResponseMetadata>
 		{
-			public string Result { get; set; }
+			public Alert Result { get; set; }
 		}
 
 		public class Request : IRequest<Response>

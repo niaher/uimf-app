@@ -10,6 +10,7 @@
 	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Configuration;
 	using UimfApp.Infrastructure.Forms;
+	using UimfApp.Infrastructure.Forms.Outputs;
 	using UimfApp.Infrastructure.Messages;
 	using UimfApp.Infrastructure.Security;
 	using UimfApp.Users.Security;
@@ -55,7 +56,7 @@
 
 			return new Response
 			{
-				Result = "Please check your email. We've sent you the password reset link."
+				Result = Alert.Success("Please check your email. We've sent you the password reset link.")
 			};
 		}
 
@@ -66,7 +67,7 @@
 
 		public class Response : FormResponse
 		{
-			public string Result { get; set; }
+			public Alert Result { get; set; }
 		}
 
 		public class Request : IRequest<Response>

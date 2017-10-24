@@ -13,7 +13,6 @@
 	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.Core.Binding;
-	using UiMetadataFramework.MediatR;
 
 	[MyForm(Id = "delete-user", PostOnLoad = true)]
 	public class DeleteUser : IMyAsyncForm<DeleteUser.Request, DeleteUser.Response>, ISecureHandler

@@ -6,7 +6,6 @@ namespace UimfApp.Infrastructure.Security
 	using System.Linq;
 	using System.Reflection;
 	using CPermissions;
-	using UimfApp.Infrastructure.Security;
 
 	/// <summary>
 	/// Keeps list of roles and allowed actions for each role. Provides simple API to scan

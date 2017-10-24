@@ -61,8 +61,8 @@
 					f.init();
 
 					var self = this;
-					f.on("form:posted", e => {
-						if (e.invokedByUser) {
+					f.on("form:responseHandled", e => {
+						if (e.invokedByUser && formInstance.metadata.closeOnPostIfModal) {
 							self.close(true);
 						}
 					});

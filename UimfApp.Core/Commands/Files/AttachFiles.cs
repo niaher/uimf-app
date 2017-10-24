@@ -13,6 +13,7 @@ namespace UimfApp.Core.Commands.Files
 	using UimfApp.Infrastructure.Security;
 	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core;
+	using UiMetadataFramework.Core.Binding;
 	using UiMetadataFramework.MediatR;
 
 	[Form(Id = "attach-files")]

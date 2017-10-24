@@ -7,13 +7,13 @@
 	using Microsoft.AspNetCore.Identity;
 	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Forms;
+	using UimfApp.Infrastructure.Forms.Outputs;
 	using UimfApp.Infrastructure.Security;
 	using UimfApp.Users.Security;
 	using UiMetadataFramework.Basic.Input;
 	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.Core.Binding;
-	using UiMetadataFramework.MediatR;
 
 	[MyForm(Id = "set-password", Label = "Set account password", SubmitButtonLabel = "Confirm password")]
 	public class SetPassword : IMyAsyncForm<SetPassword.Request, SetPassword.Response>, ISecureHandler
@@ -39,7 +39,7 @@
 
 			return new Response
 			{
-				Result = "Password was set successfully."
+				Result = Alert.Success("Password was set successfully.")
 			};
 		}
 
@@ -59,7 +59,7 @@
 
 		public class Response : FormResponse<MyFormResponseMetadata>
 		{
-			public string Result { get; set; }
+			public Alert Result { get; set; }
 		}
 
 		public class Request : IRequest<Response>
