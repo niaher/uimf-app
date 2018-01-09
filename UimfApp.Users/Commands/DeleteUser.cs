@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Users.Commands
+namespace UimfApp.Users.Commands
 {
 	using System.Collections.Generic;
 	using System.Linq;
@@ -59,7 +59,7 @@
 				{
 					{ nameof(Request.Id), userId }
 				}
-			};
+			}.WithAction(FormLinkActions.Run);
 		}
 
 		public class Response : FormResponse<MyFormResponseMetadata>

@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Users.Pickers
+namespace UimfApp.Users.Pickers
 {
 	using System;
 	using System.Linq;

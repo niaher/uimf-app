@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Filer.EntityFrameworkCore" Version="0.0.8-beta2" />
+    <PackageReference Include="UiMetadataFramework.Basic" Version="0.0.13-beta" />
+    <PackageReference Include="UiMetadataFramework.Mediatr" Version="0.0.11-beta" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UimfApp.Infrastructure\UimfApp.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

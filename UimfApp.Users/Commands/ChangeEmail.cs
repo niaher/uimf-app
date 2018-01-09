@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Users.Commands
+namespace UimfApp.Users.Commands
 {
 	using System.Threading.Tasks;
 	using CPermissions;
@@ -13,6 +13,7 @@
 	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.Core.Binding;
+	using UimfApp.Infrastructure.User;
 
 	[MyForm(Id = "change-email", Label = "Change email address")]
 	public class ChangeEmail : IMyAsyncForm<ChangeEmail.Request, ChangeEmail.Response>, ISecureHandler
@@ -28,7 +29,7 @@
 
 		public async Task<Response> Handle(Request message)
 		{
-			var user = await this.userManager.FindByNameAsync(this.userContext.UserName);
+			var user = await this.userManager.FindByNameAsync(this.userContext.User.UserName);
 
 			var passwordIsValid = await this.userManager.CheckPasswordAsync(
 				user,

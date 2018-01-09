@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[AspNetRoleClaims] (
+CREATE TABLE [dbo].[AspNetRoleClaims] (
     [Id]         INT            IDENTITY (1, 1) NOT NULL,
     [ClaimType]  NVARCHAR (MAX) NULL,
     [ClaimValue] NVARCHAR (MAX) NULL,

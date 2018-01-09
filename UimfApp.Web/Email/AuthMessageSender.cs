@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Web.Email
+namespace UimfApp.Web.Email
 {
 	using System.Net;
 	using System.Net.Mail;

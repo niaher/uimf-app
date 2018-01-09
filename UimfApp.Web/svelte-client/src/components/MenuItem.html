@@ -1,7 +1,10 @@
 {{#if menu.url != null}}
 <a href="{{menu.url}}">{{menu.label}}</a>
 {{else}}
-<label for="menu{{id}}" class="toggle-sub" onclick="">{{menu.id}}</label>
+<div class="top-menu-div">
+	<label for="menu{{id}}" class="toggle-sub" onclick="">{{menu.id}}</label>
+</div>
+
 <input type="checkbox" id="menu{{id}}" class="sub-nav-check"/>
 {{#if menu.items.length > 0}}
 <ul class="sub-nav">

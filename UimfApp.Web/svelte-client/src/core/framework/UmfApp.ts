@@ -12,6 +12,7 @@ export class UmfApp implements IAppRouter {
 	menus: MenuMetadata[];
 	private formsById: { [id: string]: FormMetadata } = {};
 	private menusByName: { [id: string]: MenuMetadata } = {};
+	private eventHandlers = [];
 	public readonly server: UmfServer;
 	public readonly formResponseHandlers: { [id: string]: IFormResponseHandler } = {};
 	public controlRegister: ControlRegister;
@@ -21,10 +22,26 @@ export class UmfApp implements IAppRouter {
 	constructor(server: UmfServer, inputRegister: ControlRegister) {
 		this.server = server;
 		this.controlRegister = inputRegister;
+
+		for (let e of ["request:started", "request:completed"]) {
+			this.server.on(e, params => {
+				this.fire(e, params);
+			});
+		}
 	}
 
-	runEventHandler(handler:any) {
-		
+	on(event: string, handler: (params: any) => void) {
+		this.eventHandlers[event] = this.eventHandlers[event] || [];
+		this.eventHandlers[event].push(handler);
+	}
+
+	private fire(event: string, params: any) {
+		var handlersForEvent = this.eventHandlers[event];
+		if (handlersForEvent != null && handlersForEvent.length > 0) {
+			for (let handler of handlersForEvent) {
+				handler(params);
+			}
+		}
 	}
 
 	useRouter(router: IAppRouter) {
@@ -84,9 +101,9 @@ export class UmfApp implements IAppRouter {
 		return new FormInstance(metadata, this.controlRegister);
 	}
 
-	handleResponse(response: FormResponse, form: FormInstance) {
+	handleResponse(response: FormResponse, form: FormInstance, args: any) {
 		var responseMetadata = response.metadata || new FormResponseMetadata();
-		var handler = this.formResponseHandlers[responseMetadata.handler];
+		var handler = this.formResponseHandlers[responseMetadata.handler || "default"];
 
 		if (handler == null) {
 			var error = new Error(`Cannot find FormResponseHandler "${responseMetadata.handler}".`);
@@ -94,10 +111,10 @@ export class UmfApp implements IAppRouter {
 			throw error;
 		}
 
-		return handler.handle(response, form);
+		return handler.handle(response, form, args);
 	}
 
-	runFunctions(functionMetadata: ClientFunctionMetadata[]) {
+	runFunctions(functionMetadata: ClientFunctionMetadata[], eventArgs?: any) {
 		if (functionMetadata == null) {
 			return Promise.resolve();
 		}
@@ -110,7 +127,7 @@ export class UmfApp implements IAppRouter {
 				throw new Error(`Could not find function '${f.id}'.`);
 			}
 
-			let promise = handler.run(f);
+			let promise = handler.run(f, eventArgs);
 			promises.push(promise);
 		}
 

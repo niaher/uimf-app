@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Infrastructure.Configuration
+namespace UimfApp.Infrastructure.Configuration
 {
 	public class AppConfig
 	{
@@ -9,5 +9,7 @@
 		public string SmtpUsername { get; set; }
 		public string SmtpPassword { get; set; }
 		public int SmtpPort { get; set; }
+
+		public static string FileUrl(int fileId) => $"/file/download?id={fileId}";
 	}
 }

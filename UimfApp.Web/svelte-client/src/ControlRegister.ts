@@ -9,6 +9,7 @@ import { MultiSelectInputController } from "core-ui/inputs/MultiSelectInputContr
 import { TypeaheadInputController } from "core-ui/inputs/TypeaheadInputController";
 import { PasswordInputController } from "core-ui/inputs/PasswordInputController";
 import { TextareaInputController } from "core-ui/inputs/TextareaInputController";
+import { FileUploaderController } from "core-ui/inputs/FileUploaderController";
 
 import TextInput from "core-ui/inputs/Text";
 import NumberInput from "core-ui/inputs/Number";
@@ -18,6 +19,7 @@ import BooleanInput from "core-ui/inputs/Boolean";
 import MultiSelectInput from "core-ui/inputs/MultiSelect";
 import Password from "core-ui/inputs/Password";
 import Textarea from "core-ui/inputs/Textarea";
+import FileUploader from "core-ui/inputs/FileUploader";
 
 import TextOutput from "core-ui/outputs/Text";
 import NumberOutput from "core-ui/outputs/Number";
@@ -31,12 +33,17 @@ import InlineForm from "core-ui/outputs/InlineForm";
 import TextValue from "core-ui/outputs/TextValue";
 import DownloadableFile from "core-ui/outputs/DownloadableFile";
 import Alert from "core-ui/outputs/Alert";
+import FileSize from "core-ui/outputs/FileSize";
+import Image from "core-ui/outputs/Image";
+import Link from "core-ui/outputs/Link";
+import ObjectList from "core-ui/outputs/ObjectList";
 
 import {
 	FormLogToConsole,
 	BindToOutput,
 	InputLogToConsole,
-	OutputLogToConsole
+	OutputLogToConsole,
+	ReloadFormAfterAction
 } from "core-eventHandlers";
 
 import { Growl } from "core-functions";
@@ -49,9 +56,11 @@ controlRegister.registerInputFieldControl("dropdown", DropdownInput, DropdownInp
 controlRegister.registerInputFieldControl("boolean", BooleanInput, BooleanInputController);
 controlRegister.registerInputFieldControl("paginator", null, PaginatorInputController);
 controlRegister.registerInputFieldControl("typeahead", MultiSelectInput, TypeaheadInputController);
+controlRegister.registerInputFieldControl("my-typeahead", MultiSelectInput, TypeaheadInputController);
 controlRegister.registerInputFieldControl("multiselect", MultiSelectInput, MultiSelectInputController);
 controlRegister.registerInputFieldControl("password", Password, PasswordInputController);
 controlRegister.registerInputFieldControl("textarea", Textarea, TextareaInputController, { block: true });
+controlRegister.registerInputFieldControl("file-uploader", FileUploader, FileUploaderController, { alwaysHideLabel: true, block: true });
 
 controlRegister.registerOutputFieldControl("text", TextOutput);
 controlRegister.registerOutputFieldControl("number", NumberOutput);
@@ -65,9 +74,14 @@ controlRegister.registerOutputFieldControl("inline-form", InlineForm, { alwaysHi
 controlRegister.registerOutputFieldControl("text-value", TextValue);
 controlRegister.registerOutputFieldControl("downloadable-file", DownloadableFile);
 controlRegister.registerOutputFieldControl("alert", Alert, { alwaysHideLabel: true, block: true });
+controlRegister.registerOutputFieldControl("file-size", FileSize);
+controlRegister.registerOutputFieldControl("image", Image, { block: true });
+controlRegister.registerOutputFieldControl("link", Link);
+controlRegister.registerOutputFieldControl("object-list", ObjectList, { block: true });
 
 // Form event handlers.
 controlRegister.registerFormEventHandler("log-to-console", new FormLogToConsole());
+controlRegister.registerFormEventHandler("reload-form-after-action", new ReloadFormAfterAction());
 
 // Input event handlers.
 controlRegister.registerInputFieldEventHandler("bind-to-output", new BindToOutput());

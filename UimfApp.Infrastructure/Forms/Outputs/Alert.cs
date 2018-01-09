@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Infrastructure.Forms.Outputs
+namespace UimfApp.Infrastructure.Forms.Outputs
 {
 	using UiMetadataFramework.Core.Binding;
 

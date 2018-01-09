@@ -1,1 +1,1 @@
-﻿CREATE SCHEMA [ntf]
+CREATE SCHEMA [ntf]

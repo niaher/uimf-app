@@ -1,1 +1,3 @@
-<a href="{{app.makeUrl(field.data.form, field.data.inputFieldValues)}}">{{field.data.label}}</a>
+{{#if field.data != null}}
+	<a href="{{app.makeUrl(field.data.form, field.data.inputFieldValues)}}">{{field.data.label}}</a>
+{{/if}}

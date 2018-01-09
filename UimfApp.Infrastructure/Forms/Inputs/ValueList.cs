@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Infrastructure.Forms.Inputs
+namespace UimfApp.Infrastructure.Forms.Inputs
 {
 	using System.Collections.Generic;
 	using UiMetadataFramework.Core.Binding;

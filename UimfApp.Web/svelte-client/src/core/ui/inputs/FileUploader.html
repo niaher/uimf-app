@@ -1,0 +1,36 @@
+<input type="file" id="{{id}}" tabindex="{{tabindex}}" on:change="addFiles(this.files)" multiple="multiple" />
+<label for="{{id}}" class="button">Select files...</label> 
+
+{{#if selectedFiles != null && selectedFiles.length > 0}}
+<ul>
+	{{#each selectedFiles as file}}
+	<li>{{file.name}}</li>
+	{{/each}}
+</ul>
+{{else}} 
+	No files selected.
+{{/if}}
+
+<script>
+	export default {
+		methods: {
+			addFiles(files) {
+				var field = this.get("field");
+				field.selected = files;
+
+				this.set({ selectedFiles: files });
+			}
+		}
+	}
+
+</script>
+
+<style>
+	/* input {
+		width: 100px;
+		height: 30px;
+		position: static;
+		clip-path: none;
+		margin: none;
+	} */
+</style>

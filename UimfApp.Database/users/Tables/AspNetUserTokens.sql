@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[AspNetUserTokens] (
+CREATE TABLE [dbo].[AspNetUserTokens] (
     [UserId]        INT            NOT NULL,
     [LoginProvider] NVARCHAR (450) NOT NULL,
     [Name]          NVARCHAR (450) NOT NULL,

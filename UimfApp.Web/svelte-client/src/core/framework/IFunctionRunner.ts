@@ -1,5 +1,5 @@
 import { ClientFunctionMetadata } from "uimf-core";
 
 export interface IFunctionRunner {
-	run(params: ClientFunctionMetadata): Promise<void>;
+	run(params: ClientFunctionMetadata, args?: any): Promise<void>;
 }

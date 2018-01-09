@@ -3,6 +3,7 @@ namespace UimfApp.Infrastructure.Security
 	using System.Collections.Generic;
 	using System.Linq;
 	using CPermissions;
+	using UimfApp.Infrastructure.User;
 
 	public class SystemPermissionManager : PermissionManager<UserContext, SystemRole>
 	{

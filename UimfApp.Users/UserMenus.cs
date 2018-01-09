@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Users
+namespace UimfApp.Users
 {
 	using System.Collections.Generic;
 	using UimfApp.Infrastructure.Forms.Menu;

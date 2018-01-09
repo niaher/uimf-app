@@ -35,10 +35,57 @@ function __extends(d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 }
 
+
+
+
+
+
+
+
+
+
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator.throw(value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+}
+
+function __generator(thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+}
+
 /**
  * Represents response of a form.
  */
-var FormResponse = /** @class */ (function (_super) {
+var FormResponse = (function (_super) {
     __extends(FormResponse, _super);
     function FormResponse() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -53,7 +100,7 @@ var FormResponse = /** @class */ (function (_super) {
 /**
  * Represents a function.
  */
-var ClientFunctionMetadata = /** @class */ (function () {
+var ClientFunctionMetadata = (function () {
     function ClientFunctionMetadata() {
     }
     return ClientFunctionMetadata;
@@ -62,7 +109,7 @@ var ClientFunctionMetadata = /** @class */ (function () {
 /**
  * Represents a function which can be run at a specific time during form's lifecycle.
  */
-var EventHandlerMetadata = /** @class */ (function (_super) {
+var EventHandlerMetadata = (function (_super) {
     __extends(EventHandlerMetadata, _super);
     function EventHandlerMetadata() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -73,7 +120,7 @@ var EventHandlerMetadata = /** @class */ (function (_super) {
 /**
  * Metadata describing how to handle the response.
  */
-var FormResponseMetadata = /** @class */ (function () {
+var FormResponseMetadata = (function () {
     function FormResponseMetadata() {
     }
     return FormResponseMetadata;
@@ -96,13 +143,13 @@ var bind = function bind(fn, thisArg) {
 /*!
  * Determine if an object is a Buffer
  *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @author   Feross Aboukhadijeh <https://feross.org>
  * @license  MIT
  */
 
 // The _isBuffer check is for Safari 5-7 support, because it's missing
 // Object.prototype.constructor. Remove this eventually
-var isBuffer_1 = function (obj) {
+var index$2 = function (obj) {
   return obj != null && (isBuffer(obj) || isSlowBuffer(obj) || !!obj._isBuffer)
 };
 
@@ -394,7 +441,7 @@ function extend(a, b, thisArg) {
 var utils = {
   isArray: isArray,
   isArrayBuffer: isArrayBuffer,
-  isBuffer: isBuffer_1,
+  isBuffer: index$2,
   isFormData: isFormData,
   isArrayBufferView: isArrayBufferView,
   isString: isString,
@@ -1583,59 +1630,83 @@ function createInstance(defaultConfig) {
 }
 
 // Create the default instance to be exported
-var axios$3 = createInstance(defaults_1);
+var axios$1 = createInstance(defaults_1);
 
 // Expose Axios class to allow class inheritance
-axios$3.Axios = Axios_1;
+axios$1.Axios = Axios_1;
 
 // Factory for creating new instances
-axios$3.create = function create(instanceConfig) {
+axios$1.create = function create(instanceConfig) {
   return createInstance(utils.merge(defaults_1, instanceConfig));
 };
 
 // Expose Cancel & CancelToken
-axios$3.Cancel = Cancel_1;
-axios$3.CancelToken = CancelToken_1;
-axios$3.isCancel = isCancel;
+axios$1.Cancel = Cancel_1;
+axios$1.CancelToken = CancelToken_1;
+axios$1.isCancel = isCancel;
 
 // Expose all/spread
-axios$3.all = function all(promises) {
+axios$1.all = function all(promises) {
   return Promise.all(promises);
 };
-axios$3.spread = spread;
+axios$1.spread = spread;
 
-var axios_1 = axios$3;
+var axios_1 = axios$1;
 
 // Allow use of default import syntax in TypeScript
-var default_1 = axios$3;
+var default_1 = axios$1;
 
 axios_1.default = default_1;
 
-var axios$1 = axios_1;
+var index = axios_1;
 
-var axios = axios$1;
-var UmfServer = /** @class */ (function () {
+var axios = index;
+var UmfServer = (function () {
     /**
      * Creates a new instance of UmfApp.
      */
     function UmfServer(getMetadataUrl, postFormUrl) {
+        this.loading = false;
+        this.eventHandlers = {};
         this.getMetadataUrl = getMetadataUrl;
         this.postFormUrl = postFormUrl;
     }
+    UmfServer.prototype.on = function (event, handler) {
+        this.eventHandlers[event] = this.eventHandlers[event] || [];
+        this.eventHandlers[event].push(handler);
+    };
+    UmfServer.prototype.fire = function (event, params) {
+        var handlersForEvent = this.eventHandlers[event];
+        if (handlersForEvent != null && handlersForEvent.length > 0) {
+            for (var _i = 0, handlersForEvent_1 = handlersForEvent; _i < handlersForEvent_1.length; _i++) {
+                var handler = handlersForEvent_1[_i];
+                handler(params);
+            }
+        }
+    };
     UmfServer.prototype.getMetadata = function (formId) {
+        var _this = this;
+        this.fire("request:started");
         return axios.get(this.getMetadataUrl + "/" + formId).then(function (response) {
+            _this.fire("request:completed");
             return response.data;
         }).catch(function (e) {
             console.warn("Did not find form \"" + formId + "\".");
+            _this.fire("request:completed");
             return null;
         });
     };
     UmfServer.prototype.getAllMetadata = function () {
+        var _this = this;
+        this.fire("request:started");
         return axios.get(this.getMetadataUrl).then(function (response) {
+            _this.fire("request:completed");
             return response.data;
         });
     };
     UmfServer.prototype.postForm = function (form, data) {
+        var _this = this;
+        this.fire("request:started");
         return axios.post(this.postFormUrl, JSON.stringify([{
                 Form: form,
                 RequestId: 1,
@@ -1648,72 +1719,104 @@ var UmfServer = /** @class */ (function () {
             var invokeFormResponses = response.data;
             // Make sure metadata is never null.
             invokeFormResponses[0].data.metadata = invokeFormResponses[0].data.metadata || new FormResponseMetadata();
+            _this.fire("request:completed");
             return invokeFormResponses[0].data;
         }).catch(function (error) {
             alert(error.response.data.error);
+            _this.fire("request:completed");
             return null;
         });
     };
     return UmfServer;
 }());
 
-var FormInstance = /** @class */ (function () {
-    function FormInstance(metadata, controllerRegister) {
+var FormEventArguments = (function () {
+    function FormEventArguments(app) {
+        this.app = app;
+    }
+    return FormEventArguments;
+}());
+var FormResponseEventArguments = (function (_super) {
+    __extends(FormResponseEventArguments, _super);
+    function FormResponseEventArguments(app, response) {
+        var _this = _super.call(this, app) || this;
+        _this.response = response;
+        return _this;
+    }
+    return FormResponseEventArguments;
+}(FormEventArguments));
+
+var FormInstance = (function () {
+    function FormInstance(metadata, controlRegister) {
         this.outputs = [];
         this.inputs = [];
-        this.formEventHandlers = [];
         this.metadata = metadata;
-        this.inputs = controllerRegister.createInputControllers(this.metadata.inputFields);
+        this.inputs = controlRegister.createInputControllers(this.metadata.inputFields);
     }
-    FormInstance.prototype.fire = function (eventName, parameters) {
-        var _this = this;
-        var promises = [];
-        // Run input event handlers.
-        for (var _i = 0, _a = this.inputs; _i < _a.length; _i++) {
-            var input = _a[_i];
-            if (input.metadata.eventHandlers != null) {
-                for (var _b = 0, _c = input.metadata.eventHandlers; _b < _c.length; _b++) {
-                    var eventHandlerMetadata = _c[_b];
-                    if (eventHandlerMetadata.runAt === eventName) {
-                        var handler = parameters.app.controlRegister.inputFieldEventHandlers[eventHandlerMetadata.id];
-                        if (handler == null) {
-                            throw new Error("Could not find input event handler '" + eventHandlerMetadata.id + "'.");
-                        }
-                        var promise = handler.run(input, eventHandlerMetadata, parameters);
-                        promises.push(promise);
-                    }
-                }
-            }
+    FormInstance.prototype.enforceCanPostOnLoad = function () {
+        // If user is trying to auto-submit a form which is not enabled for `PostOnLoad`.
+        if (!this.metadata.postOnLoad) {
+            throw new Error("Invalid invocation of form '" + this.metadata.id + "'. Form cannot be auto-posted, because *PostOnLoad* is set to false.");
         }
-        // Run output event handlers.
-        for (var _d = 0, _e = this.outputs; _d < _e.length; _d++) {
-            var output = _e[_d];
-            if (output.metadata.eventHandlers != null) {
-                for (var _f = 0, _g = output.metadata.eventHandlers; _f < _g.length; _f++) {
-                    var eventHandlerMetadata = _g[_f];
-                    if (eventHandlerMetadata.runAt === eventName) {
-                        var handler = parameters.app.controlRegister.outputFieldEventHandlers[eventHandlerMetadata.id];
-                        if (handler == null) {
-                            throw new Error("Could not find output event handler '" + eventHandlerMetadata.id + "'.");
+    };
+    FormInstance.prototype.allRequiredInputsHaveData = function (asPostOnLoad) {
+        return __awaiter(this, void 0, void 0, function () {
+            var formData;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (asPostOnLoad) {
+                            this.enforceCanPostOnLoad();
                         }
-                        var promise = handler.run(output, eventHandlerMetadata, parameters);
-                        promises.push(promise);
-                    }
+                        return [4 /*yield*/, this.getFormData(asPostOnLoad)];
+                    case 1:
+                        formData = _a.sent();
+                        return [2 /*return*/, formData != null];
                 }
-            }
-        }
-        // Run form event handlers.
-        this.metadata.eventHandlers
-            .filter(function (t) { return t.runAt === eventName; })
-            .forEach(function (t) {
-            var handler = parameters.app.controlRegister.formEventHandlers[t.id];
-            if (handler == null) {
-                throw new Error("Could not find form event handler '" + t.id + "'.");
-            }
-            var promise = handler.run(_this, t, parameters);
-            promises.push(promise);
+            });
         });
-        return Promise.all(promises);
+    };
+    FormInstance.prototype.submit = function (app, asPostOnLoad, args) {
+        return __awaiter(this, void 0, void 0, function () {
+            var formData, response;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (asPostOnLoad) {
+                            this.enforceCanPostOnLoad();
+                        }
+                        return [4 /*yield*/, this.getFormData(asPostOnLoad)];
+                    case 1:
+                        formData = _a.sent();
+                        // If not all required inputs are filled.
+                        if (formData == null) {
+                            throw new Error("Form '" + this.metadata.id + "' cannot be submitted, because some required input fields do not have values.");
+                        }
+                        return [4 /*yield*/, this.fire("form:posting", new FormEventArguments(app))];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, app.server.postForm(this.metadata.id, formData)];
+                    case 3:
+                        response = _a.sent();
+                        return [4 /*yield*/, this.fire("form:responseReceived", new FormResponseEventArguments(app, response))];
+                    case 4:
+                        _a.sent();
+                        this.setOutputFieldValues(response);
+                        // Null response is treated as a server-side error.
+                        if (response == null) {
+                            throw new Error("Received null response.");
+                        }
+                        return [4 /*yield*/, app.runFunctions(response.metadata.functionsToRun)];
+                    case 5:
+                        _a.sent();
+                        app.handleResponse(response, this, args);
+                        return [4 /*yield*/, this.fire("form:responseHandled", new FormResponseEventArguments(app, response))];
+                    case 6:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
     FormInstance.prototype.initializeInputFields = function (data) {
         var promises = [];
@@ -1738,37 +1841,10 @@ var FormInstance = /** @class */ (function () {
             field.value = data[field.metadata.id];
         }
     };
-    FormInstance.prototype.prepareForm = function (mustHaveAllRequiredInputs) {
-        var data = {};
-        var promises = [];
-        var hasRequiredMissingInput = false;
-        var _loop_1 = function (input) {
-            promise = input.getValue().then(function (value) {
-                data[input.metadata.id] = value;
-                if (input.metadata.required && (value == null || (typeof (value) === "string" && value == ""))) {
-                    hasRequiredMissingInput = true;
-                }
-            });
-            promises.push(promise);
-        };
-        var promise;
-        for (var _i = 0, _a = this.inputs; _i < _a.length; _i++) {
-            var input = _a[_i];
-            _loop_1(input);
-        }
-        return Promise.all(promises).then(function () {
-            // If not all required inputs were entered, then do not post.
-            if (hasRequiredMissingInput &&
-                mustHaveAllRequiredInputs) {
-                return null;
-            }
-            return data;
-        });
-    };
     FormInstance.prototype.getSerializedInputValues = function () {
         var data = {};
         var promises = [];
-        var _loop_2 = function (input) {
+        var _loop_1 = function (input) {
             promise = input.serialize().then(function (t) {
                 // Don't include inputs without values, because we only
                 // want to serialize "non-default" values.
@@ -1781,7 +1857,7 @@ var FormInstance = /** @class */ (function () {
         var promise;
         for (var _i = 0, _a = this.inputs; _i < _a.length; _i++) {
             var input = _a[_i];
-            _loop_2(input);
+            _loop_1(input);
         }
         return Promise.all(promises).then(function () { return data; });
     };
@@ -1804,13 +1880,29 @@ var FormInstance = /** @class */ (function () {
         }
         return data;
     };
+    FormInstance.getOutputFieldValues = function (outputFieldsMetadata, response) {
+        var fields = Array();
+        var normalizedResponse = FormInstance.getNormalizedObject(response);
+        for (var _i = 0, outputFieldsMetadata_1 = outputFieldsMetadata; _i < outputFieldsMetadata_1.length; _i++) {
+            var field = outputFieldsMetadata_1[_i];
+            var normalizedId = field.id.toLowerCase();
+            fields.push({
+                metadata: field,
+                data: normalizedResponse[normalizedId]
+            });
+        }
+        fields.sort(function (a, b) {
+            return a.metadata.orderIndex - b.metadata.orderIndex;
+        });
+        return fields;
+    };
     FormInstance.prototype.setOutputFieldValues = function (response) {
         if (response == null) {
             this.outputs = [];
             return;
         }
         var fields = Array();
-        var normalizedResponse = this.getNormalizedObject(response);
+        var normalizedResponse = FormInstance.getNormalizedObject(response);
         for (var _i = 0, _a = this.metadata.outputFields; _i < _a.length; _i++) {
             var field = _a[_i];
             fields.push({
@@ -1823,7 +1915,119 @@ var FormInstance = /** @class */ (function () {
         });
         this.outputs = fields;
     };
-    FormInstance.prototype.getNormalizedObject = function (response) {
+    FormInstance.prototype.handleEvent = function (eventName, eventMetadata, parameters) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.fire(eventName, parameters)];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    FormInstance.prototype.fire = function (eventName, parameters) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            var promises, _i, _a, input, _b, _c, eventHandlerMetadata, handler, promise, _d, _e, output, _f, _g, eventHandlerMetadata, handler, promise;
+            return __generator(this, function (_h) {
+                switch (_h.label) {
+                    case 0:
+                        promises = [];
+                        // Run input event handlers.
+                        for (_i = 0, _a = this.inputs; _i < _a.length; _i++) {
+                            input = _a[_i];
+                            if (input.metadata.eventHandlers != null) {
+                                for (_b = 0, _c = input.metadata.eventHandlers; _b < _c.length; _b++) {
+                                    eventHandlerMetadata = _c[_b];
+                                    if (eventHandlerMetadata.runAt === eventName) {
+                                        handler = parameters.app.controlRegister.inputFieldEventHandlers[eventHandlerMetadata.id];
+                                        if (handler == null) {
+                                            throw new Error("Could not find input event handler '" + eventHandlerMetadata.id + "'.");
+                                        }
+                                        promise = handler.run(input, eventHandlerMetadata, parameters);
+                                        promises.push(promise);
+                                    }
+                                }
+                            }
+                        }
+                        // Run output event handlers.
+                        for (_d = 0, _e = this.outputs; _d < _e.length; _d++) {
+                            output = _e[_d];
+                            if (output.metadata.eventHandlers != null) {
+                                for (_f = 0, _g = output.metadata.eventHandlers; _f < _g.length; _f++) {
+                                    eventHandlerMetadata = _g[_f];
+                                    if (eventHandlerMetadata.runAt === eventName) {
+                                        handler = parameters.app.controlRegister.outputFieldEventHandlers[eventHandlerMetadata.id];
+                                        if (handler == null) {
+                                            throw new Error("Could not find output event handler '" + eventHandlerMetadata.id + "'.");
+                                        }
+                                        promise = handler.run(output, eventHandlerMetadata, parameters);
+                                        promises.push(promise);
+                                    }
+                                }
+                            }
+                        }
+                        // Run form event handlers.
+                        this.metadata.eventHandlers
+                            .filter(function (t) { return t.runAt === eventName; })
+                            .forEach(function (t) {
+                            var handler = parameters.app.controlRegister.formEventHandlers[t.id];
+                            if (handler == null) {
+                                throw new Error("Could not find form event handler '" + t.id + "'.");
+                            }
+                            var promise = handler.run(_this, t, parameters);
+                            promises.push(promise);
+                        });
+                        return [4 /*yield*/, Promise.all(promises)];
+                    case 1:
+                        _h.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    FormInstance.prototype.getFormData = function (asPostOnLoad) {
+        return __awaiter(this, void 0, void 0, function () {
+            var data, promises, hasRequiredMissingInput, _loop_2, promise, _i, _a, input, skipValidation;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        data = {};
+                        promises = [];
+                        hasRequiredMissingInput = false;
+                        _loop_2 = function (input) {
+                            promise = input.getValue().then(function (value) {
+                                data[input.metadata.id] = value;
+                                if (input.metadata.required && (value == null || (typeof (value) === "string" && value == ""))) {
+                                    hasRequiredMissingInput = true;
+                                }
+                            });
+                            promises.push(promise);
+                        };
+                        for (_i = 0, _a = this.inputs; _i < _a.length; _i++) {
+                            input = _a[_i];
+                            _loop_2(input);
+                        }
+                        return [4 /*yield*/, Promise.all(promises)];
+                    case 1:
+                        _b.sent();
+                        skipValidation = !this.metadata.postOnLoadValidation &&
+                            this.metadata.postOnLoad &&
+                            // if initialization of the form, i.e. - first post.
+                            asPostOnLoad;
+                        // If not all required inputs were entered, then do not post.
+                        if (hasRequiredMissingInput &&
+                            !skipValidation) {
+                            return [2 /*return*/, null];
+                        }
+                        return [2 /*return*/, data];
+                }
+            });
+        });
+    };
+    FormInstance.getNormalizedObject = function (response) {
         var normalizedResponse = {};
         for (var field in response) {
             if (response.hasOwnProperty(field) && field !== "metadata") {
@@ -1835,15 +2039,38 @@ var FormInstance = /** @class */ (function () {
     return FormInstance;
 }());
 
-var UmfApp = /** @class */ (function () {
+var UmfApp = (function () {
     function UmfApp(server, inputRegister) {
+        var _this = this;
         this.formsById = {};
         this.menusByName = {};
+        this.eventHandlers = [];
         this.formResponseHandlers = {};
         this.server = server;
         this.controlRegister = inputRegister;
+        var _loop_1 = function (e) {
+            this_1.server.on(e, function (params) {
+                _this.fire(e, params);
+            });
+        };
+        var this_1 = this;
+        for (var _i = 0, _a = ["request:started", "request:completed"]; _i < _a.length; _i++) {
+            var e = _a[_i];
+            _loop_1(e);
+        }
     }
-    UmfApp.prototype.runEventHandler = function (handler) {
+    UmfApp.prototype.on = function (event, handler) {
+        this.eventHandlers[event] = this.eventHandlers[event] || [];
+        this.eventHandlers[event].push(handler);
+    };
+    UmfApp.prototype.fire = function (event, params) {
+        var handlersForEvent = this.eventHandlers[event];
+        if (handlersForEvent != null && handlersForEvent.length > 0) {
+            for (var _i = 0, handlersForEvent_1 = handlersForEvent; _i < handlersForEvent_1.length; _i++) {
+                var handler = handlersForEvent_1[_i];
+                handler(params);
+            }
+        }
     };
     UmfApp.prototype.useRouter = function (router) {
         this.go = function (form, values) {
@@ -1893,17 +2120,17 @@ var UmfApp = /** @class */ (function () {
         }
         return new FormInstance(metadata, this.controlRegister);
     };
-    UmfApp.prototype.handleResponse = function (response, form) {
+    UmfApp.prototype.handleResponse = function (response, form, args) {
         var responseMetadata = response.metadata || new FormResponseMetadata();
-        var handler = this.formResponseHandlers[responseMetadata.handler];
+        var handler = this.formResponseHandlers[responseMetadata.handler || "default"];
         if (handler == null) {
             var error = new Error("Cannot find FormResponseHandler \"" + responseMetadata.handler + "\".");
             console.error(error);
             throw error;
         }
-        return handler.handle(response, form);
+        return handler.handle(response, form, args);
     };
-    UmfApp.prototype.runFunctions = function (functionMetadata) {
+    UmfApp.prototype.runFunctions = function (functionMetadata, eventArgs) {
         if (functionMetadata == null) {
             return Promise.resolve();
         }
@@ -1914,7 +2141,7 @@ var UmfApp = /** @class */ (function () {
             if (handler == null) {
                 throw new Error("Could not find function '" + f.id + "'.");
             }
-            var promise = handler.run(f);
+            var promise = handler.run(f, eventArgs);
             promises.push(promise);
         }
         return Promise.all(promises);
@@ -1922,7 +2149,7 @@ var UmfApp = /** @class */ (function () {
     return UmfApp;
 }());
 
-var InputController = /** @class */ (function () {
+var InputController = (function () {
     function InputController(metadata) {
         this.metadata = metadata;
     }
@@ -1938,7 +2165,7 @@ var InputController = /** @class */ (function () {
     };
     return InputController;
 }());
-var StringInputController = /** @class */ (function (_super) {
+var StringInputController = (function (_super) {
     __extends(StringInputController, _super);
     function StringInputController(metadata) {
         return _super.call(this, metadata) || this;
@@ -1957,7 +2184,7 @@ var StringInputController = /** @class */ (function (_super) {
     return StringInputController;
 }(InputController));
 
-var ControlRegister$$1 = /** @class */ (function () {
+var ControlRegister$$1 = (function () {
     function ControlRegister$$1() {
         this.inputs = {};
         this.outputs = {};
@@ -2020,31 +2247,31 @@ var ControlRegister$$1 = /** @class */ (function () {
     return ControlRegister$$1;
 }());
 
-var OutputFieldValue = /** @class */ (function () {
+var OutputFieldValue = (function () {
     function OutputFieldValue() {
     }
     return OutputFieldValue;
 }());
 
-var FormEventHandler = /** @class */ (function () {
+var FormEventHandler = (function () {
     function FormEventHandler() {
     }
     return FormEventHandler;
 }());
 
-var InputFieldEventHandler = /** @class */ (function () {
+var InputFieldEventHandler = (function () {
     function InputFieldEventHandler() {
     }
     return InputFieldEventHandler;
 }());
 
-var OutputFieldEventHandler = /** @class */ (function () {
+var OutputFieldEventHandler = (function () {
     function OutputFieldEventHandler() {
     }
     return OutputFieldEventHandler;
 }());
 
-var MessageResponseHandler = /** @class */ (function () {
+var MessageResponseHandler = (function () {
     function MessageResponseHandler() {
         this.name = "message";
     }
@@ -2054,7 +2281,7 @@ var MessageResponseHandler = /** @class */ (function () {
     return MessageResponseHandler;
 }());
 
-var RedirectResponseHandler = /** @class */ (function () {
+var RedirectResponseHandler = (function () {
     function RedirectResponseHandler(goToForm) {
         this.name = "redirect";
         this.goToForm = goToForm;
@@ -2064,7 +2291,7 @@ var RedirectResponseHandler = /** @class */ (function () {
     };
     return RedirectResponseHandler;
 }());
-var RedirectResponse = /** @class */ (function (_super) {
+var RedirectResponse = (function (_super) {
     __extends(RedirectResponse, _super);
     function RedirectResponse() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -2072,7 +2299,7 @@ var RedirectResponse = /** @class */ (function (_super) {
     return RedirectResponse;
 }(FormResponse));
 
-var ReloadResponseHandler = /** @class */ (function () {
+var ReloadResponseHandler = (function () {
     function ReloadResponseHandler(getFormUrl) {
         this.name = "reload";
         this.getFormUrl = getFormUrl;
@@ -2084,7 +2311,7 @@ var ReloadResponseHandler = /** @class */ (function () {
     };
     return ReloadResponseHandler;
 }());
-var ReloadResponse = /** @class */ (function (_super) {
+var ReloadResponse = (function (_super) {
     __extends(ReloadResponse, _super);
     function ReloadResponse() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -2092,7 +2319,19 @@ var ReloadResponse = /** @class */ (function (_super) {
     return ReloadResponse;
 }(FormResponse));
 
-var DateInputController = /** @class */ (function (_super) {
+var FormComponentResponseHandler = (function () {
+    function FormComponentResponseHandler() {
+        this.name = "default";
+    }
+    FormComponentResponseHandler.prototype.handle = function (response, form, args) {
+        if (args != null && args.formComponent != null) {
+            args.formComponent.renderResponse(response);
+        }
+    };
+    return FormComponentResponseHandler;
+}());
+
+var DateInputController = (function (_super) {
     __extends(DateInputController, _super);
     function DateInputController() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -2129,7 +2368,7 @@ var DateInputController = /** @class */ (function (_super) {
     return DateInputController;
 }(InputController));
 
-var NumberInputController = /** @class */ (function (_super) {
+var NumberInputController = (function (_super) {
     __extends(NumberInputController, _super);
     function NumberInputController() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -2151,7 +2390,7 @@ var NumberInputController = /** @class */ (function (_super) {
     return NumberInputController;
 }(InputController));
 
-var DropdownInputController = /** @class */ (function (_super) {
+var DropdownInputController = (function (_super) {
     __extends(DropdownInputController, _super);
     function DropdownInputController() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -2179,7 +2418,7 @@ var DropdownInputController = /** @class */ (function (_super) {
     return DropdownInputController;
 }(InputController));
 
-var BooleanInputController = /** @class */ (function (_super) {
+var BooleanInputController = (function (_super) {
     __extends(BooleanInputController, _super);
     function BooleanInputController() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -2206,7 +2445,7 @@ var BooleanInputController = /** @class */ (function (_super) {
     return BooleanInputController;
 }(InputController));
 
-var PaginationParameters = /** @class */ (function () {
+var PaginationParameters = (function () {
     function PaginationParameters(pageIndex, pageSize, orderBy, ascending) {
         this.pageIndex = PaginationParameters.asInt(pageIndex, 1);
         this.pageSize = PaginationParameters.asInt(pageSize, 10);
@@ -2233,7 +2472,7 @@ var PaginationParameters = /** @class */ (function () {
     };
     return PaginationParameters;
 }());
-var PaginatorInputController = /** @class */ (function (_super) {
+var PaginatorInputController = (function (_super) {
     __extends(PaginatorInputController, _super);
     function PaginatorInputController() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -2276,7 +2515,7 @@ var PaginatorInputController = /** @class */ (function (_super) {
     return PaginatorInputController;
 }(InputController));
 
-var MultiSelectInputController = /** @class */ (function (_super) {
+var MultiSelectInputController = (function (_super) {
     __extends(MultiSelectInputController, _super);
     function MultiSelectInputController() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -2306,7 +2545,7 @@ var MultiSelectInputController = /** @class */ (function (_super) {
     };
     return MultiSelectInputController;
 }(InputController));
-var MultiSelectValue = /** @class */ (function () {
+var MultiSelectValue = (function () {
     function MultiSelectValue(items) {
         this.items = [];
         this.items = items;
@@ -2314,7 +2553,7 @@ var MultiSelectValue = /** @class */ (function () {
     return MultiSelectValue;
 }());
 
-var TypeaheadInputController = /** @class */ (function (_super) {
+var TypeaheadInputController = (function (_super) {
     __extends(TypeaheadInputController, _super);
     function TypeaheadInputController() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
@@ -2344,14 +2583,14 @@ var TypeaheadInputController = /** @class */ (function (_super) {
     };
     return TypeaheadInputController;
 }(InputController));
-var TypeaheadValue = /** @class */ (function () {
+var TypeaheadValue = (function () {
     function TypeaheadValue(value) {
         this.value = value;
     }
     return TypeaheadValue;
 }());
 
-var PasswordInputController = /** @class */ (function (_super) {
+var PasswordInputController = (function (_super) {
     __extends(PasswordInputController, _super);
     function PasswordInputController() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -2379,7 +2618,7 @@ var PasswordInputController = /** @class */ (function (_super) {
     return PasswordInputController;
 }(InputController));
 
-var TextareaInputController = /** @class */ (function (_super) {
+var TextareaInputController = (function (_super) {
     __extends(TextareaInputController, _super);
     function TextareaInputController() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -2406,6 +2645,81 @@ var TextareaInputController = /** @class */ (function (_super) {
     };
     return TextareaInputController;
 }(InputController));
+
+var axios$2 = index;
+var FileUploaderController = (function (_super) {
+    __extends(FileUploaderController, _super);
+    function FileUploaderController() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    FileUploaderController.prototype.serializeValue = function (value) {
+        return value != null ? JSON.stringify(value) : null;
+    };
+    FileUploaderController.prototype.init = function () {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            // Don't do anything. File uploader doesn't allow initialization
+            // from pre-existing value.
+            resolve(_this);
+        });
+    };
+    FileUploaderController.prototype.getValue = function () {
+        var self = this;
+        if (self.selected == null ||
+            self.selected.length === 0) {
+            return Promise.resolve(new FileUploaderValue());
+        }
+        var promises = [];
+        var result = new FileUploaderValue();
+        var _loop_1 = function (f) {
+            if (f.fileId != null) {
+                result.files.push(f.fileId);
+                return "continue";
+            }
+            var p = new Promise(function (resolve, reject) {
+                var formData = new FormData();
+                formData.append("file", f);
+                // Make http request to upload the files.
+                axios$2.post("/file/upload", formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data"
+                    }
+                }).then(function (response) {
+                    f.fileId = response.data.fileId;
+                    result.files.push(response.data.fileId);
+                    resolve();
+                }).catch(function (error) {
+                    alert(error.response.data.error);
+                    reject(error);
+                });
+            });
+            promises.push(p);
+        };
+        for (var _i = 0, _a = self.selected; _i < _a.length; _i++) {
+            var f = _a[_i];
+            _loop_1(f);
+        }
+        return Promise.all(promises).then(function (t) {
+            return result;
+        });
+    };
+    FileUploaderController.prototype.parse = function (value) {
+        var parsed = typeof (value) === "string"
+            ? JSON.parse(value)
+            : value;
+        if (parsed == null || parsed.files == null || parsed.files.length < 1) {
+            return null;
+        }
+        return parsed;
+    };
+    return FileUploaderController;
+}(InputController));
+var FileUploaderValue = (function () {
+    function FileUploaderValue() {
+        this.files = [];
+    }
+    return FileUploaderValue;
+}());
 
 function noop$1() {}
 
@@ -2620,7 +2934,7 @@ var proto = {
 	_unmount: _unmount
 };
 
-/* src\core\ui\inputs\Text.html generated by Svelte v1.40.1 */
+/* src\core\ui\inputs\Text.html generated by Svelte v1.41.1 */
 function create_main_fragment(state, component) {
 	var input, input_required_value, input_updating = false;
 
@@ -2643,6 +2957,7 @@ function create_main_fragment(state, component) {
 			input.id = state.id;
 			input.required = input_required_value = state.field.metadata.required;
 			input.tabIndex = state.tabindex;
+			input.className = "form-control";
 			addListener$1(input, "input", input_input_handler);
 		},
 
@@ -2694,7 +3009,7 @@ function SvelteComponent(options) {
 
 assign(SvelteComponent.prototype, proto);
 
-/* src\core\ui\inputs\Number.html generated by Svelte v1.40.1 */
+/* src\core\ui\inputs\Number.html generated by Svelte v1.41.1 */
 function create_main_fragment$1(state, component) {
 	var input, input_required_value, input_updating = false;
 
@@ -2717,6 +3032,7 @@ function create_main_fragment$1(state, component) {
 			input.id = state.id;
 			input.required = input_required_value = state.field.metadata.required;
 			input.tabIndex = state.tabindex;
+			input.className = "form-control";
 			addListener$1(input, "input", input_input_handler);
 		},
 
@@ -2768,7 +3084,7 @@ function SvelteComponent$1(options) {
 
 assign(SvelteComponent$1.prototype, proto);
 
-/* src\core\ui\inputs\Date.html generated by Svelte v1.40.1 */
+/* src\core\ui\inputs\Date.html generated by Svelte v1.41.1 */
 function create_main_fragment$2(state, component) {
 	var input, input_required_value, input_updating = false;
 
@@ -2791,6 +3107,7 @@ function create_main_fragment$2(state, component) {
 			input.id = state.id;
 			input.required = input_required_value = state.field.metadata.required;
 			input.tabIndex = state.tabindex;
+			input.className = "form-control";
 			addListener$1(input, "input", input_input_handler);
 		},
 
@@ -2842,7 +3159,7 @@ function SvelteComponent$2(options) {
 
 assign(SvelteComponent$2.prototype, proto);
 
-/* src\core\ui\inputs\Dropdown.html generated by Svelte v1.40.1 */
+/* src\core\ui\inputs\Dropdown.html generated by Svelte v1.41.1 */
 function create_main_fragment$3(state, component) {
 	var select, option, select_required_value, select_updating = false;
 
@@ -2880,6 +3197,7 @@ function create_main_fragment$3(state, component) {
 			select.id = state.id;
 			select.required = select_required_value = state.field.metadata.required;
 			select.tabIndex = state.tabindex;
+			select.className = "form-control";
 
 			if (!('field' in state)) component._root._beforecreate.push(select_change_handler);
 
@@ -2967,7 +3285,7 @@ function create_main_fragment$3(state, component) {
 	};
 }
 
-// (7:1) {{#each field.metadata.customProperties.items as option}}
+// (8:1) {{#each field.metadata.customProperties.items as option}}
 function create_each_block(state, items, option, option_index, component) {
 	var option_1, option_1_value_value, text_value = option.label, text;
 
@@ -3028,15 +3346,15 @@ function SvelteComponent$3(options) {
 
 assign(SvelteComponent$3.prototype, proto);
 
-/* src\core\ui\inputs\Boolean.html generated by Svelte v1.40.1 */
+/* src\core\ui\inputs\Boolean.html generated by Svelte v1.41.1 */
 function encapsulateStyles(node) {
-	setAttribute(node, "svelte-4170451394", "");
+	setAttribute(node, "svelte-3775079448", "");
 }
 
 function add_css() {
 	var style = createElement("style");
-	style.id = 'svelte-4170451394-style';
-	style.textContent = "[svelte-4170451394].checkbox,[svelte-4170451394] .checkbox{height:20px;width:20px;margin:0.6rem 0.5rem 1.1rem 0.5rem;overflow:initial;position:relative;clip:initial;-webkit-clip-path:initial;clip-path:initial;top:3px}";
+	style.id = 'svelte-3775079448-style';
+	style.textContent = "[svelte-3775079448].checkbox,[svelte-3775079448] .checkbox{height:20px;width:20px;margin:0.6rem 0.5rem 1.1rem 0.5rem;overflow:initial;position:relative;clip:initial;-webkit-clip-path:initial;clip-path:initial;top:3px}";
 	appendNode(style, document.head);
 }
 
@@ -3100,7 +3418,7 @@ function create_if_block(state, component) {
 			encapsulateStyles(input);
 			input.type = "checkbox";
 			input.id = state.id;
-			input.className = "checkbox";
+			input.className = "checkbox form-control";
 			input.tabIndex = state.tabindex;
 			addListener$1(input, "change", input_change_handler);
 		},
@@ -3226,7 +3544,7 @@ function SvelteComponent$4(options) {
 	init(this, options);
 	this._state = options.data || {};
 
-	if (!document.getElementById("svelte-4170451394-style")) add_css();
+	if (!document.getElementById("svelte-3775079448-style")) add_css();
 
 	if (!options._root) {
 		this._oncreate = [];
@@ -3258,7 +3576,7 @@ function createCommonjsModule(fn, module) {
 }
 
 var choices = createCommonjsModule(function (module, exports) {
-/*! choices.js v2.8.12 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
+/*! choices.js v3.0.2 | (c) 2017 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
 (function webpackUniversalModuleDefinition(root, factory) {
 	module.exports = factory();
 })(commonjsGlobal, function() {
@@ -3393,6 +3711,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      sortFilter: _utils.sortByAlpha,
 	      placeholder: true,
 	      placeholderValue: null,
+	      searchPlaceholderValue: null,
 	      prependValue: null,
 	      appendValue: null,
 	      renderSelectedChoices: 'auto',
@@ -3431,7 +3750,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        highlightedState: 'is-highlighted',
 	        hiddenState: 'is-hidden',
 	        flippedState: 'is-flipped',
-	        loadingState: 'is-loading'
+	        loadingState: 'is-loading',
+	        noResults: 'has-no-results',
+	        noChoices: 'has-no-choices'
 	      },
 	      fuseOptions: {
 	        include: 'score'
@@ -3466,13 +3787,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // Retrieve triggering element (i.e. element with 'data-choice' trigger)
 	    this.element = element;
 	    this.passedElement = (0, _utils.isType)('String', element) ? document.querySelector(element) : element;
-	    this.isTextElement = this.passedElement.type === 'text';
-	    this.isSelectOneElement = this.passedElement.type === 'select-one';
-	    this.isSelectMultipleElement = this.passedElement.type === 'select-multiple';
-	    this.isSelectElement = this.isSelectOneElement || this.isSelectMultipleElement;
-	    this.isValidElementType = this.isTextElement || this.isSelectElement;
-	    this.isIe11 = !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv[ :]11/));
-	    this.isScrollingOnIe = false;
 
 	    if (!this.passedElement) {
 	      if (!this.config.silent) {
@@ -3480,6 +3794,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      return;
 	    }
+
+	    this.isTextElement = this.passedElement.type === 'text';
+	    this.isSelectOneElement = this.passedElement.type === 'select-one';
+	    this.isSelectMultipleElement = this.passedElement.type === 'select-multiple';
+	    this.isSelectElement = this.isSelectOneElement || this.isSelectMultipleElement;
+	    this.isValidElementType = this.isTextElement || this.isSelectElement;
+	    this.isIe11 = !!(navigator.userAgent.match(/Trident/) && navigator.userAgent.match(/rv[ :]11/));
+	    this.isScrollingOnIe = false;
 
 	    if (this.config.shouldSortItems === true && this.isSelectOneElement) {
 	      if (!this.config.silent) {
@@ -3489,6 +3811,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    this.highlightPosition = 0;
 	    this.canSearch = this.config.searchEnabled;
+
+	    this.placeholder = false;
+	    if (!this.isSelectOneElement) {
+	      this.placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
+	    }
 
 	    // Assign preset choices from passed object
 	    this.presetChoices = this.config.choices;
@@ -3713,22 +4040,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	      }
 
+	      // Split array into placeholders and "normal" choices
+
+	      var _rendererableChoices$ = rendererableChoices.reduce(function (acc, choice) {
+	        if (choice.placeholder) {
+	          acc.placeholderChoices.push(choice);
+	        } else {
+	          acc.normalChoices.push(choice);
+	        }
+	        return acc;
+	      }, { placeholderChoices: [], normalChoices: [] }),
+	          placeholderChoices = _rendererableChoices$.placeholderChoices,
+	          normalChoices = _rendererableChoices$.normalChoices;
+
 	      // If sorting is enabled or the user is searching, filter choices
+
+
 	      if (this.config.shouldSort || this.isSearching) {
-	        rendererableChoices.sort(filter);
+	        normalChoices.sort(filter);
 	      }
 
 	      var choiceLimit = rendererableChoices.length;
 
+	      // Prepend placeholeder
+	      var sortedChoices = [].concat(_toConsumableArray(placeholderChoices), _toConsumableArray(normalChoices));
+
 	      if (this.isSearching) {
-	        choiceLimit = Math.min(searchResultLimit, rendererableChoices.length - 1);
+	        choiceLimit = searchResultLimit;
 	      } else if (renderChoiceLimit > 0 && !withinGroup) {
-	        choiceLimit = Math.min(renderChoiceLimit, rendererableChoices.length - 1);
+	        choiceLimit = renderChoiceLimit;
 	      }
 
 	      // Add each choice to dropdown within range
 	      for (var i = 0; i < choiceLimit; i++) {
-	        appendChoice(rendererableChoices[i]);
+	        if (sortedChoices[i]) {
+	          appendChoice(sortedChoices[i]);
+	        }
 	      }
 
 	      return choicesFragment;
@@ -3850,11 +4197,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	              if (this.isSearching) {
 	                notice = (0, _utils.isType)('Function', this.config.noResultsText) ? this.config.noResultsText() : this.config.noResultsText;
 
-	                dropdownItem = this._getTemplate('notice', notice);
+	                dropdownItem = this._getTemplate('notice', notice, 'no-results');
 	              } else {
 	                notice = (0, _utils.isType)('Function', this.config.noChoicesText) ? this.config.noChoicesText() : this.config.noChoicesText;
 
-	                dropdownItem = this._getTemplate('notice', notice);
+	                dropdownItem = this._getTemplate('notice', notice, 'no-choices');
 	              }
 
 	              this.choiceList.appendChild(dropdownItem);
@@ -3864,14 +4211,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        // Items
 	        if (this.currentState.items !== this.prevState.items) {
+	          // Get active items (items that can be selected)
 	          var _activeItems = this.store.getItemsFilteredByActive();
-	          if (_activeItems) {
+
+	          // Clear list
+	          this.itemList.innerHTML = '';
+
+	          if (_activeItems && _activeItems) {
 	            // Create a fragment to store our list items
 	            // (so we don't have to update the DOM for each item)
 	            var itemListFragment = this.renderItems(_activeItems);
-
-	            // Clear list
-	            this.itemList.innerHTML = '';
 
 	            // If we have items to add
 	            if (itemListFragment.childNodes) {
@@ -4240,9 +4589,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // If we are dealing with a select input, we need to create an option first
 	            // that is then selected. For text inputs we can just add items normally.
 	            if (!_this10.isTextElement) {
-	              _this10._addChoice(item.value, item.label, true, false, -1, item.customProperties, null);
+	              _this10._addChoice(item.value, item.label, true, false, -1, item.customProperties, item.placeholder);
 	            } else {
-	              _this10._addItem(item.value, item.label, item.id, undefined, item.customProperties, null);
+	              _this10._addItem(item.value, item.label, item.id, undefined, item.customProperties, item.placeholder);
 	            }
 	          } else if (itemType === 'String') {
 	            if (!_this10.isTextElement) {
@@ -4290,7 +4639,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	          if (foundChoice) {
 	            if (!foundChoice.selected) {
-	              _this11._addItem(foundChoice.value, foundChoice.label, foundChoice.id, foundChoice.groupId, foundChoice.customProperties, foundChoice.keyCode);
+	              _this11._addItem(foundChoice.value, foundChoice.label, foundChoice.id, foundChoice.groupId, foundChoice.customProperties, foundChoice.placeholder, foundChoice.keyCode);
 	            } else if (!_this11.config.silent) {
 	              console.warn('Attempting to select choice already selected');
 	            }
@@ -4335,7 +4684,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              if (result.choices) {
 	                _this12._addGroup(result, result.id || null, value, label);
 	              } else {
-	                _this12._addChoice(result[value], result[label], result.selected, result.disabled, undefined, result['customProperties'], null);
+	                _this12._addChoice(result[value], result[label], result.selected, result.disabled, undefined, result.customProperties, result.placeholder);
 	              }
 	            });
 	          }
@@ -4388,16 +4737,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'enable',
 	    value: function enable() {
-	      this.passedElement.disabled = false;
-	      var isDisabled = this.containerOuter.classList.contains(this.config.classNames.disabledState);
-	      if (this.initialised && isDisabled) {
-	        this._addEventListeners();
-	        this.passedElement.removeAttribute('disabled');
-	        this.input.removeAttribute('disabled');
-	        this.containerOuter.classList.remove(this.config.classNames.disabledState);
-	        this.containerOuter.removeAttribute('aria-disabled');
-	        if (this.isSelectOneElement) {
-	          this.containerOuter.setAttribute('tabindex', '0');
+	      if (this.initialised) {
+	        this.passedElement.disabled = false;
+	        var isDisabled = this.containerOuter.classList.contains(this.config.classNames.disabledState);
+	        if (isDisabled) {
+	          this._addEventListeners();
+	          this.passedElement.removeAttribute('disabled');
+	          this.input.removeAttribute('disabled');
+	          this.containerOuter.classList.remove(this.config.classNames.disabledState);
+	          this.containerOuter.removeAttribute('aria-disabled');
+	          if (this.isSelectOneElement) {
+	            this.containerOuter.setAttribute('tabindex', '0');
+	          }
 	        }
 	      }
 	      return this;
@@ -4412,16 +4763,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'disable',
 	    value: function disable() {
-	      this.passedElement.disabled = true;
-	      var isEnabled = !this.containerOuter.classList.contains(this.config.classNames.disabledState);
-	      if (this.initialised && isEnabled) {
-	        this._removeEventListeners();
-	        this.passedElement.setAttribute('disabled', '');
-	        this.input.setAttribute('disabled', '');
-	        this.containerOuter.classList.add(this.config.classNames.disabledState);
-	        this.containerOuter.setAttribute('aria-disabled', 'true');
-	        if (this.isSelectOneElement) {
-	          this.containerOuter.setAttribute('tabindex', '-1');
+	      if (this.initialised) {
+	        this.passedElement.disabled = true;
+	        var isEnabled = !this.containerOuter.classList.contains(this.config.classNames.disabledState);
+	        if (isEnabled) {
+	          this._removeEventListeners();
+	          this.passedElement.setAttribute('disabled', '');
+	          this.input.setAttribute('disabled', '');
+	          this.containerOuter.classList.add(this.config.classNames.disabledState);
+	          this.containerOuter.setAttribute('aria-disabled', 'true');
+	          if (this.isSelectOneElement) {
+	            this.containerOuter.setAttribute('tabindex', '-1');
+	          }
 	        }
 	      }
 	      return this;
@@ -4504,12 +4857,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this._triggerChange(itemToRemove.value);
 
 	        if (this.isSelectOneElement) {
-	          var placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
-	          if (placeholder) {
-	            var placeholderItem = this._getTemplate('placeholder', placeholder);
-	            this.itemList.appendChild(placeholderItem);
-	          }
+	          this._selectPlaceholderChoice();
 	        }
+	      }
+	    }
+
+	    /**
+	     * Select placeholder choice
+	     */
+
+	  }, {
+	    key: '_selectPlaceholderChoice',
+	    value: function _selectPlaceholderChoice() {
+	      var placeholderChoice = this.store.getPlaceholderChoice();
+
+	      if (placeholderChoice) {
+	        this._addItem(placeholderChoice.value, placeholderChoice.label, placeholderChoice.id, placeholderChoice.groupId, null, placeholderChoice.placeholder);
+	        this._triggerChange(placeholderChoice.value);
 	      }
 	    }
 
@@ -4589,7 +4953,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var canAddItem = this._canAddItem(activeItems, choice.value);
 
 	        if (canAddItem.response) {
-	          this._addItem(choice.value, choice.label, choice.id, choice.groupId, choice.customProperties, choice.keyCode);
+	          this._addItem(choice.value, choice.label, choice.id, choice.groupId, choice.customProperties, choice.placeholder, choice.keyCode);
 	          this._triggerChange(choice.value);
 	        }
 	      }
@@ -4717,12 +5081,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        // Remove loading states/text
 	        this.containerOuter.classList.remove(this.config.classNames.loadingState);
-	        var placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
 
 	        if (this.isSelectOneElement) {
-	          placeholderItem.innerHTML = placeholder || '';
+	          placeholderItem.innerHTML = this.placeholder || '';
 	        } else {
-	          this.input.placeholder = placeholder || '';
+	          this.input.placeholder = this.placeholder || '';
 	        }
 	      }
 	    }
@@ -4754,9 +5117,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	              var groupId = result.id || null;
 	              _this15._addGroup(result, groupId, value, label);
 	            } else {
-	              _this15._addChoice(result[value], result[label], result.selected, result.disabled, undefined, result['customProperties'], null);
+	              _this15._addChoice(result[value], result[label], result.selected, result.disabled, undefined, result.customProperties, result.placeholder);
 	            }
 	          });
+
+	          if (_this15.isSelectOneElement) {
+	            _this15._selectPlaceholderChoice();
+	          }
 	        } else {
 	          // No results, remove loading state
 	          _this15._handleLoadingState(false);
@@ -4781,7 +5148,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      // If new value matches the desired length and is not the same as the current value with a space
 	      if (newValue.length >= 1 && newValue !== currentValue + ' ') {
-	        var haystack = this.store.getChoicesFilteredBySelectable();
+	        var haystack = this.store.getSearchableChoices();
 	        var needle = newValue;
 	        var keys = (0, _utils.isType)('Array', this.config.searchFields) ? this.config.searchFields : [this.config.searchFields];
 	        var options = Object.assign(this.config.fuseOptions, { keys: keys });
@@ -4906,11 +5273,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: '_setInputWidth',
 	    value: function _setInputWidth() {
-	      if (this.config.placeholderValue || this.passedElement.getAttribute('placeholder') && this.config.placeholder) {
+	      if (this.placeholder) {
 	        // If there is a placeholder, we only want to set the width of the input when it is a greater
 	        // length than 75% of the placeholder. This stops the input jumping around.
-	        var placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
-	        if (this.input.value && this.input.value.length >= placeholder.length / 1.25) {
+	        if (this.input.value && this.input.value.length >= this.placeholder.length / 1.25) {
 	          this.input.style.width = (0, _utils.getWidthOfInput)(this.input);
 	        }
 	      } else {
@@ -5579,7 +5945,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        passedEl.classList.add(this.config.classNames.highlightedState);
 	        passedEl.setAttribute('aria-selected', 'true');
 	        this.containerOuter.setAttribute('aria-activedescendant', passedEl.id);
-	        this.input.setAttribute('aria-activedescendant', passedEl.id);
 	      }
 	    }
 
@@ -5601,7 +5966,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var choiceId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -1;
 	      var groupId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : -1;
 	      var customProperties = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
-	      var keyCode = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+	      var placeholder = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
+	      var keyCode = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
 
 	      var passedValue = (0, _utils.isType)('String', value) ? value.trim() : value;
 	      var passedKeyCode = keyCode;
@@ -5625,7 +5991,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        passedValue += this.config.appendValue.toString();
 	      }
 
-	      this.store.dispatch((0, _index3.addItem)(passedValue, passedLabel, id, passedOptionId, groupId, customProperties, passedKeyCode));
+	      this.store.dispatch((0, _index3.addItem)(passedValue, passedLabel, id, passedOptionId, groupId, customProperties, placeholder, passedKeyCode));
 
 	      if (this.isSelectOneElement) {
 	        this.removeActiveItems(id);
@@ -5713,7 +6079,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var isDisabled = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 	      var groupId = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : -1;
 	      var customProperties = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
-	      var keyCode = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
+	      var placeholder = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
+	      var keyCode = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : null;
 
 	      if (typeof value === 'undefined' || value === null) {
 	        return;
@@ -5725,10 +6092,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var choiceId = choices ? choices.length + 1 : 1;
 	      var choiceElementId = this.baseId + '-' + this.idNames.itemChoice + '-' + choiceId;
 
-	      this.store.dispatch((0, _index3.addChoice)(value, choiceLabel, choiceId, groupId, isDisabled, choiceElementId, customProperties, keyCode));
+	      this.store.dispatch((0, _index3.addChoice)(value, choiceLabel, choiceId, groupId, isDisabled, choiceElementId, customProperties, placeholder, keyCode));
 
 	      if (isSelected) {
-	        this._addItem(value, choiceLabel, choiceId, undefined, customProperties, keyCode);
+	        this._addItem(value, choiceLabel, choiceId, undefined, customProperties, placeholder, keyCode);
 	      }
 	    }
 
@@ -5771,9 +6138,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        groupChoices.forEach(function (option) {
 	          var isOptDisabled = option.disabled || option.parentNode && option.parentNode.disabled;
-	          var label = (0, _utils.isType)('Object', option) ? option[labelKey] : option.innerHTML;
-
-	          _this21._addChoice(option[valueKey], label, option.selected, isOptDisabled, groupId, option.customProperties);
+	          _this21._addChoice(option[valueKey], (0, _utils.isType)('Object', option) ? option[labelKey] : option.innerHTML, option.selected, isOptDisabled, groupId, option.customProperties, option.placeholder);
 	        });
 	      } else {
 	        this.store.dispatch((0, _index3.addGroup)(group.label, group.id, false, group.disabled));
@@ -5835,12 +6200,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        item: function item(data) {
 	          var _classNames2;
 
-	          var localClasses = (0, _classnames2.default)(globalClasses.item, (_classNames2 = {}, _defineProperty(_classNames2, globalClasses.highlightedState, data.highlighted), _defineProperty(_classNames2, globalClasses.itemSelectable, !data.highlighted), _classNames2));
+	          var localClasses = (0, _classnames2.default)(globalClasses.item, (_classNames2 = {}, _defineProperty(_classNames2, globalClasses.highlightedState, data.highlighted), _defineProperty(_classNames2, globalClasses.itemSelectable, !data.highlighted), _defineProperty(_classNames2, globalClasses.placeholder, data.placeholder), _classNames2));
 
 	          if (_this22.config.removeItemButton) {
 	            var _classNames3;
 
-	            localClasses = (0, _classnames2.default)(globalClasses.item, (_classNames3 = {}, _defineProperty(_classNames3, globalClasses.highlightedState, data.highlighted), _defineProperty(_classNames3, globalClasses.itemSelectable, !data.disabled), _classNames3));
+	            localClasses = (0, _classnames2.default)(globalClasses.item, (_classNames3 = {}, _defineProperty(_classNames3, globalClasses.highlightedState, data.highlighted), _defineProperty(_classNames3, globalClasses.itemSelectable, !data.disabled), _defineProperty(_classNames3, globalClasses.placeholder, data.placeholder), _classNames3));
 
 	            return (0, _utils.strToEl)('\n            <div\n              class="' + localClasses + '"\n              data-item\n              data-id="' + data.id + '"\n              data-value="' + data.value + '"\n              data-deletable\n              ' + (data.active ? 'aria-selected="true"' : '') + '\n              ' + (data.disabled ? 'aria-disabled="true"' : '') + '\n              >\n              ' + data.label + '<!--\n           --><button\n                type="button"\n                class="' + globalClasses.button + '"\n                data-button\n                aria-label="Remove item: \'' + data.value + '\'"\n                >\n                Remove item\n              </button>\n            </div>\n          ');
 	          }
@@ -5858,7 +6223,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        choice: function choice(data) {
 	          var _classNames5;
 
-	          var localClasses = (0, _classnames2.default)(globalClasses.item, globalClasses.itemChoice, (_classNames5 = {}, _defineProperty(_classNames5, globalClasses.itemDisabled, data.disabled), _defineProperty(_classNames5, globalClasses.itemSelectable, !data.disabled), _classNames5));
+	          var localClasses = (0, _classnames2.default)(globalClasses.item, globalClasses.itemChoice, (_classNames5 = {}, _defineProperty(_classNames5, globalClasses.itemDisabled, data.disabled), _defineProperty(_classNames5, globalClasses.itemSelectable, !data.disabled), _defineProperty(_classNames5, globalClasses.placeholder, data.placeholder), _classNames5));
 
 	          return (0, _utils.strToEl)('\n          <div\n            class="' + localClasses + '"\n            data-select-text="' + _this22.config.itemSelectText + '"\n            data-choice\n            data-id="' + data.id + '"\n            data-value="' + data.value + '"\n            ' + (data.disabled ? 'data-choice-disabled aria-disabled="true"' : 'data-choice-selectable') + '\n            id="' + data.elementId + '"\n            ' + (data.groupId > 0 ? 'role="treeitem"' : 'role="option"') + '\n            >\n            ' + data.label + '\n          </div>\n        ');
 	        },
@@ -5873,7 +6238,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return (0, _utils.strToEl)('\n          <div\n            class="' + localClasses + '"\n            aria-expanded="false"\n            >\n          </div>\n        ');
 	        },
 	        notice: function notice(label) {
-	          var localClasses = (0, _classnames2.default)(globalClasses.item, globalClasses.itemChoice);
+	          var _classNames6;
+
+	          var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+	          var localClasses = (0, _classnames2.default)(globalClasses.item, globalClasses.itemChoice, (_classNames6 = {}, _defineProperty(_classNames6, globalClasses.noResults, type === 'no-results'), _defineProperty(_classNames6, globalClasses.noChoices, type === 'no-choices'), _classNames6));
 
 	          return (0, _utils.strToEl)('\n          <div class="' + localClasses + '">\n            ' + label + '\n          </div>\n        ');
 	        },
@@ -5910,7 +6279,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var choiceList = this._getTemplate('choiceList');
 	      var input = this._getTemplate('input');
 	      var dropdown = this._getTemplate('dropdown');
-	      var placeholder = this.config.placeholder ? this.config.placeholderValue || this.passedElement.getAttribute('placeholder') : false;
 
 	      this.containerOuter = containerOuter;
 	      this.containerInner = containerInner;
@@ -5942,12 +6310,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Wrapper inner container with outer container
 	      (0, _utils.wrap)(containerInner, containerOuter);
 
-	      // If placeholder has been enabled and we have a value
-	      if (placeholder) {
-	        input.placeholder = placeholder;
-	        if (!this.isSelectOneElement) {
-	          input.style.width = (0, _utils.getWidthOfInput)(input);
-	        }
+	      if (this.isSelectOneElement) {
+	        input.placeholder = this.config.searchPlaceholderValue || '';
+	      } else if (this.placeholder) {
+	        input.placeholder = this.placeholder;
+	        input.style.width = (0, _utils.getWidthOfInput)(input);
 	      }
 
 	      if (!this.config.addItems) {
@@ -5989,7 +6356,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	              value: o.value,
 	              label: o.innerHTML,
 	              selected: o.selected,
-	              disabled: o.disabled || o.parentNode.disabled
+	              disabled: o.disabled || o.parentNode.disabled,
+	              placeholder: o.hasAttribute('placeholder')
 	            });
 	          });
 
@@ -6007,16 +6375,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	          allChoices.forEach(function (choice, index) {
 	            // Pre-select first choice if it's a single select
 	            if (_this23.isSelectOneElement) {
-	              if (hasSelectedChoice || !hasSelectedChoice && index > 0) {
-	                // If there is a selected choice already or the choice is not
-	                // the first in the array, add each choice normally
-	                _this23._addChoice(choice.value, choice.label, choice.selected, choice.disabled, undefined, choice.customProperties);
-	              } else {
-	                // Otherwise pre-select the first choice in the array
-	                _this23._addChoice(choice.value, choice.label, true, false, undefined, choice.customProperties);
-	              }
+	              // If there is a selected choice already or the choice is not
+	              // the first in the array, add each choice normally
+	              // Otherwise pre-select the first choice in the array
+	              var shouldPreselect = hasSelectedChoice || !hasSelectedChoice && index > 0;
+	              _this23._addChoice(choice.value, choice.label, shouldPreselect ? choice.selected : true, shouldPreselect ? choice.disabled : false, undefined, choice.customProperties, choice.placeholder);
 	            } else {
-	              _this23._addChoice(choice.value, choice.label, choice.selected, choice.disabled, undefined, choice.customProperties);
+	              _this23._addChoice(choice.value, choice.label, choice.selected, choice.disabled, undefined, choice.customProperties, choice.placeholder);
 	            }
 	          });
 	        }
@@ -6028,7 +6393,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (!item.value) {
 	              return;
 	            }
-	            _this23._addItem(item.value, item.label, item.id, undefined, item.customProperties);
+	            _this23._addItem(item.value, item.label, item.id, undefined, item.customProperties, item.placeholder);
 	          } else if (itemType === 'String') {
 	            _this23._addItem(item);
 	          }
@@ -6937,6 +7302,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var Store = function () {
@@ -7051,7 +7418,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var choices = this.getChoices();
 	      var values = choices.filter(function (choice) {
 	        return choice.active === true;
-	      }, []);
+	      });
 
 	      return values;
 	    }
@@ -7067,9 +7434,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var choices = this.getChoices();
 	      var values = choices.filter(function (choice) {
 	        return choice.disabled !== true;
-	      }, []);
+	      });
 
 	      return values;
+	    }
+
+	    /**
+	     * Get choices that can be searched (excluding placeholders)
+	     * @return {Array} Option objects
+	     */
+
+	  }, {
+	    key: 'getSearchableChoices',
+	    value: function getSearchableChoices() {
+	      var filtered = this.getChoicesFilteredBySelectable();
+	      return filtered.filter(function (choice) {
+	        return choice.placeholder !== true;
+	      });
 	    }
 
 	    /**
@@ -7139,6 +7520,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 
 	      return foundGroup;
+	    }
+
+	    /**
+	     * Get placeholder choice from store
+	     * @return {Object} Found placeholder
+	     */
+
+	  }, {
+	    key: 'getPlaceholderChoice',
+	    value: function getPlaceholderChoice() {
+	      var choices = this.getChoices();
+	      var placeholderChoice = [].concat(_toConsumableArray(choices)).reverse().find(function (choice) {
+	        return choice.placeholder === true;
+	      });
+
+	      return placeholderChoice;
 	    }
 	  }]);
 
@@ -8206,6 +8603,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          active: true,
 	          highlighted: false,
 	          customProperties: action.customProperties,
+	          placeholder: action.placeholder || false,
 	          keyCode: null
 	        }]);
 
@@ -8323,6 +8721,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          active: true,
 	          score: 9999,
 	          customProperties: action.customProperties,
+	          placeholder: action.placeholder || false,
 	          keyCode: null
 	        }]);
 	      }
@@ -8420,7 +8819,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	var addItem = exports.addItem = function addItem(value, label, id, choiceId, groupId, customProperties, keyCode) {
+	var addItem = exports.addItem = function addItem(value, label, id, choiceId, groupId, customProperties, placeholder, keyCode) {
 	  return {
 	    type: 'ADD_ITEM',
 	    value: value,
@@ -8429,6 +8828,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    choiceId: choiceId,
 	    groupId: groupId,
 	    customProperties: customProperties,
+	    placeholder: placeholder,
 	    keyCode: keyCode
 	  };
 	};
@@ -8449,7 +8849,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	};
 
-	var addChoice = exports.addChoice = function addChoice(value, label, id, groupId, disabled, elementId, customProperties, keyCode) {
+	var addChoice = exports.addChoice = function addChoice(value, label, id, groupId, disabled, elementId, customProperties, placeholder, keyCode) {
 	  return {
 	    type: 'ADD_CHOICE',
 	    value: value,
@@ -8459,6 +8859,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    disabled: disabled,
 	    elementId: elementId,
 	    customProperties: customProperties,
+	    placeholder: placeholder,
 	    keyCode: keyCode
 	  };
 	};
@@ -8641,13 +9042,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var whichTransitionEvent = exports.whichTransitionEvent = function whichTransitionEvent() {
 	  var t,
-	      el = document.createElement("fakeelement");
+	      el = document.createElement('fakeelement');
 
 	  var transitions = {
-	    "transition": "transitionend",
-	    "OTransition": "oTransitionEnd",
-	    "MozTransition": "transitionend",
-	    "WebkitTransition": "webkitTransitionEnd"
+	    'transition': 'transitionend',
+	    'OTransition': 'oTransitionEnd',
+	    'MozTransition': 'transitionend',
+	    'WebkitTransition': 'webkitTransitionEnd'
 	  };
 
 	  for (t in transitions) {
@@ -9019,6 +9420,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    testEl.style.width = 'auto';
 	    testEl.style.whiteSpace = 'pre';
 
+	    if (document.body.contains(input) && window.getComputedStyle) {
+	      var inputStyle = window.getComputedStyle(input);
+
+	      if (inputStyle) {
+	        testEl.style.fontSize = inputStyle.fontSize;
+	        testEl.style.fontFamily = inputStyle.fontFamily;
+	        testEl.style.fontWeight = inputStyle.fontWeight;
+	        testEl.style.fontStyle = inputStyle.fontStyle;
+	        testEl.style.letterSpacing = inputStyle.letterSpacing;
+	        testEl.style.textTransform = inputStyle.textTransform;
+	        testEl.style.padding = inputStyle.padding;
+	      }
+	    }
+
 	    document.body.appendChild(testEl);
 
 	    if (value && testEl.offsetWidth !== input.offsetWidth) {
@@ -9225,7 +9640,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 var Choices = unwrapExports(choices);
 
-/* src\core\ui\inputs\MultiSelect.html generated by Svelte v1.40.1 */
+/* src\core\ui\inputs\MultiSelect.html generated by Svelte v1.41.1 */
 function mapToTypeaheadItems(items) {
 	return items.map(t => {
 		return {
@@ -9240,6 +9655,13 @@ function setFieldValue(field, value) {
 		field.value = {
 			value: value[0] != null ? value[0].value : null
 		};
+
+		// We need to convert the value to string, otherwise it doesn't work.
+		// This is due to the way UmfApp deals with url parameters (or something
+		// along those lines).
+		if (field.value.value != null) {
+			field.value.value = field.value.value.toString();
+		}
 	}
 	else {
 		field.value = {
@@ -9261,10 +9683,45 @@ function setInputValue(a, field) {
 	}
 }
 
+function getIdsQuery(field) {
+	var currentValue = field.maxItemCount == 1
+		? [(field.value || {}).value || ""]
+		: (field.value || {}).items || [];
+
+	// Put values into an array.
+	if (currentValue[0] === "") {
+		currentValue = [];
+	}
+
+	return currentValue;
+}
+
+function buildFilter(parentForm, parameters, query) {
+	var promise;
+
+	var filter = { query: query };
+	if (parameters != null && parameters.length > 0) {
+		promise = parentForm.get("form").getSerializedInputValues().then(data => {
+			for (let p of parameters) {
+				filter[p] = data[p];
+			}
+
+			return filter;
+		});
+	}
+	else {
+		promise = Promise.resolve(filter);
+	}
+
+	return promise;
+}
+
 function oncreate() {
 	var field = this.get("field");
 	var source = field.metadata.customProperties.source;
+	var parameters = field.metadata.customProperties.parameters;
 	var app = this.get("app");
+	var parentForm = this.get("form");
 	var a = new Choices(this.refs.input, {
 		duplicateItems: true,
 		searchResultLimit: 10,
@@ -9289,33 +9746,40 @@ function oncreate() {
 			// to avoid excessive http requests.
 			timer = setTimeout(function () {
 				a.ajax(callback => {
-					return app.server.postForm(source, { query: query }).then(data => {
-						var toAdd = data.items.filter(t => {
-							var key = JSON.stringify(t.value);
-							if (addedItems[key] == null) {
-								addedItems[key] = true;
+					buildFilter(parentForm, parameters, query).then(filter => {
+						app.server.postForm(source, filter).then(data => {
+							var toAdd = data.items.filter(t => {
+								var key = JSON.stringify(t.value);
+								if (addedItems[key] == null) {
+									addedItems[key] = true;
 
-								// Add item.
-								return true;
-							}
+									// Add item.
+									return true;
+								}
 
-							// Don't add item.
-							return false;
+								// Don't add item.
+								return false;
+							});
+
+							callback(toAdd, "value", "label");
 						});
-
-						callback(toAdd, "value", "label");
 					});
 				});
 			}, 300);
 		});
 
-		var currentValue = field.maxItemCount == 1
-			? (field.value || {}).value || ""
-			: (field.value || {}).items || [];
-
+		var currentValue = getIdsQuery(field);
+		
+		// If the field has a value, we need to load it.
 		if (currentValue.length > 0) {
 			a.ajax(callback => {
-				return app.server.postForm(source, { ids: field.value }).then(data => {
+				return app.server.postForm(source, { ids: { items: currentValue } }).then(data => {
+					// Mark items as added as "choices".
+					for (let t of data.items) {
+						var key = JSON.stringify(t.value);
+						addedItems[key] = true;
+					}
+
 					callback(mapToTypeaheadItems(data.items), "value", "label");
 					setInputValue(a, field);
 				});
@@ -9349,8 +9813,7 @@ function create_main_fragment$5(state, component) {
 		},
 
 		h: function hydrate() {
-			select.className = "multi-select";
-			setAttribute(select, "type", "text");
+			select.className = "multi-select form-control";
 			select.id = state.id;
 			select.required = select_required_value = state.field.metadata.required;
 			select.tabIndex = state.tabindex;
@@ -9411,7 +9874,7 @@ function SvelteComponent$5(options) {
 
 assign(SvelteComponent$5.prototype, proto);
 
-/* src\core\ui\inputs\Password.html generated by Svelte v1.40.1 */
+/* src\core\ui\inputs\Password.html generated by Svelte v1.41.1 */
 function create_main_fragment$6(state, component) {
 	var input, input_required_value, input_updating = false;
 
@@ -9434,6 +9897,7 @@ function create_main_fragment$6(state, component) {
 			input.id = state.id;
 			input.required = input_required_value = state.field.metadata.required;
 			input.tabIndex = state.tabindex;
+			input.className = "form-control";
 			addListener$1(input, "input", input_input_handler);
 		},
 
@@ -9485,15 +9949,15 @@ function SvelteComponent$6(options) {
 
 assign(SvelteComponent$6.prototype, proto);
 
-/* src\core\ui\inputs\Textarea.html generated by Svelte v1.40.1 */
+/* src\core\ui\inputs\Textarea.html generated by Svelte v1.41.1 */
 function encapsulateStyles$1(node) {
-	setAttribute(node, "svelte-2941923377", "");
+	setAttribute(node, "svelte-1826537607", "");
 }
 
 function add_css$1() {
 	var style = createElement("style");
-	style.id = 'svelte-2941923377-style';
-	style.textContent = "textarea[svelte-2941923377],[svelte-2941923377] textarea{width:100%;height:100px}";
+	style.id = 'svelte-1826537607-style';
+	style.textContent = "textarea[svelte-1826537607],[svelte-1826537607] textarea{width:100%;height:100px}";
 	appendNode(style, document.head);
 }
 
@@ -9519,6 +9983,8 @@ function create_main_fragment$7(state, component) {
 			textarea.id = state.id;
 			textarea.required = textarea_required_value = state.field.metadata.required;
 			textarea.tabIndex = state.tabindex;
+			textarea.className = "form-control";
+			textarea.value = "\r\n";
 			addListener$1(textarea, "input", textarea_input_handler);
 		},
 
@@ -9560,7 +10026,7 @@ function SvelteComponent$7(options) {
 	init(this, options);
 	this._state = options.data || {};
 
-	if (!document.getElementById("svelte-2941923377-style")) add_css$1();
+	if (!document.getElementById("svelte-1826537607-style")) add_css$1();
 
 	this._fragment = create_main_fragment$7(this._state, this);
 
@@ -9572,24 +10038,205 @@ function SvelteComponent$7(options) {
 
 assign(SvelteComponent$7.prototype, proto);
 
-/* src\core\ui\outputs\Text.html generated by Svelte v1.40.1 */
+/* src\core\ui\inputs\FileUploader.html generated by Svelte v1.41.1 */
+var methods = {
+	addFiles(files) {
+		var field = this.get("field");
+		field.selected = files;
+
+		this.set({ selectedFiles: files });
+	}
+};
+
 function create_main_fragment$8(state, component) {
-	var text_value = state.field.data, text;
+	var input, text, label, text_2, if_block_anchor;
+
+	function change_handler(event) {
+		component.addFiles(input.files);
+	}
+
+	var current_block_type = select_block_type$1(state);
+	var if_block = current_block_type(state, component);
 
 	return {
 		c: function create() {
+			input = createElement("input");
+			text = createText("\r\n");
+			label = createElement("label");
+			label.textContent = "Select files...";
+			text_2 = createText(" \r\n\r\n");
+			if_block.c();
+			if_block_anchor = createComment();
+			this.h();
+		},
+
+		h: function hydrate() {
+			input.type = "file";
+			input.id = state.id;
+			input.tabIndex = state.tabindex;
+			input.multiple = "multiple";
+			addListener$1(input, "change", change_handler);
+			label.htmlFor = state.id;
+			label.className = "button";
+		},
+
+		m: function mount(target, anchor) {
+			insertNode(input, target, anchor);
+			insertNode(text, target, anchor);
+			insertNode(label, target, anchor);
+			insertNode(text_2, target, anchor);
+			if_block.m(target, anchor);
+			insertNode(if_block_anchor, target, anchor);
+		},
+
+		p: function update(changed, state) {
+			if (changed.id) {
+				input.id = state.id;
+			}
+
+			if (changed.tabindex) {
+				input.tabIndex = state.tabindex;
+			}
+
+			if (changed.id) {
+				label.htmlFor = state.id;
+			}
+
+			if (current_block_type === (current_block_type = select_block_type$1(state)) && if_block) {
+				if_block.p(changed, state);
+			} else {
+				if_block.u();
+				if_block.d();
+				if_block = current_block_type(state, component);
+				if_block.c();
+				if_block.m(if_block_anchor.parentNode, if_block_anchor);
+			}
+		},
+
+		u: function unmount() {
+			detachNode(input);
+			detachNode(text);
+			detachNode(label);
+			detachNode(text_2);
+			if_block.u();
+			detachNode(if_block_anchor);
+		},
+
+		d: function destroy$$1() {
+			removeListener$1(input, "change", change_handler);
+			if_block.d();
+		}
+	};
+}
+
+// (6:1) {{#each selectedFiles as file}}
+function create_each_block$1(state, selectedFiles, file, file_index, component) {
+	var li, text_value = file.name, text;
+
+	return {
+		c: function create() {
+			li = createElement("li");
 			text = createText(text_value);
+		},
+
+		m: function mount(target, anchor) {
+			insertNode(li, target, anchor);
+			appendNode(text, li);
+		},
+
+		p: function update(changed, state, selectedFiles, file, file_index) {
+			if ((changed.selectedFiles) && text_value !== (text_value = file.name)) {
+				text.data = text_value;
+			}
+		},
+
+		u: function unmount() {
+			detachNode(li);
+		},
+
+		d: noop$1
+	};
+}
+
+// (4:0) {{#if selectedFiles != null && selectedFiles.length > 0}}
+function create_if_block$1(state, component) {
+	var ul;
+
+	var selectedFiles = state.selectedFiles;
+
+	var each_blocks = [];
+
+	for (var i = 0; i < selectedFiles.length; i += 1) {
+		each_blocks[i] = create_each_block$1(state, selectedFiles, selectedFiles[i], i, component);
+	}
+
+	return {
+		c: function create() {
+			ul = createElement("ul");
+
+			for (var i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].c();
+			}
+		},
+
+		m: function mount(target, anchor) {
+			insertNode(ul, target, anchor);
+
+			for (var i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].m(ul, null);
+			}
+		},
+
+		p: function update(changed, state) {
+			var selectedFiles = state.selectedFiles;
+
+			if (changed.selectedFiles) {
+				for (var i = 0; i < selectedFiles.length; i += 1) {
+					if (each_blocks[i]) {
+						each_blocks[i].p(changed, state, selectedFiles, selectedFiles[i], i);
+					} else {
+						each_blocks[i] = create_each_block$1(state, selectedFiles, selectedFiles[i], i, component);
+						each_blocks[i].c();
+						each_blocks[i].m(ul, null);
+					}
+				}
+
+				for (; i < each_blocks.length; i += 1) {
+					each_blocks[i].u();
+					each_blocks[i].d();
+				}
+				each_blocks.length = selectedFiles.length;
+			}
+		},
+
+		u: function unmount() {
+			detachNode(ul);
+
+			for (var i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].u();
+			}
+		},
+
+		d: function destroy$$1() {
+			destroyEach(each_blocks);
+		}
+	};
+}
+
+// (10:0) {{else}}
+function create_if_block_1$1(state, component) {
+	var text;
+
+	return {
+		c: function create() {
+			text = createText("No files selected.");
 		},
 
 		m: function mount(target, anchor) {
 			insertNode(text, target, anchor);
 		},
 
-		p: function update(changed, state) {
-			if ((changed.field) && text_value !== (text_value = state.field.data)) {
-				text.data = text_value;
-			}
-		},
+		p: noop$1,
 
 		u: function unmount() {
 			detachNode(text);
@@ -9597,6 +10244,11 @@ function create_main_fragment$8(state, component) {
 
 		d: noop$1
 	};
+}
+
+function select_block_type$1(state) {
+	if (state.selectedFiles != null && state.selectedFiles.length > 0) return create_if_block$1;
+	return create_if_block_1$1;
 }
 
 function SvelteComponent$8(options) {
@@ -9611,9 +10263,9 @@ function SvelteComponent$8(options) {
 	}
 }
 
-assign(SvelteComponent$8.prototype, proto);
+assign(SvelteComponent$8.prototype, methods, proto);
 
-/* src\core\ui\outputs\Number.html generated by Svelte v1.40.1 */
+/* src\core\ui\outputs\Text.html generated by Svelte v1.41.1 */
 function create_main_fragment$9(state, component) {
 	var text_value = state.field.data, text;
 
@@ -9653,6 +10305,47 @@ function SvelteComponent$9(options) {
 }
 
 assign(SvelteComponent$9.prototype, proto);
+
+/* src\core\ui\outputs\Number.html generated by Svelte v1.41.1 */
+function create_main_fragment$10(state, component) {
+	var text_value = state.field.data, text;
+
+	return {
+		c: function create() {
+			text = createText(text_value);
+		},
+
+		m: function mount(target, anchor) {
+			insertNode(text, target, anchor);
+		},
+
+		p: function update(changed, state) {
+			if ((changed.field) && text_value !== (text_value = state.field.data)) {
+				text.data = text_value;
+			}
+		},
+
+		u: function unmount() {
+			detachNode(text);
+		},
+
+		d: noop$1
+	};
+}
+
+function SvelteComponent$10(options) {
+	init(this, options);
+	this._state = options.data || {};
+
+	this._fragment = create_main_fragment$10(this._state, this);
+
+	if (options.target) {
+		this._fragment.c();
+		this._fragment.m(options.target, options.anchor || null);
+	}
+}
+
+assign(SvelteComponent$10.prototype, proto);
 
 var hookCallback;
 
@@ -14101,12 +14794,12 @@ hooks.relativeTimeThreshold = getSetRelativeTimeThreshold;
 hooks.calendarFormat        = getCalendarFormat;
 hooks.prototype             = proto$1;
 
-/* src\core\ui\outputs\Datetime.html generated by Svelte v1.40.1 */
+/* src\core\ui\outputs\Datetime.html generated by Svelte v1.41.1 */
 function format(datetime) {
 	return datetime != null ? hooks(datetime).format("D MMM YYYY") : "";
 }
 
-function create_main_fragment$10(state, component) {
+function create_main_fragment$11(state, component) {
 	var text_value = format(state.field.data), text;
 
 	return {
@@ -14132,11 +14825,11 @@ function create_main_fragment$10(state, component) {
 	};
 }
 
-function SvelteComponent$10(options) {
+function SvelteComponent$11(options) {
 	init(this, options);
 	this._state = options.data || {};
 
-	this._fragment = create_main_fragment$10(this._state, this);
+	this._fragment = create_main_fragment$11(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -14144,9 +14837,9 @@ function SvelteComponent$10(options) {
 	}
 }
 
-assign(SvelteComponent$10.prototype, proto);
+assign(SvelteComponent$11.prototype, proto);
 
-/* src\core\ui\Output.html generated by Svelte v1.40.1 */
+/* src\core\ui\Output.html generated by Svelte v1.41.1 */
 function data() {
     return {
         showLabel: true
@@ -14187,20 +14880,20 @@ function oncreate$2() {
 }
 
 function encapsulateStyles$3(node) {
-	setAttribute(node, "svelte-1713469982", "");
+	setAttribute(node, "svelte-2848923544", "");
 }
 
 function add_css$3() {
 	var style = createElement("style");
-	style.id = 'svelte-1713469982-style';
-	style.textContent = "[svelte-1713469982].inline,[svelte-1713469982] .inline{display:inline-block\r\n    }";
+	style.id = 'svelte-2848923544-style';
+	style.textContent = "[svelte-2848923544].inline,[svelte-2848923544] .inline{display:inline-block\r\n    }";
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$12(state, component) {
+function create_main_fragment$13(state, component) {
 	var if_block_anchor;
 
-	var current_block_type = select_block_type$2(state);
+	var current_block_type = select_block_type$3(state);
 	var if_block = current_block_type(state, component);
 
 	return {
@@ -14215,7 +14908,7 @@ function create_main_fragment$12(state, component) {
 		},
 
 		p: function update(changed, state) {
-			if (current_block_type === (current_block_type = select_block_type$2(state)) && if_block) {
+			if (current_block_type === (current_block_type = select_block_type$3(state)) && if_block) {
 				if_block.p(changed, state);
 			} else {
 				if_block.u();
@@ -14237,8 +14930,8 @@ function create_main_fragment$12(state, component) {
 	};
 }
 
-// (1:0) {{#if showLabel === true && !alwaysHideLabel }}
-function create_if_block$2(state, component) {
+// (1:0) {{#if showLabel === true && !alwaysHideLabel && field.metadata.label !== ""}}
+function create_if_block$3(state, component) {
 	var div, strong, text_value = state.field.metadata.label, text, text_1, text_2, div_1;
 
 	return {
@@ -14288,7 +14981,7 @@ function create_if_block$2(state, component) {
 }
 
 // (6:0) {{else}}
-function create_if_block_1$2(state, component) {
+function create_if_block_1$3(state, component) {
 	var div;
 
 	return {
@@ -14323,17 +15016,17 @@ function create_if_block_1$2(state, component) {
 	};
 }
 
-function select_block_type$2(state) {
-	if (state.showLabel === true && !state.alwaysHideLabel) return create_if_block$2;
-	return create_if_block_1$2;
+function select_block_type$3(state) {
+	if (state.showLabel === true && !state.alwaysHideLabel && state.field.metadata.label !== "") return create_if_block$3;
+	return create_if_block_1$3;
 }
 
-function SvelteComponent$12(options) {
+function SvelteComponent$13(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = assign(data(), options.data);
 
-	if (!document.getElementById("svelte-1713469982-style")) add_css$3();
+	if (!document.getElementById("svelte-2848923544-style")) add_css$3();
 
 	var _oncreate = oncreate$2.bind(this);
 
@@ -14343,7 +15036,7 @@ function SvelteComponent$12(options) {
 	 	this._root._oncreate.push(_oncreate);
 	 }
 
-	this._fragment = create_main_fragment$12(this._state, this);
+	this._fragment = create_main_fragment$13(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -14353,11 +15046,11 @@ function SvelteComponent$12(options) {
 	}
 }
 
-assign(SvelteComponent$12.prototype, proto);
+assign(SvelteComponent$13.prototype, proto);
 
-/* src\core\ui\outputs\Table.html generated by Svelte v1.40.1 */
+/* src\core\ui\outputs\Table.html generated by Svelte v1.41.1 */
 function columnsOrdered(field) {
-	return field.metadata.customProperties.columns.sort((a, b) => {
+	return field.metadata.customProperties.columns.filter(b => !b.hidden).sort((a, b) => {
             		return a.orderIndex - b.orderIndex;
         		});
 }
@@ -14393,20 +15086,20 @@ function oncreate$1() {
 }
 
 function encapsulateStyles$2(node) {
-	setAttribute(node, "svelte-902727033", "");
+	setAttribute(node, "svelte-2227593408", "");
 }
 
 function add_css$2() {
 	var style = createElement("style");
-	style.id = 'svelte-902727033-style';
-	style.textContent = "[svelte-902727033].alert-nodata,[svelte-902727033] .alert-nodata{padding:5px 15px;font-style:italic}[svelte-902727033].table>tbody>tr>td .actionlist,[svelte-902727033] .table>tbody>tr>td .actionlist{background:none;border:none;margin:0;padding:0}";
+	style.id = 'svelte-2227593408-style';
+	style.textContent = "[svelte-2227593408].alert-nodata,[svelte-2227593408] .alert-nodata{padding:5px 15px;font-style:italic}[svelte-2227593408].table>tbody>tr>td .actionlist,[svelte-2227593408] .table>tbody>tr>td .actionlist{background:none;border:none;margin:0;padding:0;text-align:left}[svelte-2227593408].table,[svelte-2227593408] .table{border:1px solid #e5eff8}[svelte-2227593408].table thead th,[svelte-2227593408] .table thead th{border-bottom:1px solid #e5eff8;border-left:1px solid #e5eff8;font-weight:normal;background:#f4f9fe;color:#3f6e94}[svelte-2227593408].table tbody td,[svelte-2227593408] .table tbody td{border-top:1px solid #e9ecef;color:#678197;border-bottom:1px solid #e5eff8;border-left:1px solid #e5eff8}[svelte-2227593408].table tbody tr:nth-child(even) td,[svelte-2227593408] .table tbody tr:nth-child(even) td{background:#f4f9fe\r\n\t}[svelte-2227593408].table tbody tr:nth-child(odd) td,[svelte-2227593408] .table tbody tr:nth-child(odd) td{background:#FFF\r\n\t}";
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$11(state, component) {
+function create_main_fragment$12(state, component) {
 	var if_block_anchor;
 
-	var current_block_type = select_block_type$1(state);
+	var current_block_type = select_block_type$2(state);
 	var if_block = current_block_type(state, component);
 
 	return {
@@ -14421,7 +15114,7 @@ function create_main_fragment$11(state, component) {
 		},
 
 		p: function update(changed, state) {
-			if (current_block_type === (current_block_type = select_block_type$1(state)) && if_block) {
+			if (current_block_type === (current_block_type = select_block_type$2(state)) && if_block) {
 				if_block.p(changed, state);
 			} else {
 				if_block.u();
@@ -14444,7 +15137,7 @@ function create_main_fragment$11(state, component) {
 }
 
 // (5:3) {{#each columnsOrdered as column}}
-function create_each_block$1(state, columnsOrdered_1, column, column_index, component) {
+function create_each_block$2(state, columnsOrdered_1, column, column_index, component) {
 	var th, text_value = column.label, text;
 
 	return {
@@ -14541,7 +15234,7 @@ function create_each_block_1(state, data, row, row_index, component) {
 function create_each_block_2(state, data, row, row_index, columnsOrdered_1, column_1, column_index, component) {
 	var td;
 
-	var formoutput = new SvelteComponent$12({
+	var formoutput = new SvelteComponent$13({
 		_root: component._root,
 		data: {
 			field: state.getField(row, column_1),
@@ -14583,7 +15276,7 @@ function create_each_block_2(state, data, row, row_index, columnsOrdered_1, colu
 }
 
 // (11:2) {{#if map != null}}
-function create_if_block_1$1(state, component) {
+function create_if_block_1$2(state, component) {
 	var each_anchor;
 
 	var data = state.field.data;
@@ -14648,7 +15341,7 @@ function create_if_block_1$1(state, component) {
 }
 
 // (1:0) {{#if field.data.length > 0}}
-function create_if_block$1(state, component) {
+function create_if_block$2(state, component) {
 	var table, thead, tr, text_2, tbody;
 
 	var columnsOrdered_1 = state.columnsOrdered;
@@ -14656,10 +15349,10 @@ function create_if_block$1(state, component) {
 	var each_blocks = [];
 
 	for (var i = 0; i < columnsOrdered_1.length; i += 1) {
-		each_blocks[i] = create_each_block$1(state, columnsOrdered_1, columnsOrdered_1[i], i, component);
+		each_blocks[i] = create_each_block$2(state, columnsOrdered_1, columnsOrdered_1[i], i, component);
 	}
 
-	var if_block = (state.map != null) && create_if_block_1$1(state, component);
+	var if_block = (state.map != null) && create_if_block_1$2(state, component);
 
 	return {
 		c: function create() {
@@ -14704,7 +15397,7 @@ function create_if_block$1(state, component) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, state, columnsOrdered_1, columnsOrdered_1[i], i);
 					} else {
-						each_blocks[i] = create_each_block$1(state, columnsOrdered_1, columnsOrdered_1[i], i, component);
+						each_blocks[i] = create_each_block$2(state, columnsOrdered_1, columnsOrdered_1[i], i, component);
 						each_blocks[i].c();
 						each_blocks[i].m(tr, null);
 					}
@@ -14721,7 +15414,7 @@ function create_if_block$1(state, component) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block_1$1(state, component);
+					if_block = create_if_block_1$2(state, component);
 					if_block.c();
 					if_block.m(tbody, null);
 				}
@@ -14780,17 +15473,17 @@ function create_if_block_2(state, component) {
 	};
 }
 
-function select_block_type$1(state) {
-	if (state.field.data.length > 0) return create_if_block$1;
+function select_block_type$2(state) {
+	if (state.field.data.length > 0) return create_if_block$2;
 	return create_if_block_2;
 }
 
-function SvelteComponent$11(options) {
+function SvelteComponent$12(options) {
 	init(this, options);
 	this._state = options.data || {};
 	this._recompute({ field: 1 }, this._state);
 
-	if (!document.getElementById("svelte-902727033-style")) add_css$2();
+	if (!document.getElementById("svelte-2227593408-style")) add_css$2();
 
 	var _oncreate = oncreate$1.bind(this);
 
@@ -14802,7 +15495,7 @@ function SvelteComponent$11(options) {
 	 	this._root._oncreate.push(_oncreate);
 	 }
 
-	this._fragment = create_main_fragment$11(this._state, this);
+	this._fragment = create_main_fragment$12(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -14816,16 +15509,60 @@ function SvelteComponent$11(options) {
 	}
 }
 
-assign(SvelteComponent$11.prototype, proto);
+assign(SvelteComponent$12.prototype, proto);
 
-SvelteComponent$11.prototype._recompute = function _recompute(changed, state) {
+SvelteComponent$12.prototype._recompute = function _recompute(changed, state) {
 	if (changed.field) {
 		if (differs(state.columnsOrdered, (state.columnsOrdered = columnsOrdered(state.field)))) changed.columnsOrdered = true;
 	}
 };
 
-/* src\core\ui\outputs\FormLink.html generated by Svelte v1.40.1 */
-function create_main_fragment$13(state, component) {
+/* src\core\ui\outputs\FormLink.html generated by Svelte v1.41.1 */
+function create_main_fragment$14(state, component) {
+	var if_block_anchor;
+
+	var if_block = (state.field.data != null) && create_if_block$4(state, component);
+
+	return {
+		c: function create() {
+			if (if_block) if_block.c();
+			if_block_anchor = createComment();
+		},
+
+		m: function mount(target, anchor) {
+			if (if_block) if_block.m(target, anchor);
+			insertNode(if_block_anchor, target, anchor);
+		},
+
+		p: function update(changed, state) {
+			if (state.field.data != null) {
+				if (if_block) {
+					if_block.p(changed, state);
+				} else {
+					if_block = create_if_block$4(state, component);
+					if_block.c();
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				}
+			} else if (if_block) {
+				if_block.u();
+				if_block.d();
+				if_block = null;
+			}
+		},
+
+		u: function unmount() {
+			if (if_block) if_block.u();
+			detachNode(if_block_anchor);
+		},
+
+		d: function destroy$$1() {
+			if (if_block) if_block.d();
+		}
+	};
+}
+
+// (1:0) {{#if field.data != null}}
+function create_if_block$4(state, component) {
 	var a, a_href_value, text_value = state.field.data.label, text;
 
 	return {
@@ -14862,11 +15599,11 @@ function create_main_fragment$13(state, component) {
 	};
 }
 
-function SvelteComponent$13(options) {
+function SvelteComponent$14(options) {
 	init(this, options);
 	this._state = options.data || {};
 
-	this._fragment = create_main_fragment$13(this._state, this);
+	this._fragment = create_main_fragment$14(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -14874,9 +15611,9 @@ function SvelteComponent$13(options) {
 	}
 }
 
-assign(SvelteComponent$13.prototype, proto);
+assign(SvelteComponent$14.prototype, proto);
 
-/* src\core\ui\outputs\Tabstrip.html generated by Svelte v1.40.1 */
+/* src\core\ui\outputs\Tabstrip.html generated by Svelte v1.41.1 */
 function getCssClass(tab, tabstrip) {
 	return tab.form == tabstrip.currentTab
 		? "active"
@@ -14884,17 +15621,17 @@ function getCssClass(tab, tabstrip) {
 }
 
 function encapsulateStyles$4(node) {
-	setAttribute(node, "svelte-3113705699", "");
+	setAttribute(node, "svelte-1787366051", "");
 }
 
 function add_css$4() {
 	var style = createElement("style");
-	style.id = 'svelte-3113705699-style';
-	style.textContent = "[svelte-3113705699].tabstrip,[svelte-3113705699] .tabstrip{border-bottom:1px solid #ccc;margin:10px 0;padding:0 5px}[svelte-3113705699].tabstrip>div,[svelte-3113705699] .tabstrip>div{display:inline-block}[svelte-3113705699].tabstrip>div>a,[svelte-3113705699] .tabstrip>div>a{background:#e6e6e6;border-width:1px 1px 0 1px;border-style:solid;border-color:#ccc;padding:10px 15px;margin:0 5px 0 0;display:inline-block;text-decoration:none}[svelte-3113705699].tabstrip>div>a:hover,[svelte-3113705699] .tabstrip>div>a:hover{text-decoration:underline}[svelte-3113705699].tabstrip>div>a.active,[svelte-3113705699] .tabstrip>div>a.active{margin-bottom:-1px;padding-bottom:11px;background:#f8f8f8}";
+	style.id = 'svelte-1787366051-style';
+	style.textContent = "[svelte-1787366051].tabstrip,[svelte-1787366051] .tabstrip{margin:10px 0}[svelte-1787366051].tabstrip>div,[svelte-1787366051] .tabstrip>div{display:inline-block}[svelte-1787366051].tabstrip>div>a,[svelte-1787366051] .tabstrip>div>a{background:#eef3f7;border-width:1px 1px 1px 1px;border-style:solid;border-color:rgb(187, 210, 214);padding:10px 15px;margin:0 5px 0 0;display:inline-block;text-decoration:none;color:#838c98;font-weight:bold;border-radius:5px}[svelte-1787366051].tabstrip>div>a:hover,[svelte-1787366051] .tabstrip>div>a:hover{color:#f3818c}[svelte-1787366051].tabstrip>div>a.active,[svelte-1787366051] .tabstrip>div>a.active{margin-bottom:-1px;padding-bottom:11px;background:#fff;border-bottom:none;color:#3287c0;border-bottom-right-radius:3px;border-bottom-left-radius:3px}";
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$14(state, component) {
+function create_main_fragment$15(state, component) {
 	var div;
 
 	var tabs = state.field.data.tabs;
@@ -14902,7 +15639,7 @@ function create_main_fragment$14(state, component) {
 	var each_blocks = [];
 
 	for (var i = 0; i < tabs.length; i += 1) {
-		each_blocks[i] = create_each_block$2(state, tabs, tabs[i], i, component);
+		each_blocks[i] = create_each_block$3(state, tabs, tabs[i], i, component);
 	}
 
 	return {
@@ -14936,7 +15673,7 @@ function create_main_fragment$14(state, component) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, state, tabs, tabs[i], i);
 					} else {
-						each_blocks[i] = create_each_block$2(state, tabs, tabs[i], i, component);
+						each_blocks[i] = create_each_block$3(state, tabs, tabs[i], i, component);
 						each_blocks[i].c();
 						each_blocks[i].m(div, null);
 					}
@@ -14965,7 +15702,7 @@ function create_main_fragment$14(state, component) {
 }
 
 // (2:1) {{#each field.data.tabs as tab}}
-function create_each_block$2(state, tabs, tab, tab_index, component) {
+function create_each_block$3(state, tabs, tab, tab_index, component) {
 	var div, a, a_href_value, a_class_value, text_value = tab.label, text;
 
 	return {
@@ -15009,13 +15746,13 @@ function create_each_block$2(state, tabs, tab, tab_index, component) {
 	};
 }
 
-function SvelteComponent$14(options) {
+function SvelteComponent$15(options) {
 	init(this, options);
 	this._state = options.data || {};
 
-	if (!document.getElementById("svelte-3113705699-style")) add_css$4();
+	if (!document.getElementById("svelte-1787366051-style")) add_css$4();
 
-	this._fragment = create_main_fragment$14(this._state, this);
+	this._fragment = create_main_fragment$15(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -15023,11 +15760,11 @@ function SvelteComponent$14(options) {
 	}
 }
 
-assign(SvelteComponent$14.prototype, proto);
+assign(SvelteComponent$15.prototype, proto);
 
-/* src\core\ui\outputs\Table.html generated by Svelte v1.40.1 */
+/* src\core\ui\outputs\Table.html generated by Svelte v1.41.1 */
 function columnsOrdered$1(field) {
-	return field.metadata.customProperties.columns.sort((a, b) => {
+	return field.metadata.customProperties.columns.filter(b => !b.hidden).sort((a, b) => {
             		return a.orderIndex - b.orderIndex;
         		});
 }
@@ -15063,20 +15800,20 @@ function oncreate$4() {
 }
 
 function encapsulateStyles$6(node) {
-	setAttribute(node, "svelte-902727033", "");
+	setAttribute(node, "svelte-2227593408", "");
 }
 
 function add_css$6() {
 	var style = createElement("style");
-	style.id = 'svelte-902727033-style';
-	style.textContent = "[svelte-902727033].alert-nodata,[svelte-902727033] .alert-nodata{padding:5px 15px;font-style:italic}[svelte-902727033].table>tbody>tr>td .actionlist,[svelte-902727033] .table>tbody>tr>td .actionlist{background:none;border:none;margin:0;padding:0}";
+	style.id = 'svelte-2227593408-style';
+	style.textContent = "[svelte-2227593408].alert-nodata,[svelte-2227593408] .alert-nodata{padding:5px 15px;font-style:italic}[svelte-2227593408].table>tbody>tr>td .actionlist,[svelte-2227593408] .table>tbody>tr>td .actionlist{background:none;border:none;margin:0;padding:0;text-align:left}[svelte-2227593408].table,[svelte-2227593408] .table{border:1px solid #e5eff8}[svelte-2227593408].table thead th,[svelte-2227593408] .table thead th{border-bottom:1px solid #e5eff8;border-left:1px solid #e5eff8;font-weight:normal;background:#f4f9fe;color:#3f6e94}[svelte-2227593408].table tbody td,[svelte-2227593408] .table tbody td{border-top:1px solid #e9ecef;color:#678197;border-bottom:1px solid #e5eff8;border-left:1px solid #e5eff8}[svelte-2227593408].table tbody tr:nth-child(even) td,[svelte-2227593408] .table tbody tr:nth-child(even) td{background:#f4f9fe\r\n\t}[svelte-2227593408].table tbody tr:nth-child(odd) td,[svelte-2227593408] .table tbody tr:nth-child(odd) td{background:#FFF\r\n\t}";
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$16(state, component) {
+function create_main_fragment$17(state, component) {
 	var if_block_anchor;
 
-	var current_block_type = select_block_type$4(state);
+	var current_block_type = select_block_type$5(state);
 	var if_block = current_block_type(state, component);
 
 	return {
@@ -15091,7 +15828,7 @@ function create_main_fragment$16(state, component) {
 		},
 
 		p: function update(changed, state) {
-			if (current_block_type === (current_block_type = select_block_type$4(state)) && if_block) {
+			if (current_block_type === (current_block_type = select_block_type$5(state)) && if_block) {
 				if_block.p(changed, state);
 			} else {
 				if_block.u();
@@ -15114,7 +15851,7 @@ function create_main_fragment$16(state, component) {
 }
 
 // (5:3) {{#each columnsOrdered as column}}
-function create_each_block$4(state, columnsOrdered_1, column, column_index, component) {
+function create_each_block$5(state, columnsOrdered_1, column, column_index, component) {
 	var th, text_value = column.label, text;
 
 	return {
@@ -15211,7 +15948,7 @@ function create_each_block_1$1(state, data, row, row_index, component) {
 function create_each_block_2$1(state, data, row, row_index, columnsOrdered_1, column_1, column_index, component) {
 	var td;
 
-	var formoutput = new SvelteComponent$12({
+	var formoutput = new SvelteComponent$13({
 		_root: component._root,
 		data: {
 			field: state.getField(row, column_1),
@@ -15253,7 +15990,7 @@ function create_each_block_2$1(state, data, row, row_index, columnsOrdered_1, co
 }
 
 // (11:2) {{#if map != null}}
-function create_if_block_1$4(state, component) {
+function create_if_block_1$5(state, component) {
 	var each_anchor;
 
 	var data = state.field.data;
@@ -15318,7 +16055,7 @@ function create_if_block_1$4(state, component) {
 }
 
 // (1:0) {{#if field.data.length > 0}}
-function create_if_block$4(state, component) {
+function create_if_block$6(state, component) {
 	var table, thead, tr, text_2, tbody;
 
 	var columnsOrdered_1 = state.columnsOrdered;
@@ -15326,10 +16063,10 @@ function create_if_block$4(state, component) {
 	var each_blocks = [];
 
 	for (var i = 0; i < columnsOrdered_1.length; i += 1) {
-		each_blocks[i] = create_each_block$4(state, columnsOrdered_1, columnsOrdered_1[i], i, component);
+		each_blocks[i] = create_each_block$5(state, columnsOrdered_1, columnsOrdered_1[i], i, component);
 	}
 
-	var if_block = (state.map != null) && create_if_block_1$4(state, component);
+	var if_block = (state.map != null) && create_if_block_1$5(state, component);
 
 	return {
 		c: function create() {
@@ -15374,7 +16111,7 @@ function create_if_block$4(state, component) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, state, columnsOrdered_1, columnsOrdered_1[i], i);
 					} else {
-						each_blocks[i] = create_each_block$4(state, columnsOrdered_1, columnsOrdered_1[i], i, component);
+						each_blocks[i] = create_each_block$5(state, columnsOrdered_1, columnsOrdered_1[i], i, component);
 						each_blocks[i].c();
 						each_blocks[i].m(tr, null);
 					}
@@ -15391,7 +16128,7 @@ function create_if_block$4(state, component) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block_1$4(state, component);
+					if_block = create_if_block_1$5(state, component);
 					if_block.c();
 					if_block.m(tbody, null);
 				}
@@ -15450,17 +16187,17 @@ function create_if_block_2$2(state, component) {
 	};
 }
 
-function select_block_type$4(state) {
-	if (state.field.data.length > 0) return create_if_block$4;
+function select_block_type$5(state) {
+	if (state.field.data.length > 0) return create_if_block$6;
 	return create_if_block_2$2;
 }
 
-function SvelteComponent$16(options) {
+function SvelteComponent$17(options) {
 	init(this, options);
 	this._state = options.data || {};
 	this._recompute({ field: 1 }, this._state);
 
-	if (!document.getElementById("svelte-902727033-style")) add_css$6();
+	if (!document.getElementById("svelte-2227593408-style")) add_css$6();
 
 	var _oncreate = oncreate$4.bind(this);
 
@@ -15472,7 +16209,7 @@ function SvelteComponent$16(options) {
 	 	this._root._oncreate.push(_oncreate);
 	 }
 
-	this._fragment = create_main_fragment$16(this._state, this);
+	this._fragment = create_main_fragment$17(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -15486,15 +16223,15 @@ function SvelteComponent$16(options) {
 	}
 }
 
-assign(SvelteComponent$16.prototype, proto);
+assign(SvelteComponent$17.prototype, proto);
 
-SvelteComponent$16.prototype._recompute = function _recompute(changed, state) {
+SvelteComponent$17.prototype._recompute = function _recompute(changed, state) {
 	if (changed.field) {
 		if (differs(state.columnsOrdered, (state.columnsOrdered = columnsOrdered$1(state.field)))) changed.columnsOrdered = true;
 	}
 };
 
-/* src\core\ui\outputs\Paginator.html generated by Svelte v1.40.1 */
+/* src\core\ui\outputs\Paginator.html generated by Svelte v1.41.1 */
 function pages(field, form) {
 	var paginatorInput = form.inputs.find(t => t.metadata.id == field.metadata.customProperties.customizations.paginator);
 
@@ -15527,7 +16264,7 @@ function data$1() {
 	}
 }
 
-var methods = {
+var methods$1 = {
 	goToPage(page) {
 		var parent = this.get("parent");
 		var form = parent.get("form");
@@ -15546,7 +16283,7 @@ function oncreate$3() {
 	tableField.data = field.data.results;
 	tableField.metadata = field.metadata;
 
-	var i = new SvelteComponent$16({
+	var i = new SvelteComponent$17({
 		target: this.refs.container,
 		data: {
 			field: tableField,
@@ -15558,20 +16295,20 @@ function oncreate$3() {
 }
 
 function encapsulateStyles$5(node) {
-	setAttribute(node, "svelte-770985968", "");
+	setAttribute(node, "svelte-838979378", "");
 }
 
 function add_css$5() {
 	var style = createElement("style");
-	style.id = 'svelte-770985968-style';
-	style.textContent = "[svelte-770985968].paginator,[svelte-770985968] .paginator{margin:.5rem 0;padding-left:0}[svelte-770985968].paginator>li,[svelte-770985968] .paginator>li{display:inline-block}[svelte-770985968].paginator>li>a,[svelte-770985968] .paginator>li>a,[svelte-770985968].paginator>li>button,[svelte-770985968] .paginator>li>button{padding:2px 10px;margin:1px;display:inline-block;background:#eee}[svelte-770985968].paginator>li>a.current,[svelte-770985968] .paginator>li>a.current,[svelte-770985968].paginator>li>button.current,[svelte-770985968] .paginator>li>button.current{background:#4f4f4f;color:#fff}";
+	style.id = 'svelte-838979378-style';
+	style.textContent = "[svelte-838979378].paginator,[svelte-838979378] .paginator{margin:.5rem 0;padding-left:0}[svelte-838979378].paginator>li,[svelte-838979378] .paginator>li{display:inline-block}[svelte-838979378].paginator>li>a,[svelte-838979378] .paginator>li>a,[svelte-838979378].paginator>li>button,[svelte-838979378] .paginator>li>button{padding:2px 10px;margin:1px;display:inline-block;background:#eee}[svelte-838979378].paginator>li>a.current,[svelte-838979378] .paginator>li>a.current,[svelte-838979378].paginator>li>button.current,[svelte-838979378] .paginator>li>button.current{background:#1eb1c8;color:#fff}[svelte-838979378].paginator>li>a:hover,[svelte-838979378] .paginator>li>a:hover,[svelte-838979378].paginator>li>button:hover,[svelte-838979378] .paginator>li>button:hover{color:#f3818c;text-decoration:none\r\n\t}";
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$15(state, component) {
+function create_main_fragment$16(state, component) {
 	var ul, text, div;
 
-	var if_block = (state.pages.length > 1) && create_if_block$3(state, component);
+	var if_block = (state.pages.length > 1) && create_if_block$5(state, component);
 
 	return {
 		c: function create() {
@@ -15601,7 +16338,7 @@ function create_main_fragment$15(state, component) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$3(state, component);
+					if_block = create_if_block$5(state, component);
 					if_block.c();
 					if_block.m(ul, null);
 				}
@@ -15627,10 +16364,10 @@ function create_main_fragment$15(state, component) {
 }
 
 // (3:1) {{#each pages as page}}
-function create_each_block$3(state, pages_1, page, page_index, component) {
+function create_each_block$4(state, pages_1, page, page_index, component) {
 	var if_block_anchor;
 
-	var current_block_type = select_block_type$3(state, pages_1, page, page_index);
+	var current_block_type = select_block_type$4(state, pages_1, page, page_index);
 	var if_block = current_block_type(state, pages_1, page, page_index, component);
 
 	return {
@@ -15645,7 +16382,7 @@ function create_each_block$3(state, pages_1, page, page_index, component) {
 		},
 
 		p: function update(changed, state, pages_1, page, page_index) {
-			if (current_block_type === (current_block_type = select_block_type$3(state, pages_1, page, page_index)) && if_block) {
+			if (current_block_type === (current_block_type = select_block_type$4(state, pages_1, page, page_index)) && if_block) {
 				if_block.p(changed, state, pages_1, page, page_index);
 			} else {
 				if_block.u();
@@ -15668,7 +16405,7 @@ function create_each_block$3(state, pages_1, page, page_index, component) {
 }
 
 // (4:2) {{#if parent.get('useUrl')}}
-function create_if_block_1$3(state, pages_1, page, page_index, component) {
+function create_if_block_1$4(state, pages_1, page, page_index, component) {
 	var li, a, a_href_value, a_class_value, text_value = page.number, text;
 
 	return {
@@ -15765,7 +16502,7 @@ function create_if_block_2$1(state, pages_1, page, page_index, component) {
 }
 
 // (2:1) {{#if pages.length > 1}}
-function create_if_block$3(state, component) {
+function create_if_block$5(state, component) {
 	var each_anchor;
 
 	var pages_1 = state.pages;
@@ -15773,7 +16510,7 @@ function create_if_block$3(state, component) {
 	var each_blocks = [];
 
 	for (var i = 0; i < pages_1.length; i += 1) {
-		each_blocks[i] = create_each_block$3(state, pages_1, pages_1[i], i, component);
+		each_blocks[i] = create_each_block$4(state, pages_1, pages_1[i], i, component);
 	}
 
 	return {
@@ -15801,7 +16538,7 @@ function create_if_block$3(state, component) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, state, pages_1, pages_1[i], i);
 					} else {
-						each_blocks[i] = create_each_block$3(state, pages_1, pages_1[i], i, component);
+						each_blocks[i] = create_each_block$4(state, pages_1, pages_1[i], i, component);
 						each_blocks[i].c();
 						each_blocks[i].m(each_anchor.parentNode, each_anchor);
 					}
@@ -15835,18 +16572,18 @@ function click_handler(event) {
 	component.goToPage(page);
 }
 
-function select_block_type$3(state, pages_1, page, page_index) {
-	if (state.parent.get('useUrl')) return create_if_block_1$3;
+function select_block_type$4(state, pages_1, page, page_index) {
+	if (state.parent.get('useUrl')) return create_if_block_1$4;
 	return create_if_block_2$1;
 }
 
-function SvelteComponent$15(options) {
+function SvelteComponent$16(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = assign(data$1(), options.data);
 	this._recompute({ field: 1, form: 1 }, this._state);
 
-	if (!document.getElementById("svelte-770985968-style")) add_css$5();
+	if (!document.getElementById("svelte-838979378-style")) add_css$5();
 
 	var _oncreate = oncreate$3.bind(this);
 
@@ -15856,7 +16593,7 @@ function SvelteComponent$15(options) {
 	 	this._root._oncreate.push(_oncreate);
 	 }
 
-	this._fragment = create_main_fragment$15(this._state, this);
+	this._fragment = create_main_fragment$16(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -15866,15 +16603,15 @@ function SvelteComponent$15(options) {
 	}
 }
 
-assign(SvelteComponent$15.prototype, methods, proto);
+assign(SvelteComponent$16.prototype, methods$1, proto);
 
-SvelteComponent$15.prototype._recompute = function _recompute(changed, state) {
+SvelteComponent$16.prototype._recompute = function _recompute(changed, state) {
 	if (changed.field || changed.form) {
 		if (differs(state.pages, (state.pages = pages(state.field, state.form)))) changed.pages = true;
 	}
 };
 
-/* src\core\ui\Input.html generated by Svelte v1.40.1 */
+/* src\core\ui\Input.html generated by Svelte v1.41.1 */
 var inputId = 0;
 
 function data$4() {
@@ -15888,8 +16625,15 @@ function oncreate$5() {
     let field = this.get("field");
     let tabindex = this.get("tabindex");
     let app = this.get("app");
-
+    
     var input = app.controlRegister.getInput(field.metadata.type);
+
+    // Set correct css class based on the field type.
+    var inputDisplayConfig = input.constants || {};
+    this.set({ 
+        class: inputDisplayConfig.block ? "block" : "inline",
+        alwaysHideLabel: inputDisplayConfig.alwaysHideLabel
+    });
 
     var i = new input.component({
         target: this.refs.container,
@@ -15897,33 +16641,66 @@ function oncreate$5() {
             field: field,
             tabindex: tabindex,
             id: this.get("id"),
-            app: app
+            app: app,
+            form: this.get("form")
         }
     });
-
-    // Set correct css class based on the field type.
-    var outputDisplayConfig = input.constants || {};
-    if (outputDisplayConfig.block) {
-        this.set({ class: "block" });
-    }
-    else {
-        this.set({ class: "inline" });
-    }
 }
 
 function encapsulateStyles$9(node) {
-	setAttribute(node, "svelte-849255196", "");
+	setAttribute(node, "svelte-2084715023", "");
 }
 
 function add_css$9() {
 	var style = createElement("style");
-	style.id = 'svelte-849255196-style';
-	style.textContent = "[svelte-849255196].inline,[svelte-849255196] .inline{display:inline-block\r\n    }";
+	style.id = 'svelte-2084715023-style';
+	style.textContent = "[svelte-2084715023].inline,[svelte-2084715023] .inline{display:inline-block\r\n    }";
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$19(state, component) {
-	var div, label, text_value = state.field.metadata.label, text, text_1, div_1;
+function create_main_fragment$20(state, component) {
+	var if_block_anchor;
+
+	var current_block_type = select_block_type$6(state);
+	var if_block = current_block_type(state, component);
+
+	return {
+		c: function create() {
+			if_block.c();
+			if_block_anchor = createComment();
+		},
+
+		m: function mount(target, anchor) {
+			if_block.m(target, anchor);
+			insertNode(if_block_anchor, target, anchor);
+		},
+
+		p: function update(changed, state) {
+			if (current_block_type === (current_block_type = select_block_type$6(state)) && if_block) {
+				if_block.p(changed, state);
+			} else {
+				if_block.u();
+				if_block.d();
+				if_block = current_block_type(state, component);
+				if_block.c();
+				if_block.m(if_block_anchor.parentNode, if_block_anchor);
+			}
+		},
+
+		u: function unmount() {
+			if_block.u();
+			detachNode(if_block_anchor);
+		},
+
+		d: function destroy$$1() {
+			if_block.d();
+		}
+	};
+}
+
+// (1:0) {{#if !alwaysHideLabel && field.metadata.label !== ""}}
+function create_if_block$9(state, component) {
+	var div, label, text_value = state.field.metadata.label, text, text_1, div_1, div_1_class_value;
 
 	return {
 		c: function create() {
@@ -15937,8 +16714,10 @@ function create_main_fragment$19(state, component) {
 
 		h: function hydrate() {
 			encapsulateStyles$9(div);
+			div.className = "form-group row";
 			label.htmlFor = state.id;
-			div_1.className = state.class;
+			label.className = "col-sm-2 col-form-label";
+			div_1.className = div_1_class_value = "" + state.class + " col-sm-10";
 		},
 
 		m: function mount(target, anchor) {
@@ -15959,8 +16738,8 @@ function create_main_fragment$19(state, component) {
 				text.data = text_value;
 			}
 
-			if (changed.class) {
-				div_1.className = state.class;
+			if ((changed.class) && div_1_class_value !== (div_1_class_value = "" + state.class + " col-sm-10")) {
+				div_1.className = div_1_class_value;
 			}
 		},
 
@@ -15974,12 +16753,56 @@ function create_main_fragment$19(state, component) {
 	};
 }
 
-function SvelteComponent$19(options) {
+// (6:0) {{else}}
+function create_if_block_1$7(state, component) {
+	var div, div_1, div_1_class_value;
+
+	return {
+		c: function create() {
+			div = createElement("div");
+			div_1 = createElement("div");
+			this.h();
+		},
+
+		h: function hydrate() {
+			encapsulateStyles$9(div);
+			div.className = "form-group row";
+			div_1.className = div_1_class_value = "" + state.class + " col-sm-12";
+		},
+
+		m: function mount(target, anchor) {
+			insertNode(div, target, anchor);
+			appendNode(div_1, div);
+			component.refs.container = div_1;
+		},
+
+		p: function update(changed, state) {
+			if ((changed.class) && div_1_class_value !== (div_1_class_value = "" + state.class + " col-sm-12")) {
+				div_1.className = div_1_class_value;
+			}
+		},
+
+		u: function unmount() {
+			detachNode(div);
+		},
+
+		d: function destroy$$1() {
+			if (component.refs.container === div_1) component.refs.container = null;
+		}
+	};
+}
+
+function select_block_type$6(state) {
+	if (!state.alwaysHideLabel && state.field.metadata.label !== "") return create_if_block$9;
+	return create_if_block_1$7;
+}
+
+function SvelteComponent$20(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = assign(data$4(), options.data);
 
-	if (!document.getElementById("svelte-849255196-style")) add_css$9();
+	if (!document.getElementById("svelte-2084715023-style")) add_css$9();
 
 	var _oncreate = oncreate$5.bind(this);
 
@@ -15989,7 +16812,7 @@ function SvelteComponent$19(options) {
 	 	this._root._oncreate.push(_oncreate);
 	 }
 
-	this._fragment = create_main_fragment$19(this._state, this);
+	this._fragment = create_main_fragment$20(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -15999,10 +16822,32 @@ function SvelteComponent$19(options) {
 	}
 }
 
-assign(SvelteComponent$19.prototype, proto);
+assign(SvelteComponent$20.prototype, proto);
 
-/* src\core\ui\Form.html generated by Svelte v1.40.1 */
+/* src\core\ui\Form.html generated by Svelte v1.41.1 */
 let tabindex = 1;
+var openForms = [];
+
+function bindEventHandlersToCustomEvents(formComponent, eventHandlers) {
+	let formInstance = formComponent.get("form");
+	let app = formComponent.get("app");
+
+	// Bind all "form event handlers". 
+	for (let eventHandler of eventHandlers) {
+		// Don't bind default event handlers, because they are already auto-bound inside FormInstance.
+		if (eventHandler.runAt.indexOf("form:") === 0) {
+			continue;
+		}
+
+		formComponent.on(eventHandler.runAt, e => {
+			// Augment event args with form which is firing the event. This is needed,
+			// so that event handler can know from which particular form this event is coming.
+			e.form = formComponent;
+			
+			formInstance.handleEvent(eventHandler.runAt, eventHandler, e);
+		});
+	}
+}
 
 function data$3() {
 	return {
@@ -16011,12 +16856,13 @@ function data$3() {
 		urlData: null,
 		initialized: false,
 		responseMetadata: {},
-		useUrl: true
+		useUrl: true,
+		parent: null // Can be set if this is a nested form within another form (i.e. - InlineForm.html)
 	};
 }
 
-var methods$2 = {
-	init: function () {
+var methods$3 = {
+	init: async function () {
 		if (!this.get("initialized")) {
 			var form = this.get("form");
 
@@ -16033,12 +16879,31 @@ var methods$2 = {
 
 			var app = this.get("app");
 
+			bindEventHandlersToCustomEvents(this, form.metadata.eventHandlers);
+			// TODO: bind input and output event handlers.
+
 			form.fire("form:loaded", { app: app });
 
 			// Auto-submit form if necessary.
 			if (form.metadata.postOnLoad) {
-				this.submit(app, form);
+				await this.submit(app, form);
 			}
+
+			openForms.push(this);
+
+			if (this.get("parent") == null) {
+				if(this.get("responseMetadata").title == null){
+					document.title = form.metadata.label;
+				}						
+			}
+		}
+	},
+	fireAndBubbleUp(eventName, eventArgs) {
+		this.fire(eventName, eventArgs);
+		var parentFormComponent = this.get("parent");
+
+		if (parentFormComponent != null) {
+			parentFormComponent.fireAndBubbleUp(eventName, eventArgs);
 		}
 	},
 	enableForm: function() {
@@ -16067,6 +16932,10 @@ var methods$2 = {
 			outputFieldValues: formInstance.outputs,
 			responseMetadata: response.metadata
 		});
+
+		if(this.get("parent") == null){
+			document.title = response.metadata.title;
+		}
 	},
 	submit: async function (app, formInstance, event, redirect) {
 		var self = this;
@@ -16075,16 +16944,9 @@ var methods$2 = {
 			event.preventDefault();
 		}
 		
-		var skipValidation =
-			!formInstance.metadata.postOnLoadValidation &&
-			formInstance.metadata.postOnLoad &&
-			// if initialization of the form, i.e. - first post.
-			redirect == null;
-
-		let data = await formInstance.prepareForm(!skipValidation);
-		
 		// If not all required inputs are filled.
-		if (data == null) {
+		var allRequiredInputsHaveValues = await formInstance.allRequiredInputsHaveData(redirect == null);
+		if (!allRequiredInputsHaveValues) {
 			return;
 		}
 
@@ -16104,31 +16966,10 @@ var methods$2 = {
 			
 			return;
 		}
-
-		await formInstance.fire("form:posting", { response: null, app: app });
 		
 		try {
-			let response = await app.server.postForm(formInstance.metadata.id, data);
-			await formInstance.fire("form:responseReceived", { response: response, app: app });
+			await formInstance.submit(app, redirect == null, { formComponent: self });
 			
-			formInstance.setOutputFieldValues(response);
-
-			// Null response is treated as a server-side error.
-			if (response == null) {
-				throw new Error(`Received null response.`);
-			}
-			
-			await app.runFunctions(response.metadata.functionsToRun);
-		
-			if (response.metadata.handler == "" || response.metadata.handler == null) {
-				self.renderResponse(response);
-			}
-			else {
-				app.handleResponse(response, formInstance);
-			}
-			
-			await formInstance.fire("form:responseHandled", { response: response, app: app });
-		
 			self.enableForm();
 
 			// Signal event to child controls.
@@ -16139,50 +16980,74 @@ var methods$2 = {
 		}
 		catch(e) {
 			self.enableForm();
+		}
+	},
+	reloadTopForm() {
+		var parentFormComponent = this.get("parent");
+		
+		if (parentFormComponent != null) {
+			parentFormComponent.reloadTopForm();
+		}
+		else {
+			let app = this.get("app");
+			let formInstance = this.get("form");
+			this.submit(app, formInstance, null, true);
+		}
+	},
+	reloadAllForms() {				
+		for (let f of openForms) {
+			f.reloadTopForm();
 		}				
 	}
 };
 
+function ondestroy() {
+	openForms = openForms.filter(f => f !== this);
+}
+
 function encapsulateStyles$8(node) {
-	setAttribute(node, "svelte-4177434319", "");
+	setAttribute(node, "svelte-1750191902", "");
 }
 
 function add_css$8() {
 	var style = createElement("style");
-	style.id = 'svelte-4177434319-style';
-	style.textContent = "[svelte-4177434319].response,[svelte-4177434319] .response{margin-top:50px}[svelte-4177434319].inline-form .response,[svelte-4177434319] .inline-form .response{margin-top:0;padding:10px 15px}[svelte-4177434319].inline-form h2,[svelte-4177434319] .inline-form h2{margin:0;background:#eee;padding:10px 15px 15px;font-size:15px}";
+	style.id = 'svelte-1750191902-style';
+	style.textContent = "[svelte-1750191902].response,[svelte-1750191902] .response{margin-top:15px;padding-left:10px;padding-right:10px}[svelte-1750191902].inline-form .response,[svelte-1750191902] .inline-form .response{margin-top:0;padding:10px 15px}[svelte-1750191902].inline-form h2,[svelte-1750191902] .inline-form h2{margin:0;background:#eee;padding:10px 15px 15px;font-size:15px}";
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$18(state, component) {
-	var h2, text_value = state.responseMetadata.title || state.metadata.label, text, text_1, text_2, if_block_1_anchor;
+function create_main_fragment$19(state, component) {
+	var div, h2, text_value = state.responseMetadata.title || state.metadata.label, text, text_2, text_3, if_block_1_anchor;
 
-	var if_block = (state.initialized && state.visibleInputFields.length > 0) && create_if_block$5(state, component);
+	var if_block = (state.initialized && state.visibleInputFields.length > 0) && create_if_block$8(state, component);
 
-	var if_block_1 = (state.outputFieldValues != null) && create_if_block_1$5(state, component);
+	var if_block_1 = (state.outputFieldValues != null) && create_if_block_1$6(state, component);
 
 	return {
 		c: function create() {
+			div = createElement("div");
 			h2 = createElement("h2");
 			text = createText(text_value);
-			text_1 = createText("\r\n\r\n");
-			if (if_block) if_block.c();
 			text_2 = createText("\r\n\r\n");
+			if (if_block) if_block.c();
+			text_3 = createText("\r\n\r\n");
 			if (if_block_1) if_block_1.c();
 			if_block_1_anchor = createComment();
 			this.h();
 		},
 
 		h: function hydrate() {
-			encapsulateStyles$8(h2);
+			encapsulateStyles$8(div);
+			div.className = "form-header";
 		},
 
 		m: function mount(target, anchor) {
-			insertNode(h2, target, anchor);
+			insertNode(div, target, anchor);
+			appendNode(h2, div);
 			appendNode(text, h2);
-			insertNode(text_1, target, anchor);
-			if (if_block) if_block.m(target, anchor);
 			insertNode(text_2, target, anchor);
+			if (if_block) if_block.m(target, anchor);
+			insertNode(text_3, target, anchor);
 			if (if_block_1) if_block_1.m(target, anchor);
 			insertNode(if_block_1_anchor, target, anchor);
 		},
@@ -16196,9 +17061,9 @@ function create_main_fragment$18(state, component) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$5(state, component);
+					if_block = create_if_block$8(state, component);
 					if_block.c();
-					if_block.m(text_2.parentNode, text_2);
+					if_block.m(text_3.parentNode, text_3);
 				}
 			} else if (if_block) {
 				if_block.u();
@@ -16210,7 +17075,7 @@ function create_main_fragment$18(state, component) {
 				if (if_block_1) {
 					if_block_1.p(changed, state);
 				} else {
-					if_block_1 = create_if_block_1$5(state, component);
+					if_block_1 = create_if_block_1$6(state, component);
 					if_block_1.c();
 					if_block_1.m(if_block_1_anchor.parentNode, if_block_1_anchor);
 				}
@@ -16222,10 +17087,10 @@ function create_main_fragment$18(state, component) {
 		},
 
 		u: function unmount() {
-			detachNode(h2);
-			detachNode(text_1);
-			if (if_block) if_block.u();
+			detachNode(div);
 			detachNode(text_2);
+			if (if_block) if_block.u();
+			detachNode(text_3);
 			if (if_block_1) if_block_1.u();
 			detachNode(if_block_1_anchor);
 		},
@@ -16237,15 +17102,16 @@ function create_main_fragment$18(state, component) {
 	};
 }
 
-// (5:1) {{#each visibleInputFields as inputField}}
-function create_each_block$6(state, visibleInputFields, inputField, inputField_index, component) {
+// (8:1) {{#each visibleInputFields as inputField}}
+function create_each_block$7(state, visibleInputFields, inputField, inputField_index, component) {
 
-	var forminput = new SvelteComponent$19({
+	var forminput = new SvelteComponent$20({
 		_root: component._root,
 		data: {
 			field: inputField,
 			app: state.app,
-			tabindex: state.tabindex * 100 + inputField.metadata.orderIndex
+			tabindex: state.tabindex * 100 + inputField.metadata.orderIndex,
+			form: state.self
 		}
 	});
 
@@ -16263,6 +17129,7 @@ function create_each_block$6(state, visibleInputFields, inputField, inputField_i
 			if (changed.visibleInputFields) forminput_changes.field = inputField;
 			if (changed.app) forminput_changes.app = state.app;
 			if (changed.tabindex || changed.visibleInputFields) forminput_changes.tabindex = state.tabindex * 100 + inputField.metadata.orderIndex;
+			if (changed.self) forminput_changes.form = state.self;
 			forminput._set( forminput_changes );
 		},
 
@@ -16276,9 +17143,9 @@ function create_each_block$6(state, visibleInputFields, inputField, inputField_i
 	};
 }
 
-// (3:0) {{#if initialized && visibleInputFields.length > 0}}
-function create_if_block$5(state, component) {
-	var form, text, button, text_1;
+// (5:0) {{#if initialized && visibleInputFields.length > 0}}
+function create_if_block$8(state, component) {
+	var div, form, text, button, text_1;
 
 	function submit_handler(event) {
 		var state = component.get();
@@ -16290,11 +17157,12 @@ function create_if_block$5(state, component) {
 	var each_blocks = [];
 
 	for (var i = 0; i < visibleInputFields.length; i += 1) {
-		each_blocks[i] = create_each_block$6(state, visibleInputFields, visibleInputFields[i], i, component);
+		each_blocks[i] = create_each_block$7(state, visibleInputFields, visibleInputFields[i], i, component);
 	}
 
 	return {
 		c: function create() {
+			div = createElement("div");
 			form = createElement("form");
 
 			for (var i = 0; i < each_blocks.length; i += 1) {
@@ -16308,15 +17176,18 @@ function create_if_block$5(state, component) {
 		},
 
 		h: function hydrate() {
-			encapsulateStyles$8(form);
+			encapsulateStyles$8(div);
+			div.className = "form-body";
 			addListener$1(form, "submit", submit_handler);
 			button.type = "submit";
 			button.disabled = state.disabled;
 			button.tabIndex = "-1";
+			button.className = "btn btn-info";
 		},
 
 		m: function mount(target, anchor) {
-			insertNode(form, target, anchor);
+			insertNode(div, target, anchor);
+			appendNode(form, div);
 
 			for (var i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].m(form, null);
@@ -16330,12 +17201,12 @@ function create_if_block$5(state, component) {
 		p: function update(changed, state) {
 			var visibleInputFields = state.visibleInputFields;
 
-			if (changed.visibleInputFields || changed.app || changed.tabindex) {
+			if (changed.visibleInputFields || changed.app || changed.tabindex || changed.self) {
 				for (var i = 0; i < visibleInputFields.length; i += 1) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, state, visibleInputFields, visibleInputFields[i], i);
 					} else {
-						each_blocks[i] = create_each_block$6(state, visibleInputFields, visibleInputFields[i], i, component);
+						each_blocks[i] = create_each_block$7(state, visibleInputFields, visibleInputFields[i], i, component);
 						each_blocks[i].c();
 						each_blocks[i].m(form, text);
 					}
@@ -16358,7 +17229,7 @@ function create_if_block$5(state, component) {
 		},
 
 		u: function unmount() {
-			detachNode(form);
+			detachNode(div);
 
 			for (var i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].u();
@@ -16373,7 +17244,7 @@ function create_if_block$5(state, component) {
 	};
 }
 
-// (15:1) {{#each outputFieldValues as outputField}}
+// (19:1) {{#each outputFieldValues as outputField}}
 function create_each_block_1$2(state, outputFieldValues, outputField, outputField_index, component) {
 	var if_block_anchor;
 
@@ -16417,10 +17288,10 @@ function create_each_block_1$2(state, outputFieldValues, outputField, outputFiel
 	};
 }
 
-// (16:1) {{#if outputField.metadata.hidden == false}}
+// (20:1) {{#if outputField.metadata.hidden == false}}
 function create_if_block_2$3(state, outputFieldValues, outputField, outputField_index, component) {
 
-	var formoutput = new SvelteComponent$12({
+	var formoutput = new SvelteComponent$13({
 		_root: component._root,
 		data: {
 			field: outputField,
@@ -16458,8 +17329,8 @@ function create_if_block_2$3(state, outputFieldValues, outputField, outputField_
 	};
 }
 
-// (13:0) {{#if outputFieldValues != null}}
-function create_if_block_1$5(state, component) {
+// (17:0) {{#if outputFieldValues != null}}
+function create_if_block_1$6(state, component) {
 	var div;
 
 	var outputFieldValues = state.outputFieldValues;
@@ -16529,11 +17400,13 @@ function create_if_block_1$5(state, component) {
 	};
 }
 
-function SvelteComponent$18(options) {
+function SvelteComponent$19(options) {
 	init(this, options);
 	this._state = assign(data$3(), options.data);
 
-	if (!document.getElementById("svelte-4177434319-style")) add_css$8();
+	this._handlers.destroy = [ondestroy];
+
+	if (!document.getElementById("svelte-1750191902-style")) add_css$8();
 
 	if (!options._root) {
 		this._oncreate = [];
@@ -16541,7 +17414,7 @@ function SvelteComponent$18(options) {
 		this._aftercreate = [];
 	}
 
-	this._fragment = create_main_fragment$18(this._state, this);
+	this._fragment = create_main_fragment$19(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -16555,9 +17428,22 @@ function SvelteComponent$18(options) {
 	}
 }
 
-assign(SvelteComponent$18.prototype, methods$2, proto);
+assign(SvelteComponent$19.prototype, methods$3, proto);
 
-/* src\core\ui\outputs\ActionList.html generated by Svelte v1.40.1 */
+/**
+ * Represents an event triggered by an action-list.
+ */
+var ActionListEventArguments = (function (_super) {
+    __extends(ActionListEventArguments, _super);
+    function ActionListEventArguments(app, actionFormId) {
+        var _this = _super.call(this, app) || this;
+        _this.actionFormId = actionFormId;
+        return _this;
+    }
+    return ActionListEventArguments;
+}(FormEventArguments));
+
+/* src\core\ui\outputs\ActionList.html generated by Svelte v1.41.1 */
 var modalId = 0;
 var modals = [];
 
@@ -16588,16 +17474,26 @@ function data$2() {
 	}
 }
 
-var methods$1 = {
-	run(action, app) {
-		this.set({ open: true });
+var methods$2 = {
+	async run(action, app) {
+		var self = this;
 
 		var formInstance = app.getFormInstance(action.form, true);
 		
 		// TODO: find a way to initialize from action.inputFieldValues directly.
 		var serializedInputValues = formInstance.getSerializedInputValuesFromObject(action.inputFieldValues);
-		formInstance.initializeInputFields(serializedInputValues).then(() => {
-			var f = new SvelteComponent$18({
+		await formInstance.initializeInputFields(serializedInputValues);
+		
+		var allRequiredInputsHaveData = await formInstance.allRequiredInputsHaveData(false);
+		
+		if (action.action === "run" && allRequiredInputsHaveData) {
+			await formInstance.submit(this.get("app"), false);
+			this.onActionRun(formInstance.metadata.id);
+		}
+		else {
+			this.set({ open: true });
+
+			var f = new SvelteComponent$19({
 				target: this.refs.container,
 				data: {
 					metadata: formInstance.metadata,
@@ -16617,9 +17513,9 @@ var methods$1 = {
 			});
 
 			this.set({current: f});
-		});
 
-		modals.push(this);
+			modals.push(self);
+		}
 	},
 	close(reloadParentForm) {
 		// Ensure the modal div is hidden.
@@ -16627,31 +17523,131 @@ var methods$1 = {
 
 		// Destroy underlying form instance.
 		var modalForm = this.get("current");
-		modalForm.destroy();
-
+		
 		if (reloadParentForm) {
-			// Refresh parent form.
-			var app = this.get("app");
-			var form = this.get("form");
-			this.get("parent").submit(app, form, null, true);
+			let formId = modalForm.get("metadata").id;
+			this.onActionRun(formId);
 		}
 
+		modalForm.destroy();
 		modals.pop(this);
+	},
+	async onActionRun(formId) {
+		let parentForm = this.get("parent");
+		let app = parentForm.get("app");
+		let formInstance = parentForm.get("form");
+
+		await parentForm.submit(app, formInstance, null, true);
+
+		var eventArgs = new ActionListEventArguments(app, formId);
+		parentForm.fireAndBubbleUp(`action-list:run`, eventArgs);
 	}
 };
 
 function encapsulateStyles$7(node) {
-	setAttribute(node, "svelte-605003387", "");
+	setAttribute(node, "svelte-1263416417", "");
 }
 
 function add_css$7() {
 	var style = createElement("style");
-	style.id = 'svelte-605003387-style';
-	style.textContent = "[svelte-605003387].modal .card,[svelte-605003387] .modal .card{max-width:85%;padding:10px 15px}[svelte-605003387].hidden,[svelte-605003387] .hidden{width:0;height:0;position:absolute;left:-1000px}[svelte-605003387].actionlist,[svelte-605003387] .actionlist{margin:10px 0;padding:0 5px;background:#f5f5f5;border-width:1px 0;border-style:solid;border-color:#e8e8e8;text-align:right}[svelte-605003387].actionlist>li,[svelte-605003387] .actionlist>li{list-style-type:none;display:inline-block}";
+	style.id = 'svelte-1263416417-style';
+	style.textContent = "[svelte-1263416417].modal .card,[svelte-1263416417] .modal .card{max-width:85%;padding:10px 15px}[svelte-1263416417].hidden,[svelte-1263416417] .hidden{width:0;height:0;position:absolute;left:-1000px}[svelte-1263416417].actionlist,[svelte-1263416417] .actionlist{margin:0px 0;padding:0 5px;text-align:right;background:#fff;margin-bottom:15px}[svelte-1263416417].actionlist>li,[svelte-1263416417] .actionlist>li{list-style-type:none;display:inline-block}";
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$17(state, component) {
+function create_main_fragment$18(state, component) {
+	var if_block_anchor;
+
+	var if_block = (state.field.data != null && state.field.data.actions != null && state.field.data.actions.length > 0) && create_if_block$7(state, component);
+
+	return {
+		c: function create() {
+			if (if_block) if_block.c();
+			if_block_anchor = createComment();
+		},
+
+		m: function mount(target, anchor) {
+			if (if_block) if_block.m(target, anchor);
+			insertNode(if_block_anchor, target, anchor);
+		},
+
+		p: function update(changed, state) {
+			if (state.field.data != null && state.field.data.actions != null && state.field.data.actions.length > 0) {
+				if (if_block) {
+					if_block.p(changed, state);
+				} else {
+					if_block = create_if_block$7(state, component);
+					if_block.c();
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				}
+			} else if (if_block) {
+				if_block.u();
+				if_block.d();
+				if_block = null;
+			}
+		},
+
+		u: function unmount() {
+			if (if_block) if_block.u();
+			detachNode(if_block_anchor);
+		},
+
+		d: function destroy$$1() {
+			if (if_block) if_block.d();
+		}
+	};
+}
+
+// (3:1) {{#each field.data.actions as action}}
+function create_each_block$6(state, actions, action, action_index, component) {
+	var li, button, text_value = action.label, text;
+
+	return {
+		c: function create() {
+			li = createElement("li");
+			button = createElement("button");
+			text = createText(text_value);
+			this.h();
+		},
+
+		h: function hydrate() {
+			button.className = "btn btn-default";
+			addListener$1(button, "click", click_handler$1);
+
+			button._svelte = {
+				component: component,
+				actions: actions,
+				action_index: action_index
+			};
+		},
+
+		m: function mount(target, anchor) {
+			insertNode(li, target, anchor);
+			appendNode(button, li);
+			appendNode(text, button);
+		},
+
+		p: function update(changed, state, actions, action, action_index) {
+			button._svelte.actions = actions;
+			button._svelte.action_index = action_index;
+
+			if ((changed.field) && text_value !== (text_value = action.label)) {
+				text.data = text_value;
+			}
+		},
+
+		u: function unmount() {
+			detachNode(li);
+		},
+
+		d: function destroy$$1() {
+			removeListener$1(button, "click", click_handler$1);
+		}
+	};
+}
+
+// (1:0) {{#if field.data != null && field.data.actions != null && field.data.actions.length > 0}}
+function create_if_block$7(state, component) {
 	var ul, text, input, input_id_value, text_1, div, div_1, label, label_for_value, text_2, div_2;
 
 	var actions = state.field.data.actions;
@@ -16659,7 +17655,7 @@ function create_main_fragment$17(state, component) {
 	var each_blocks = [];
 
 	for (var i = 0; i < actions.length; i += 1) {
-		each_blocks[i] = create_each_block$5(state, actions, actions[i], i, component);
+		each_blocks[i] = create_each_block$6(state, actions, actions[i], i, component);
 	}
 
 	function input_change_handler() {
@@ -16734,7 +17730,7 @@ function create_main_fragment$17(state, component) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, state, actions, actions[i], i);
 					} else {
-						each_blocks[i] = create_each_block$5(state, actions, actions[i], i, component);
+						each_blocks[i] = create_each_block$6(state, actions, actions[i], i, component);
 						each_blocks[i].c();
 						each_blocks[i].m(ul, null);
 					}
@@ -16781,53 +17777,6 @@ function create_main_fragment$17(state, component) {
 	};
 }
 
-// (2:1) {{#each field.data.actions as action}}
-function create_each_block$5(state, actions, action, action_index, component) {
-	var li, button, text_value = action.label, text;
-
-	return {
-		c: function create() {
-			li = createElement("li");
-			button = createElement("button");
-			text = createText(text_value);
-			this.h();
-		},
-
-		h: function hydrate() {
-			addListener$1(button, "click", click_handler$1);
-
-			button._svelte = {
-				component: component,
-				actions: actions,
-				action_index: action_index
-			};
-		},
-
-		m: function mount(target, anchor) {
-			insertNode(li, target, anchor);
-			appendNode(button, li);
-			appendNode(text, button);
-		},
-
-		p: function update(changed, state, actions, action, action_index) {
-			button._svelte.actions = actions;
-			button._svelte.action_index = action_index;
-
-			if ((changed.field) && text_value !== (text_value = action.label)) {
-				text.data = text_value;
-			}
-		},
-
-		u: function unmount() {
-			detachNode(li);
-		},
-
-		d: function destroy$$1() {
-			removeListener$1(button, "click", click_handler$1);
-		}
-	};
-}
-
 function click_handler$1(event) {
 	var component = this._svelte.component;
 	var actions = this._svelte.actions, action_index = this._svelte.action_index, action = actions[action_index];
@@ -16835,14 +17784,14 @@ function click_handler$1(event) {
 	component.run(action, state.app);
 }
 
-function SvelteComponent$17(options) {
+function SvelteComponent$18(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = assign(data$2(), options.data);
 
-	if (!document.getElementById("svelte-605003387-style")) add_css$7();
+	if (!document.getElementById("svelte-1263416417-style")) add_css$7();
 
-	this._fragment = create_main_fragment$17(this._state, this);
+	this._fragment = create_main_fragment$18(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -16850,23 +17799,25 @@ function SvelteComponent$17(options) {
 	}
 }
 
-assign(SvelteComponent$17.prototype, methods$1, proto);
+assign(SvelteComponent$18.prototype, methods$2, proto);
 
-/* src\core\ui\outputs\InlineForm.html generated by Svelte v1.40.1 */
+/* src\core\ui\outputs\InlineForm.html generated by Svelte v1.41.1 */
 function oncreate$6() {
 	var app = this.get("app");
 	var field = this.get("field");
+	var parentFormComponent = this.get("parent");
 
 	var formInstance = app.getFormInstance(field.data.form, true);	
 	
 	formInstance.initializeInputFields(field.data.inputFieldValues).then(() => {
-		var f = new SvelteComponent$18({
+		var f = new SvelteComponent$19({
 			target: this.refs.container,
 			data: {
 				metadata: formInstance.metadata,
 				form: formInstance,
 				app: app,
-				useUrl: false
+				useUrl: false,
+				parent: parentFormComponent
 			}
 		});
 
@@ -16874,20 +17825,30 @@ function oncreate$6() {
 
 		this.set({current: f});
 	});
+
+	this.get("parent").on("destroy", () => this.destroy());
+}
+
+function ondestroy$1() {
+	var form = this.get("current");
+	
+	if (form != null){
+		form.destroy();
+	}
 }
 
 function encapsulateStyles$10(node) {
-	setAttribute(node, "svelte-508887878", "");
+	setAttribute(node, "svelte-1030257636", "");
 }
 
 function add_css$10() {
 	var style = createElement("style");
-	style.id = 'svelte-508887878-style';
-	style.textContent = "[svelte-508887878].inline-form,[svelte-508887878] .inline-form{border-width:1px 1px 1px;border-style:solid;border-color:#ccc;margin:30px 0;padding:1px 1px;border-radius:5px}";
+	style.id = 'svelte-1030257636-style';
+	style.textContent = "[svelte-1030257636].inline-form,[svelte-1030257636] .inline-form{border-width:1px 1px 1px;border-style:solid;border-color:#ccc;margin:30px 0;padding:1px 1px;border-radius:5px}";
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$20(state, component) {
+function create_main_fragment$21(state, component) {
 	var div;
 
 	return {
@@ -16918,12 +17879,14 @@ function create_main_fragment$20(state, component) {
 	};
 }
 
-function SvelteComponent$20(options) {
+function SvelteComponent$21(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = options.data || {};
 
-	if (!document.getElementById("svelte-508887878-style")) add_css$10();
+	this._handlers.destroy = [ondestroy$1];
+
+	if (!document.getElementById("svelte-1030257636-style")) add_css$10();
 
 	var _oncreate = oncreate$6.bind(this);
 
@@ -16933,7 +17896,7 @@ function SvelteComponent$20(options) {
 	 	this._root._oncreate.push(_oncreate);
 	 }
 
-	this._fragment = create_main_fragment$20(this._state, this);
+	this._fragment = create_main_fragment$21(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -16943,10 +17906,10 @@ function SvelteComponent$20(options) {
 	}
 }
 
-assign(SvelteComponent$20.prototype, proto);
+assign(SvelteComponent$21.prototype, proto);
 
-/* src\core\ui\outputs\TextValue.html generated by Svelte v1.40.1 */
-function create_main_fragment$21(state, component) {
+/* src\core\ui\outputs\TextValue.html generated by Svelte v1.41.1 */
+function create_main_fragment$22(state, component) {
 	var text_value = state.field.data.value, text;
 
 	return {
@@ -16972,11 +17935,11 @@ function create_main_fragment$21(state, component) {
 	};
 }
 
-function SvelteComponent$21(options) {
+function SvelteComponent$22(options) {
 	init(this, options);
 	this._state = options.data || {};
 
-	this._fragment = create_main_fragment$21(this._state, this);
+	this._fragment = create_main_fragment$22(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -16984,10 +17947,10 @@ function SvelteComponent$21(options) {
 	}
 }
 
-assign(SvelteComponent$21.prototype, proto);
+assign(SvelteComponent$22.prototype, proto);
 
-/* src\core\ui\outputs\DownloadableFile.html generated by Svelte v1.40.1 */
-function create_main_fragment$22(state, component) {
+/* src\core\ui\outputs\DownloadableFile.html generated by Svelte v1.41.1 */
+function create_main_fragment$23(state, component) {
 	var a, a_href_value, text_value = state.field.data.name, text;
 
 	return {
@@ -17024,11 +17987,11 @@ function create_main_fragment$22(state, component) {
 	};
 }
 
-function SvelteComponent$22(options) {
+function SvelteComponent$23(options) {
 	init(this, options);
 	this._state = options.data || {};
 
-	this._fragment = create_main_fragment$22(this._state, this);
+	this._fragment = create_main_fragment$23(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -17036,9 +17999,9 @@ function SvelteComponent$22(options) {
 	}
 }
 
-assign(SvelteComponent$22.prototype, proto);
+assign(SvelteComponent$23.prototype, proto);
 
-/* src\core\ui\outputs\Alert.html generated by Svelte v1.40.1 */
+/* src\core\ui\outputs\Alert.html generated by Svelte v1.41.1 */
 function encapsulateStyles$11(node) {
 	setAttribute(node, "svelte-112451367", "");
 }
@@ -17050,10 +18013,10 @@ function add_css$11() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$23(state, component) {
+function create_main_fragment$24(state, component) {
 	var if_block_anchor;
 
-	var if_block = (state.field.data != null) && create_if_block$6(state, component);
+	var if_block = (state.field.data != null) && create_if_block$10(state, component);
 
 	return {
 		c: function create() {
@@ -17071,7 +18034,7 @@ function create_main_fragment$23(state, component) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$6(state, component);
+					if_block = create_if_block$10(state, component);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -17094,7 +18057,7 @@ function create_main_fragment$23(state, component) {
 }
 
 // (3:1) {{#if field.data.heading != null}}
-function create_if_block_1$6(state, component) {
+function create_if_block_1$8(state, component) {
 	var div, text_value = state.field.data.heading, text;
 
 	return {
@@ -17162,10 +18125,10 @@ function create_if_block_2$4(state, component) {
 }
 
 // (1:0) {{#if field.data != null}}
-function create_if_block$6(state, component) {
+function create_if_block$10(state, component) {
 	var div, div_class_value, text;
 
-	var if_block = (state.field.data.heading != null) && create_if_block_1$6(state, component);
+	var if_block = (state.field.data.heading != null) && create_if_block_1$8(state, component);
 
 	var if_block_1 = (state.field.data.message != null) && create_if_block_2$4(state, component);
 
@@ -17199,7 +18162,7 @@ function create_if_block$6(state, component) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block_1$6(state, component);
+					if_block = create_if_block_1$8(state, component);
 					if_block.c();
 					if_block.m(div, text);
 				}
@@ -17237,13 +18200,13 @@ function create_if_block$6(state, component) {
 	};
 }
 
-function SvelteComponent$23(options) {
+function SvelteComponent$24(options) {
 	init(this, options);
 	this._state = options.data || {};
 
 	if (!document.getElementById("svelte-112451367-style")) add_css$11();
 
-	this._fragment = create_main_fragment$23(this._state, this);
+	this._fragment = create_main_fragment$24(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -17251,9 +18214,580 @@ function SvelteComponent$23(options) {
 	}
 }
 
-assign(SvelteComponent$23.prototype, proto);
+assign(SvelteComponent$24.prototype, proto);
 
-var FormLogToConsole = /** @class */ (function (_super) {
+/* src\core\ui\outputs\FileSize.html generated by Svelte v1.41.1 */
+function filesize(bytes) {
+	var si = true;
+	var thresh = si ? 1000 : 1024;
+	if (Math.abs(bytes) < thresh) {
+		return bytes + ' B';
+	}
+
+	var units = si
+		? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+		: ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+
+	var u = -1;
+
+	do {
+		bytes /= thresh;
+		++u;
+	} while (Math.abs(bytes) >= thresh && u < units.length - 1);
+
+	return bytes.toFixed(1) + ' ' + units[u];
+}
+
+function create_main_fragment$25(state, component) {
+	var text_value = filesize(state.field.data.bytes), text;
+
+	return {
+		c: function create() {
+			text = createText(text_value);
+		},
+
+		m: function mount(target, anchor) {
+			insertNode(text, target, anchor);
+		},
+
+		p: function update(changed, state) {
+			if ((changed.field) && text_value !== (text_value = filesize(state.field.data.bytes))) {
+				text.data = text_value;
+			}
+		},
+
+		u: function unmount() {
+			detachNode(text);
+		},
+
+		d: noop$1
+	};
+}
+
+function SvelteComponent$25(options) {
+	init(this, options);
+	this._state = options.data || {};
+
+	this._fragment = create_main_fragment$25(this._state, this);
+
+	if (options.target) {
+		this._fragment.c();
+		this._fragment.m(options.target, options.anchor || null);
+	}
+}
+
+assign(SvelteComponent$25.prototype, proto);
+
+/* src\core\ui\outputs\Image.html generated by Svelte v1.41.1 */
+function create_main_fragment$26(state, component) {
+	var if_block_anchor;
+
+	var if_block = (state.field.data != null) && create_if_block$11(state, component);
+
+	return {
+		c: function create() {
+			if (if_block) if_block.c();
+			if_block_anchor = createComment();
+		},
+
+		m: function mount(target, anchor) {
+			if (if_block) if_block.m(target, anchor);
+			insertNode(if_block_anchor, target, anchor);
+		},
+
+		p: function update(changed, state) {
+			if (state.field.data != null) {
+				if (if_block) {
+					if_block.p(changed, state);
+				} else {
+					if_block = create_if_block$11(state, component);
+					if_block.c();
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				}
+			} else if (if_block) {
+				if_block.u();
+				if_block.d();
+				if_block = null;
+			}
+		},
+
+		u: function unmount() {
+			if (if_block) if_block.u();
+			detachNode(if_block_anchor);
+		},
+
+		d: function destroy$$1() {
+			if (if_block) if_block.d();
+		}
+	};
+}
+
+// (1:0) {{#if field.data != null}}
+function create_if_block$11(state, component) {
+	var img, img_src_value;
+
+	return {
+		c: function create() {
+			img = createElement("img");
+			this.h();
+		},
+
+		h: function hydrate() {
+			img.src = img_src_value = state.field.data.url;
+			img.alt = '';
+		},
+
+		m: function mount(target, anchor) {
+			insertNode(img, target, anchor);
+		},
+
+		p: function update(changed, state) {
+			if ((changed.field) && img_src_value !== (img_src_value = state.field.data.url)) {
+				img.src = img_src_value;
+			}
+		},
+
+		u: function unmount() {
+			detachNode(img);
+		},
+
+		d: noop$1
+	};
+}
+
+function SvelteComponent$26(options) {
+	init(this, options);
+	this._state = options.data || {};
+
+	this._fragment = create_main_fragment$26(this._state, this);
+
+	if (options.target) {
+		this._fragment.c();
+		this._fragment.m(options.target, options.anchor || null);
+	}
+}
+
+assign(SvelteComponent$26.prototype, proto);
+
+/* src\core\ui\outputs\Link.html generated by Svelte v1.41.1 */
+function create_main_fragment$27(state, component) {
+	var if_block_anchor;
+
+	var if_block = (state.field.data != null) && create_if_block$12(state, component);
+
+	return {
+		c: function create() {
+			if (if_block) if_block.c();
+			if_block_anchor = createComment();
+		},
+
+		m: function mount(target, anchor) {
+			if (if_block) if_block.m(target, anchor);
+			insertNode(if_block_anchor, target, anchor);
+		},
+
+		p: function update(changed, state) {
+			if (state.field.data != null) {
+				if (if_block) {
+					if_block.p(changed, state);
+				} else {
+					if_block = create_if_block$12(state, component);
+					if_block.c();
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				}
+			} else if (if_block) {
+				if_block.u();
+				if_block.d();
+				if_block = null;
+			}
+		},
+
+		u: function unmount() {
+			if (if_block) if_block.u();
+			detachNode(if_block_anchor);
+		},
+
+		d: function destroy$$1() {
+			if (if_block) if_block.d();
+		}
+	};
+}
+
+// (1:0) {{#if field.data != null}}
+function create_if_block$12(state, component) {
+	var a, a_href_value, text_value = state.field.data.anchor, text;
+
+	return {
+		c: function create() {
+			a = createElement("a");
+			text = createText(text_value);
+			this.h();
+		},
+
+		h: function hydrate() {
+			a.href = a_href_value = state.field.data.url;
+		},
+
+		m: function mount(target, anchor) {
+			insertNode(a, target, anchor);
+			appendNode(text, a);
+		},
+
+		p: function update(changed, state) {
+			if ((changed.field) && a_href_value !== (a_href_value = state.field.data.url)) {
+				a.href = a_href_value;
+			}
+
+			if ((changed.field) && text_value !== (text_value = state.field.data.anchor)) {
+				text.data = text_value;
+			}
+		},
+
+		u: function unmount() {
+			detachNode(a);
+		},
+
+		d: noop$1
+	};
+}
+
+function SvelteComponent$27(options) {
+	init(this, options);
+	this._state = options.data || {};
+
+	this._fragment = create_main_fragment$27(this._state, this);
+
+	if (options.target) {
+		this._fragment.c();
+		this._fragment.m(options.target, options.anchor || null);
+	}
+}
+
+assign(SvelteComponent$27.prototype, proto);
+
+/* src\core\ui\outputs\ObjectList.html generated by Svelte v1.41.1 */
+function oncreate$7() {
+	var field = this.get("field");
+	var metadata = field.data.metadata;
+
+	var items = [];
+	for (let item of field.data.items) {
+		items.push(FormInstance.getOutputFieldValues(metadata, item));
+	}		
+
+	this.set({
+		items: items
+	});
+}
+
+function encapsulateStyles$12(node) {
+	setAttribute(node, "svelte-3414328956", "");
+}
+
+function add_css$12() {
+	var style = createElement("style");
+	style.id = 'svelte-3414328956-style';
+	style.textContent = "[svelte-3414328956].object-list-item,[svelte-3414328956] .object-list-item{margin:10px 0;border-bottom:1px solid #eee;padding:10px 0}";
+	appendNode(style, document.head);
+}
+
+function create_main_fragment$28(state, component) {
+	var if_block_anchor;
+
+	var if_block = (state.items != null) && create_if_block$13(state, component);
+
+	return {
+		c: function create() {
+			if (if_block) if_block.c();
+			if_block_anchor = createComment();
+		},
+
+		m: function mount(target, anchor) {
+			if (if_block) if_block.m(target, anchor);
+			insertNode(if_block_anchor, target, anchor);
+		},
+
+		p: function update(changed, state) {
+			if (state.items != null) {
+				if (if_block) {
+					if_block.p(changed, state);
+				} else {
+					if_block = create_if_block$13(state, component);
+					if_block.c();
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				}
+			} else if (if_block) {
+				if_block.u();
+				if_block.d();
+				if_block = null;
+			}
+		},
+
+		u: function unmount() {
+			if (if_block) if_block.u();
+			detachNode(if_block_anchor);
+		},
+
+		d: function destroy$$1() {
+			if (if_block) if_block.d();
+		}
+	};
+}
+
+// (2:0) {{#each items as itemFields}}
+function create_each_block$8(state, items, itemFields, itemFields_index, component) {
+	var div;
+
+	var itemFields_1 = itemFields;
+
+	var each_blocks = [];
+
+	for (var i = 0; i < itemFields_1.length; i += 1) {
+		each_blocks[i] = create_each_block_1$3(state, items, itemFields, itemFields_index, itemFields_1, itemFields_1[i], i, component);
+	}
+
+	return {
+		c: function create() {
+			div = createElement("div");
+
+			for (var i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].c();
+			}
+			this.h();
+		},
+
+		h: function hydrate() {
+			encapsulateStyles$12(div);
+			div.className = "object-list-item";
+		},
+
+		m: function mount(target, anchor) {
+			insertNode(div, target, anchor);
+
+			for (var i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].m(div, null);
+			}
+		},
+
+		p: function update(changed, state, items, itemFields, itemFields_index) {
+			var itemFields_1 = itemFields;
+
+			if (changed.items || changed.app || changed.form || changed.parent) {
+				for (var i = 0; i < itemFields_1.length; i += 1) {
+					if (each_blocks[i]) {
+						each_blocks[i].p(changed, state, items, itemFields, itemFields_index, itemFields_1, itemFields_1[i], i);
+					} else {
+						each_blocks[i] = create_each_block_1$3(state, items, itemFields, itemFields_index, itemFields_1, itemFields_1[i], i, component);
+						each_blocks[i].c();
+						each_blocks[i].m(div, null);
+					}
+				}
+
+				for (; i < each_blocks.length; i += 1) {
+					each_blocks[i].u();
+					each_blocks[i].d();
+				}
+				each_blocks.length = itemFields_1.length;
+			}
+		},
+
+		u: function unmount() {
+			detachNode(div);
+
+			for (var i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].u();
+			}
+		},
+
+		d: function destroy$$1() {
+			destroyEach(each_blocks);
+		}
+	};
+}
+
+// (4:2) {{#each itemFields as itemField}}
+function create_each_block_1$3(state, items, itemFields, itemFields_index, itemFields_1, itemField, itemField_index, component) {
+	var if_block_anchor;
+
+	var if_block = (itemField.metadata.hidden == false) && create_if_block_1$9(state, items, itemFields, itemFields_index, itemFields_1, itemField, itemField_index, component);
+
+	return {
+		c: function create() {
+			if (if_block) if_block.c();
+			if_block_anchor = createComment();
+		},
+
+		m: function mount(target, anchor) {
+			if (if_block) if_block.m(target, anchor);
+			insertNode(if_block_anchor, target, anchor);
+		},
+
+		p: function update(changed, state, items, itemFields, itemFields_index, itemFields_1, itemField, itemField_index) {
+			if (itemField.metadata.hidden == false) {
+				if (if_block) {
+					if_block.p(changed, state, items, itemFields, itemFields_index, itemFields_1, itemField, itemField_index);
+				} else {
+					if_block = create_if_block_1$9(state, items, itemFields, itemFields_index, itemFields_1, itemField, itemField_index, component);
+					if_block.c();
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				}
+			} else if (if_block) {
+				if_block.u();
+				if_block.d();
+				if_block = null;
+			}
+		},
+
+		u: function unmount() {
+			if (if_block) if_block.u();
+			detachNode(if_block_anchor);
+		},
+
+		d: function destroy$$1() {
+			if (if_block) if_block.d();
+		}
+	};
+}
+
+// (5:2) {{#if itemField.metadata.hidden == false}}
+function create_if_block_1$9(state, items, itemFields, itemFields_index, itemFields_1, itemField, itemField_index, component) {
+
+	var formoutput = new SvelteComponent$13({
+		_root: component._root,
+		data: {
+			field: itemField,
+			app: state.app,
+			form: state.form,
+			parent: state.parent
+		}
+	});
+
+	return {
+		c: function create() {
+			formoutput._fragment.c();
+		},
+
+		m: function mount(target, anchor) {
+			formoutput._mount(target, anchor);
+		},
+
+		p: function update(changed, state, items, itemFields, itemFields_index, itemFields_1, itemField, itemField_index) {
+			var formoutput_changes = {};
+			if (changed.items) formoutput_changes.field = itemField;
+			if (changed.app) formoutput_changes.app = state.app;
+			if (changed.form) formoutput_changes.form = state.form;
+			if (changed.parent) formoutput_changes.parent = state.parent;
+			formoutput._set( formoutput_changes );
+		},
+
+		u: function unmount() {
+			formoutput._unmount();
+		},
+
+		d: function destroy$$1() {
+			formoutput.destroy(false);
+		}
+	};
+}
+
+// (1:0) {{#if items != null}}
+function create_if_block$13(state, component) {
+	var each_anchor;
+
+	var items = state.items;
+
+	var each_blocks = [];
+
+	for (var i = 0; i < items.length; i += 1) {
+		each_blocks[i] = create_each_block$8(state, items, items[i], i, component);
+	}
+
+	return {
+		c: function create() {
+			for (var i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].c();
+			}
+
+			each_anchor = createComment();
+		},
+
+		m: function mount(target, anchor) {
+			for (var i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].m(target, anchor);
+			}
+
+			insertNode(each_anchor, target, anchor);
+		},
+
+		p: function update(changed, state) {
+			var items = state.items;
+
+			if (changed.items || changed.app || changed.form || changed.parent) {
+				for (var i = 0; i < items.length; i += 1) {
+					if (each_blocks[i]) {
+						each_blocks[i].p(changed, state, items, items[i], i);
+					} else {
+						each_blocks[i] = create_each_block$8(state, items, items[i], i, component);
+						each_blocks[i].c();
+						each_blocks[i].m(each_anchor.parentNode, each_anchor);
+					}
+				}
+
+				for (; i < each_blocks.length; i += 1) {
+					each_blocks[i].u();
+					each_blocks[i].d();
+				}
+				each_blocks.length = items.length;
+			}
+		},
+
+		u: function unmount() {
+			for (var i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].u();
+			}
+
+			detachNode(each_anchor);
+		},
+
+		d: function destroy$$1() {
+			destroyEach(each_blocks);
+		}
+	};
+}
+
+function SvelteComponent$28(options) {
+	init(this, options);
+	this._state = options.data || {};
+
+	if (!document.getElementById("svelte-3414328956-style")) add_css$12();
+
+	var _oncreate = oncreate$7.bind(this);
+
+	if (!options._root) {
+		this._oncreate = [_oncreate];
+		this._beforecreate = [];
+		this._aftercreate = [];
+	} else {
+	 	this._root._oncreate.push(_oncreate);
+	 }
+
+	this._fragment = create_main_fragment$28(this._state, this);
+
+	if (options.target) {
+		this._fragment.c();
+		this._fragment.m(options.target, options.anchor || null);
+
+		this._lock = true;
+		callAll(this._beforecreate);
+		callAll(this._oncreate);
+		callAll(this._aftercreate);
+		this._lock = false;
+	}
+}
+
+assign(SvelteComponent$28.prototype, proto);
+
+var FormLogToConsole = (function (_super) {
     __extends(FormLogToConsole, _super);
     function FormLogToConsole() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -17265,7 +18799,25 @@ var FormLogToConsole = /** @class */ (function (_super) {
     return FormLogToConsole;
 }(FormEventHandler));
 
-var BindToOutput = /** @class */ (function (_super) {
+/**
+ * Reloads form after
+ */
+var ReloadFormAfterAction = (function (_super) {
+    __extends(ReloadFormAfterAction, _super);
+    function ReloadFormAfterAction() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    ReloadFormAfterAction.prototype.run = function (form, eventHandlerMetadata, args) {
+        var isTopLevelForm = args.form.get("parent") == null;
+        if (isTopLevelForm && eventHandlerMetadata.customProperties.formId === args.actionFormId) {
+            args.form.submit(args.app, form, null, false);
+        }
+        return Promise.resolve();
+    };
+    return ReloadFormAfterAction;
+}(FormEventHandler));
+
+var BindToOutput = (function (_super) {
     __extends(BindToOutput, _super);
     function BindToOutput() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -17286,7 +18838,7 @@ var BindToOutput = /** @class */ (function (_super) {
     return BindToOutput;
 }(InputFieldEventHandler));
 
-var InputLogToConsole = /** @class */ (function (_super) {
+var InputLogToConsole = (function (_super) {
     __extends(InputLogToConsole, _super);
     function InputLogToConsole() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -17299,7 +18851,7 @@ var InputLogToConsole = /** @class */ (function (_super) {
     return InputLogToConsole;
 }(InputFieldEventHandler));
 
-var OutputLogToConsole = /** @class */ (function (_super) {
+var OutputLogToConsole = (function (_super) {
     __extends(OutputLogToConsole, _super);
     function OutputLogToConsole() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -17311,7 +18863,7 @@ var OutputLogToConsole = /** @class */ (function (_super) {
     return OutputLogToConsole;
 }(OutputFieldEventHandler));
 
-var Growl = /** @class */ (function () {
+var Growl = (function () {
     function Growl() {
     }
     Growl.prototype.run = function (metadata) {
@@ -17329,23 +18881,30 @@ controlRegister.registerInputFieldControl("dropdown", SvelteComponent$3, Dropdow
 controlRegister.registerInputFieldControl("boolean", SvelteComponent$4, BooleanInputController);
 controlRegister.registerInputFieldControl("paginator", null, PaginatorInputController);
 controlRegister.registerInputFieldControl("typeahead", SvelteComponent$5, TypeaheadInputController);
+controlRegister.registerInputFieldControl("my-typeahead", SvelteComponent$5, TypeaheadInputController);
 controlRegister.registerInputFieldControl("multiselect", SvelteComponent$5, MultiSelectInputController);
 controlRegister.registerInputFieldControl("password", SvelteComponent$6, PasswordInputController);
 controlRegister.registerInputFieldControl("textarea", SvelteComponent$7, TextareaInputController, { block: true });
-controlRegister.registerOutputFieldControl("text", SvelteComponent$8);
-controlRegister.registerOutputFieldControl("number", SvelteComponent$9);
-controlRegister.registerOutputFieldControl("datetime", SvelteComponent$10);
-controlRegister.registerOutputFieldControl("table", SvelteComponent$11, { block: true });
-controlRegister.registerOutputFieldControl("formlink", SvelteComponent$13);
-controlRegister.registerOutputFieldControl("tabstrip", SvelteComponent$14, { alwaysHideLabel: true, block: true });
-controlRegister.registerOutputFieldControl("paginated-data", SvelteComponent$15, { block: true });
-controlRegister.registerOutputFieldControl("action-list", SvelteComponent$17, { alwaysHideLabel: true, block: true });
-controlRegister.registerOutputFieldControl("inline-form", SvelteComponent$20, { alwaysHideLabel: true, block: true });
-controlRegister.registerOutputFieldControl("text-value", SvelteComponent$21);
-controlRegister.registerOutputFieldControl("downloadable-file", SvelteComponent$22);
-controlRegister.registerOutputFieldControl("alert", SvelteComponent$23, { alwaysHideLabel: true, block: true });
+controlRegister.registerInputFieldControl("file-uploader", SvelteComponent$8, FileUploaderController, { alwaysHideLabel: true, block: true });
+controlRegister.registerOutputFieldControl("text", SvelteComponent$9);
+controlRegister.registerOutputFieldControl("number", SvelteComponent$10);
+controlRegister.registerOutputFieldControl("datetime", SvelteComponent$11);
+controlRegister.registerOutputFieldControl("table", SvelteComponent$12, { block: true });
+controlRegister.registerOutputFieldControl("formlink", SvelteComponent$14);
+controlRegister.registerOutputFieldControl("tabstrip", SvelteComponent$15, { alwaysHideLabel: true, block: true });
+controlRegister.registerOutputFieldControl("paginated-data", SvelteComponent$16, { block: true });
+controlRegister.registerOutputFieldControl("action-list", SvelteComponent$18, { alwaysHideLabel: true, block: true });
+controlRegister.registerOutputFieldControl("inline-form", SvelteComponent$21, { alwaysHideLabel: true, block: true });
+controlRegister.registerOutputFieldControl("text-value", SvelteComponent$22);
+controlRegister.registerOutputFieldControl("downloadable-file", SvelteComponent$23);
+controlRegister.registerOutputFieldControl("alert", SvelteComponent$24, { alwaysHideLabel: true, block: true });
+controlRegister.registerOutputFieldControl("file-size", SvelteComponent$25);
+controlRegister.registerOutputFieldControl("image", SvelteComponent$26, { block: true });
+controlRegister.registerOutputFieldControl("link", SvelteComponent$27);
+controlRegister.registerOutputFieldControl("object-list", SvelteComponent$28, { block: true });
 // Form event handlers.
 controlRegister.registerFormEventHandler("log-to-console", new FormLogToConsole());
+controlRegister.registerFormEventHandler("reload-form-after-action", new ReloadFormAfterAction());
 // Input event handlers.
 controlRegister.registerInputFieldEventHandler("bind-to-output", new BindToOutput());
 controlRegister.registerInputFieldEventHandler("log-to-console", new InputLogToConsole());
@@ -17363,6 +18922,8 @@ var stateStringParser = function(stateString) {
 		return stateNames
 	}, [])
 };
+
+var parse = stateStringParser;
 
 var stateState = function StateState() {
 	var states = {};
@@ -17397,7 +18958,7 @@ var stateState = function StateState() {
 	}
 
 	function guaranteeAllStatesExist(newStateName) {
-		var stateNames = stateStringParser(newStateName);
+		var stateNames = parse(newStateName);
 		var statesThatDontExist = stateNames.filter(function(name) {
 			return !states[name]
 		});
@@ -17450,7 +19011,7 @@ var stateState = function StateState() {
 	}
 };
 
-var combineArrays = function(obj) {
+var index$6 = function(obj) {
 	var keys = Object.keys(obj);
 
 	keys.forEach(function(key) {
@@ -17481,14 +19042,14 @@ var combineArrays = function(obj) {
 	return output
 };
 
-var isarray = Array.isArray || function (arr) {
+var index$10 = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
 /**
  * Expose `pathToRegexp`.
  */
-var pathToRegexpWithReversibleKeys = pathToRegexp;
+var index$8 = pathToRegexp;
 
 /**
  * The main path matching regexp utility.
@@ -17675,7 +19236,7 @@ function pathToRegexp (path, keys, options, allTokens) {
   keys = keys || [];
   allTokens = allTokens || [];
 
-  if (!isarray(keys)) {
+  if (!index$10(keys)) {
     options = keys;
     keys = [];
   } else if (!options) {
@@ -17686,7 +19247,7 @@ function pathToRegexp (path, keys, options, allTokens) {
     return regexpToRegexp(path, keys, options, allTokens);
   }
 
-  if (isarray(path)) {
+  if (index$10(path)) {
     return arrayToRegexp(path, keys, options, allTokens);
   }
 
@@ -17731,7 +19292,7 @@ function pathParameters() {
 		}
 
 		if (!parameters[path]) {
-			parameters[path] = pathToRegexpWithReversibleKeys(path).keys.map(function(key) {
+			parameters[path] = index$8(path).keys.map(function(key) {
 				return key.name
 			});
 		}
@@ -17751,7 +19312,7 @@ function parametersThatMatterWereChanged(stateState, getPathParameters, stateNam
 }
 
 function stateComparison(parametersChanged, originalState, originalParameters, newState, newParameters) {
-	var states = combineArrays({
+	var states = index$6({
 		start: stateStringParser(originalState),
 		end: stateStringParser(newState)
 	});
@@ -17896,7 +19457,7 @@ var promiseMapSeries = function sequence(array, iterator, thisArg) {
 	return npo.all(results)
 };
 
-var thenDenodeify = function denodeify(fn) {
+var index$12 = function denodeify(fn) {
 	return function() {
 		var self = this;
 		var args = Array.prototype.slice.call(arguments);
@@ -17922,7 +19483,7 @@ var thenDenodeify = function denodeify(fn) {
 	}
 };
 
-var eventemitter3 = createCommonjsModule(function (module) {
+var index$14 = createCommonjsModule(function (module) {
 'use strict';
 
 var has = Object.prototype.hasOwnProperty
@@ -18256,7 +19817,7 @@ function extend$2() {
     return target
 }
 
-var strictUriEncode = function (str) {
+var index$20 = function (str) {
 	return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
 		return '%' + c.charCodeAt(0).toString(16).toUpperCase();
 	});
@@ -18325,7 +19886,7 @@ function shouldUseNative() {
 	}
 }
 
-var objectAssign = shouldUseNative() ? Object.assign : function (target, source) {
+var index$22 = shouldUseNative() ? Object.assign : function (target, source) {
 	var from;
 	var to = toObject$1(target);
 	var symbols;
@@ -18442,7 +20003,7 @@ function parserForArrayFormat(opts) {
 
 function encode$1(value, opts) {
 	if (opts.encode) {
-		return opts.strict ? strictUriEncode(value) : encodeURIComponent(value);
+		return opts.strict ? index$20(value) : encodeURIComponent(value);
 	}
 
 	return value;
@@ -18466,8 +20027,8 @@ var extract = function (str) {
 	return str.split('?')[1] || '';
 };
 
-var parse = function (str, opts) {
-	opts = objectAssign({arrayFormat: 'none'}, opts);
+var parse$1 = function (str, opts) {
+	opts = index$22({arrayFormat: 'none'}, opts);
 
 	var formatter = parserForArrayFormat(opts);
 
@@ -18519,7 +20080,7 @@ var stringify = function (obj, opts) {
 		arrayFormat: 'none'
 	};
 
-	opts = objectAssign(defaults, opts);
+	opts = index$22(defaults, opts);
 
 	var formatter = encoderForArrayFormat(opts);
 
@@ -18554,14 +20115,14 @@ var stringify = function (obj, opts) {
 	}).join('&') : '';
 };
 
-var queryString = {
+var index$18 = {
 	extract: extract,
-	parse: parse,
+	parse: parse$1,
 	stringify: stringify
 };
 
 var hashLocation = function HashLocation(window) {
-	var emitter = new eventemitter3();
+	var emitter = new index$14();
 	var last = '';
 	var needToDecode = getNeedToDecode();
 
@@ -18607,8 +20168,8 @@ function getNeedToDecode() {
 	return !/x x/.test(a.hash)
 }
 
-var hashBrownRouter = function Router(opts, hashLocation$$1) {
-	var emitter = new eventemitter3();
+var index$16 = function Router(opts, hashLocation$$1) {
+	var emitter = new index$14();
 	if (isHashLocation(opts)) {
 		hashLocation$$1 = opts;
 		opts = null;
@@ -18652,7 +20213,7 @@ function getPathParts(path) {
 	var chunks = path.split('?');
 	return {
 		path: chunks.shift(),
-		queryString: queryString.parse(chunks.join(''))
+		queryString: index$18.parse(chunks.join(''))
 	}
 }
 
@@ -18688,7 +20249,7 @@ function add$2(routes, routeString, routeFunction) {
 	if (typeof routeFunction !== 'function') {
 		throw new Error('The router add function must be passed a callback function')
 	}
-	var newRoute = pathToRegexpWithReversibleKeys(routeString);
+	var newRoute = index$8(routeString);
 	newRoute.fn = routeFunction;
 	routes.push(newRoute);
 }
@@ -18722,7 +20283,7 @@ function find(aryOfRegexes, str) {
 
 
 var pathParser = function(pathString) {
-	var parseResults = pathToRegexpWithReversibleKeys(pathString);
+	var parseResults = index$8(pathString);
 
 	// The only reason I'm returning a new object instead of the results of the pathToRegexp
 	// function is so that if the official implementation ends up returning an
@@ -18734,9 +20295,9 @@ var pathParser = function(pathString) {
 	}
 };
 
-var stringifyQuerystring = queryString.stringify;
+var stringifyQuerystring = index$18.stringify;
 
-var pagePathBuilder = function(pathStr, parameters) {
+var index$24 = function(pathStr, parameters) {
 	var parsed = typeof pathStr === 'string' ? pathParser(pathStr) : pathStr;
 	var allTokens = parsed.allTokens;
 	var regex = parsed.regex;
@@ -18799,19 +20360,11 @@ var browser$1 = function (fn) {
 
 var expectedPropertiesOfAddState = [ 'name', 'route', 'defaultChild', 'data', 'template', 'resolve', 'activate', 'querystringParameters', 'defaultQuerystringParameters', 'defaultParameters' ];
 
-var abstractStateRouter = function StateProvider(makeRenderer, rootElement, stateRouterOptions) {
+var index$4 = function StateProvider(makeRenderer, rootElement, stateRouterOptions) {
 	var prototypalStateHolder = stateState();
 	var lastCompletelyLoadedState = currentState();
 	var lastStateStartedActivating = currentState();
-	var stateProviderEmitter = new eventemitter3();
-	var compareStartAndEndStates = stateComparison_1(prototypalStateHolder);
-
-	function stateNameToArrayofStates(stateName) {
-		return stateStringParser(stateName).map(function(name) {
-			return prototypalStateHolder.get(name)
-		})
-	}
-
+	var stateProviderEmitter = new index$14();
 	stateTransitionManager(stateProviderEmitter);
 	stateRouterOptions = immutable({
 		throwOnError: true,
@@ -18819,7 +20372,7 @@ var abstractStateRouter = function StateProvider(makeRenderer, rootElement, stat
 	}, stateRouterOptions);
 
 	if (!stateRouterOptions.router) {
-		stateRouterOptions.router = hashBrownRouter(defaultRouterOptions);
+		stateRouterOptions.router = index$16(defaultRouterOptions);
 	}
 
 	stateRouterOptions.router.on('not found', function(route, parameters) {
@@ -19026,10 +20579,10 @@ var abstractStateRouter = function StateProvider(makeRenderer, rootElement, stat
 			}
 			return state
 		}).then(ifNotCancelled(function(state) {
-			stateProviderEmitter.emit('stateChangeStart', state, parameters, stateNameToArrayofStates(state.name));
+			stateProviderEmitter.emit('stateChangeStart', state, parameters);
 			lastStateStartedActivating.set(state.name, parameters);
 		})).then(function getStateChanges() {
-			var stateComparisonResults = compareStartAndEndStates(lastCompletelyLoadedState.get().name, lastCompletelyLoadedState.get().parameters, newStateName, parameters);
+			var stateComparisonResults = stateComparison_1(prototypalStateHolder)(lastCompletelyLoadedState.get().name, lastCompletelyLoadedState.get().parameters, newStateName, parameters);
 			return stateChangeLogic(stateComparisonResults) // { destroy, change, create }
 		}).then(ifNotCancelled(function resolveDestroyAndActivateStates(stateChanges) {
 			return resolveStates(getStatesToResolve(stateChanges), immutable(parameters)).catch(function onResolveError(e) {
@@ -19055,7 +20608,7 @@ var abstractStateRouter = function StateProvider(makeRenderer, rootElement, stat
 
 			function activateStates(stateNames) {
 				return stateNames.map(prototypalStateHolder.get).forEach(function(state) {
-					var emitter = new eventemitter3();
+					var emitter = new index$14();
 					var context = Object.create(emitter);
 					context.domApi = activeDomApis[state.name];
 					context.data = state.data;
@@ -19075,7 +20628,7 @@ var abstractStateRouter = function StateProvider(makeRenderer, rootElement, stat
 		})).then(function stateChangeComplete() {
 			lastCompletelyLoadedState.set(newStateName, parameters);
 			try {
-				stateProviderEmitter.emit('stateChangeEnd', prototypalStateHolder.get(newStateName), parameters, stateNameToArrayofStates(newStateName));
+				stateProviderEmitter.emit('stateChangeEnd', prototypalStateHolder.get(newStateName), parameters);
 			} catch (e) {
 				handleError('stateError', e);
 			}
@@ -19115,7 +20668,7 @@ var abstractStateRouter = function StateProvider(makeRenderer, rootElement, stat
 
 		prototypalStateHolder.guaranteeAllStatesExist(destinationStateName);
 		var route = prototypalStateHolder.buildFullStateRoute(destinationStateName);
-		return pagePathBuilder(route, parameters || {})
+		return index$24(route, parameters || {})
 	}
 
 	var defaultOptions = {
@@ -19148,10 +20701,10 @@ var abstractStateRouter = function StateProvider(makeRenderer, rootElement, stat
 
 	var renderer = makeRenderer(stateProviderEmitter);
 
-	destroyDom = thenDenodeify(renderer.destroy);
-	getDomChild = thenDenodeify(renderer.getChildElement);
-	renderDom = thenDenodeify(renderer.render);
-	resetDom = thenDenodeify(renderer.reset);
+	destroyDom = index$12(renderer.destroy);
+	getDomChild = index$12(renderer.getChildElement);
+	renderDom = index$12(renderer.render);
+	resetDom = index$12(renderer.reset);
 
 	return stateProviderEmitter
 };
@@ -19197,7 +20750,7 @@ function resolveStates(states, parameters) {
 	}));
 
 	return resolves.then(function(resolveResults) {
-		return combineArrays({
+		return index$6({
 			stateName: stateNamesWithResolveFunctions,
 			resolveResult: resolveResults
 		}).reduce(function(obj, result) {
@@ -19231,7 +20784,7 @@ function promiseMe() {
 	})
 }
 
-var deepmerge = createCommonjsModule(function (module, exports) {
+var index$28 = createCommonjsModule(function (module, exports) {
 (function (root, factory) {
     if (typeof undefined === 'function' && undefined.amd) {
         undefined(factory);
@@ -19316,37 +20869,36 @@ return deepmerge
 }));
 });
 
-var svelteStateRenderer = function SvelteStateRendererFactory(defaultOptions = {}) {
+const copy = object => index$28({}, object, { clone: true });
+
+var index$26 = function SvelteStateRendererFactory(defaultOptions = {}) {
 	return function makeRenderer(stateRouter) {
 		const asr = {
 			makePath: stateRouter.makePath,
-			stateIsActive: stateRouter.stateIsActive,
+			stateIsActive: stateRouter.stateIsActive
 		};
 
 		function render(context, cb) {
 			const { element: target, template, content } = context;
 
-			const rendererSuppliedOptions = deepmerge(defaultOptions, {
+			const rendererSuppliedOptions = index$28(defaultOptions, {
 				target,
-				data: Object.assign(content, defaultOptions.data, { asr }),
+				data: Object.assign(content, defaultOptions.data, { asr })
 			});
-
-			function construct(component, options) {
-				return options.methods
-					? instantiateWithMethods(component, options, options.methods)
-					: new component(options)
-			}
 
 			let svelte;
 
 			try {
 				if (typeof template === 'function') {
-					svelte = construct(template, rendererSuppliedOptions);
+					svelte = new template(rendererSuppliedOptions);
 				} else {
-					const options = deepmerge(rendererSuppliedOptions, template.options);
+					const options = index$28(rendererSuppliedOptions, template.options);
 
-					svelte = construct(template.component, options);
+					svelte = options.methods
+						? instantiateWithMethods(template.component, options, options.methods)
+						: new template.component(options);
 				}
+				svelte.asrReset = createComponentResetter(svelte);
 			} catch (e) {
 				cb(e);
 				return
@@ -19354,7 +20906,7 @@ var svelteStateRenderer = function SvelteStateRendererFactory(defaultOptions = {
 
 			function onRouteChange() {
 				svelte.set({
-					asr,
+					asr
 				});
 			}
 
@@ -19372,13 +20924,10 @@ var svelteStateRenderer = function SvelteStateRendererFactory(defaultOptions = {
 			render,
 			reset: function reset(context, cb) {
 				const svelte = context.domApi;
-				const element = svelte.mountedToTarget;
 
-				svelte.teardown();
+				svelte.asrReset(context.content);
 
-				const renderContext = Object.assign({ element }, context);
-
-				render(renderContext, cb);
+				cb();
 			},
 			destroy: function destroy(svelte, cb) {
 				svelte.teardown();
@@ -19392,10 +20941,23 @@ var svelteStateRenderer = function SvelteStateRendererFactory(defaultOptions = {
 				} catch (e) {
 					cb(e);
 				}
-			},
+			}
 		}
 	}
 };
+
+function createComponentResetter(component) {
+	const originalData = copy(component.get());
+
+	return function reset(newData) {
+		const resetObject = Object.create(null);
+		Object.keys(component.get()).forEach(key => {
+			resetObject[key] = undefined;
+		});
+		Object.assign(resetObject, copy(originalData), newData);
+		component.set(resetObject);
+	}
+}
 
 function instantiateWithMethods(Component, options, methods) {
 	// const coolPrototype = Object.assign(Object.create(Component.prototype), methods)
@@ -19403,7 +20965,7 @@ function instantiateWithMethods(Component, options, methods) {
 	return Object.assign(new Component(options), methods)
 }
 
-/* src\components\MenuItem.html generated by Svelte v1.40.1 */
+/* src\components\MenuItem.html generated by Svelte v1.41.1 */
 let id = 0;
 function data$5() {
 	return {
@@ -19411,10 +20973,10 @@ function data$5() {
 	};
 }
 
-function create_main_fragment$25(state, component) {
+function create_main_fragment$30(state, component) {
 	var if_block_anchor;
 
-	var current_block_type = select_block_type$5(state);
+	var current_block_type = select_block_type$7(state);
 	var if_block = current_block_type(state, component);
 
 	return {
@@ -19429,7 +20991,7 @@ function create_main_fragment$25(state, component) {
 		},
 
 		p: function update(changed, state) {
-			if (current_block_type === (current_block_type = select_block_type$5(state)) && if_block) {
+			if (current_block_type === (current_block_type = select_block_type$7(state)) && if_block) {
 				if_block.p(changed, state);
 			} else {
 				if_block.u();
@@ -19451,11 +21013,11 @@ function create_main_fragment$25(state, component) {
 	};
 }
 
-// (8:1) {{#each menu.items as submenu}}
-function create_each_block$8(state, items, submenu, submenu_index, component) {
+// (11:1) {{#each menu.items as submenu}}
+function create_each_block$10(state, items, submenu, submenu_index, component) {
 	var li;
 
-	var sveltecomponent = new SvelteComponent$25({
+	var sveltecomponent = new SvelteComponent$30({
 		_root: component._root,
 		data: { menu: submenu }
 	});
@@ -19487,7 +21049,7 @@ function create_each_block$8(state, items, submenu, submenu_index, component) {
 	};
 }
 
-// (6:0) {{#if menu.items.length > 0}}
+// (9:0) {{#if menu.items.length > 0}}
 function create_if_block_2$5(state, component) {
 	var ul;
 
@@ -19496,7 +21058,7 @@ function create_if_block_2$5(state, component) {
 	var each_blocks = [];
 
 	for (var i = 0; i < items.length; i += 1) {
-		each_blocks[i] = create_each_block$8(state, items, items[i], i, component);
+		each_blocks[i] = create_each_block$10(state, items, items[i], i, component);
 	}
 
 	return {
@@ -19529,7 +21091,7 @@ function create_if_block_2$5(state, component) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, state, items, items[i], i);
 					} else {
-						each_blocks[i] = create_each_block$8(state, items, items[i], i, component);
+						each_blocks[i] = create_each_block$10(state, items, items[i], i, component);
 						each_blocks[i].c();
 						each_blocks[i].m(ul, null);
 					}
@@ -19558,7 +21120,7 @@ function create_if_block_2$5(state, component) {
 }
 
 // (1:0) {{#if menu.url != null}}
-function create_if_block$8(state, component) {
+function create_if_block$15(state, component) {
 	var a, a_href_value, text_value = state.menu.label, text;
 
 	return {
@@ -19596,24 +21158,26 @@ function create_if_block$8(state, component) {
 }
 
 // (3:0) {{else}}
-function create_if_block_1$7(state, component) {
-	var label, label_for_value, text_value = state.menu.id, text, text_1, input, input_id_value, text_2, if_block_anchor;
+function create_if_block_1$10(state, component) {
+	var div, label, label_for_value, text_value = state.menu.id, text, text_2, input, input_id_value, text_3, if_block_anchor;
 
 	var if_block = (state.menu.items.length > 0) && create_if_block_2$5(state, component);
 
 	return {
 		c: function create() {
+			div = createElement("div");
 			label = createElement("label");
 			text = createText(text_value);
-			text_1 = createText("\r\n");
+			text_2 = createText("\r\n\r\n");
 			input = createElement("input");
-			text_2 = createText("\r\n");
+			text_3 = createText("\r\n");
 			if (if_block) if_block.c();
 			if_block_anchor = createComment();
 			this.h();
 		},
 
 		h: function hydrate() {
+			div.className = "top-menu-div";
 			label.htmlFor = label_for_value = "menu" + state.id;
 			label.className = "toggle-sub";
 			setAttribute(label, "onclick", '');
@@ -19623,11 +21187,12 @@ function create_if_block_1$7(state, component) {
 		},
 
 		m: function mount(target, anchor) {
-			insertNode(label, target, anchor);
+			insertNode(div, target, anchor);
+			appendNode(label, div);
 			appendNode(text, label);
-			insertNode(text_1, target, anchor);
-			insertNode(input, target, anchor);
 			insertNode(text_2, target, anchor);
+			insertNode(input, target, anchor);
+			insertNode(text_3, target, anchor);
 			if (if_block) if_block.m(target, anchor);
 			insertNode(if_block_anchor, target, anchor);
 		},
@@ -19661,10 +21226,10 @@ function create_if_block_1$7(state, component) {
 		},
 
 		u: function unmount() {
-			detachNode(label);
-			detachNode(text_1);
-			detachNode(input);
+			detachNode(div);
 			detachNode(text_2);
+			detachNode(input);
+			detachNode(text_3);
 			if (if_block) if_block.u();
 			detachNode(if_block_anchor);
 		},
@@ -19675,12 +21240,12 @@ function create_if_block_1$7(state, component) {
 	};
 }
 
-function select_block_type$5(state) {
-	if (state.menu.url != null) return create_if_block$8;
-	return create_if_block_1$7;
+function select_block_type$7(state) {
+	if (state.menu.url != null) return create_if_block$15;
+	return create_if_block_1$10;
 }
 
-function SvelteComponent$25(options) {
+function SvelteComponent$30(options) {
 	init(this, options);
 	this._state = assign(data$5(), options.data);
 
@@ -19690,7 +21255,7 @@ function SvelteComponent$25(options) {
 		this._aftercreate = [];
 	}
 
-	this._fragment = create_main_fragment$25(this._state, this);
+	this._fragment = create_main_fragment$30(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -19704,9 +21269,9 @@ function SvelteComponent$25(options) {
 	}
 }
 
-assign(SvelteComponent$25.prototype, proto);
+assign(SvelteComponent$30.prototype, proto);
 
-/* src\components\Menu.html generated by Svelte v1.40.1 */
+/* src\components\Menu.html generated by Svelte v1.41.1 */
 function nestedSort(array, comparison) {
 	array.sort(comparison);
 
@@ -19717,7 +21282,7 @@ function nestedSort(array, comparison) {
 	}
 }
 
-function oncreate$7() {
+function oncreate$8() {
 	var forms = this.get("forms");
 	var getMenu = this.get("getMenu");
 	var makeUrl = this.get("makeUrl");
@@ -19771,10 +21336,10 @@ function oncreate$7() {
 	this.set({ menus: tree });
 }
 
-function create_main_fragment$24(state, component) {
+function create_main_fragment$29(state, component) {
 	var if_block_anchor;
 
-	var if_block = (state.menus != null) && create_if_block$7(state, component);
+	var if_block = (state.menus != null) && create_if_block$14(state, component);
 
 	return {
 		c: function create() {
@@ -19792,7 +21357,7 @@ function create_main_fragment$24(state, component) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$7(state, component);
+					if_block = create_if_block$14(state, component);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -19815,10 +21380,10 @@ function create_main_fragment$24(state, component) {
 }
 
 // (3:1) {{#each menus as menu}}
-function create_each_block$7(state, menus, menu, menu_index, component) {
+function create_each_block$9(state, menus, menu, menu_index, component) {
 	var li;
 
-	var menuitem = new SvelteComponent$25({
+	var menuitem = new SvelteComponent$30({
 		_root: component._root,
 		data: { menu: menu }
 	});
@@ -19851,7 +21416,7 @@ function create_each_block$7(state, menus, menu, menu_index, component) {
 }
 
 // (1:0) {{#if menus != null}}
-function create_if_block$7(state, component) {
+function create_if_block$14(state, component) {
 	var ul;
 
 	var menus = state.menus;
@@ -19859,7 +21424,7 @@ function create_if_block$7(state, component) {
 	var each_blocks = [];
 
 	for (var i = 0; i < menus.length; i += 1) {
-		each_blocks[i] = create_each_block$7(state, menus, menus[i], i, component);
+		each_blocks[i] = create_each_block$9(state, menus, menus[i], i, component);
 	}
 
 	return {
@@ -19887,7 +21452,7 @@ function create_if_block$7(state, component) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, state, menus, menus[i], i);
 					} else {
-						each_blocks[i] = create_each_block$7(state, menus, menus[i], i, component);
+						each_blocks[i] = create_each_block$9(state, menus, menus[i], i, component);
 						each_blocks[i].c();
 						each_blocks[i].m(ul, null);
 					}
@@ -19915,11 +21480,11 @@ function create_if_block$7(state, component) {
 	};
 }
 
-function SvelteComponent$24(options) {
+function SvelteComponent$29(options) {
 	init(this, options);
 	this._state = options.data || {};
 
-	var _oncreate = oncreate$7.bind(this);
+	var _oncreate = oncreate$8.bind(this);
 
 	if (!options._root) {
 		this._oncreate = [_oncreate];
@@ -19929,7 +21494,7 @@ function SvelteComponent$24(options) {
 	 	this._root._oncreate.push(_oncreate);
 	 }
 
-	this._fragment = create_main_fragment$24(this._state, this);
+	this._fragment = create_main_fragment$29(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -19943,10 +21508,10 @@ function SvelteComponent$24(options) {
 	}
 }
 
-assign(SvelteComponent$24.prototype, proto);
+assign(SvelteComponent$29.prototype, proto);
 
-/* src\components\Home.html generated by Svelte v1.40.1 */
-function create_main_fragment$26(state, component) {
+/* src\components\Home.html generated by Svelte v1.41.1 */
+function create_main_fragment$31(state, component) {
 	var text;
 
 	return {
@@ -19968,11 +21533,11 @@ function create_main_fragment$26(state, component) {
 	};
 }
 
-function SvelteComponent$26(options) {
+function SvelteComponent$31(options) {
 	init(this, options);
 	this._state = options.data || {};
 
-	this._fragment = create_main_fragment$26(this._state, this);
+	this._fragment = create_main_fragment$31(this._state, this);
 
 	if (options.target) {
 		this._fragment.c();
@@ -19980,25 +21545,25 @@ function SvelteComponent$26(options) {
 	}
 }
 
-assign(SvelteComponent$26.prototype, proto);
+assign(SvelteComponent$31.prototype, proto);
 
-var AppRouter = /** @class */ (function () {
+var AppRouter = (function () {
     function AppRouter(element, app) {
         this.element = element;
-        this.stateRenderer = svelteStateRenderer({});
-        this.stateRouter = abstractStateRouter(this.stateRenderer, this.element);
+        this.stateRenderer = index$26({});
+        this.stateRouter = index$4(this.stateRenderer, this.element);
         var rpb = this.rpb = new RouteParameterBuilder("_", app);
         this.stateRouter.addState({
             name: "home",
             data: {},
             route: "/home",
-            template: SvelteComponent$26
+            template: SvelteComponent$31
         });
         var self = this;
         this.stateRouter.addState({
             name: "menu",
             route: "/menu",
-            template: SvelteComponent$24,
+            template: SvelteComponent$29,
             resolve: function (data, parameters, cb) {
                 cb(false, {
                     forms: app.forms,
@@ -20016,7 +21581,7 @@ var AppRouter = /** @class */ (function () {
             name: "form",
             data: {},
             route: "/form/:_id",
-            template: SvelteComponent$18,
+            template: SvelteComponent$19,
             // Force route reload when value of _d parameter changes. This is
             // needed because by default the router will not reload route even if
             // any of the parameters change, unless they are specified in "querystringParameters".
@@ -20052,7 +21617,7 @@ var AppRouter = /** @class */ (function () {
     
     return AppRouter;
 }());
-var RouteParameterBuilder = /** @class */ (function () {
+var RouteParameterBuilder = (function () {
     function RouteParameterBuilder(parameterName, app) {
         this.defaultParameters = {};
         this.getFormInstance = function (formId, throwError) { return app.getFormInstance(formId, null); };
@@ -20086,9 +21651,16 @@ var RouteParameterBuilder = /** @class */ (function () {
 
 var server = new UmfServer("/api/form/metadata", "/api/form/run");
 var app = new UmfApp(server, controlRegister);
+app.on("request:started", function (request) {
+    showLoader();
+});
+app.on("request:completed", function (request) {
+    hideLoader();
+});
 app.load().then(function (response) {
     var router = new AppRouter(document.getElementById("main"), app);
     app.useRouter(router);
+    app.registerResponseHandler(new FormComponentResponseHandler());
     app.registerResponseHandler(new MessageResponseHandler());
     app.registerResponseHandler(new ReloadResponseHandler(function (form, inputFieldValues) {
         return app.load().then(function (t) {
@@ -20107,7 +21679,7 @@ function buildMenu(app) {
     while (myNode.firstChild) {
         myNode.removeChild(myNode.firstChild);
     }
-    new SvelteComponent$24({
+    new SvelteComponent$29({
         target: document.getElementById("topmenu"),
         data: {
             forms: app.forms,
@@ -20120,6 +21692,20 @@ function buildMenu(app) {
             makeUrl: function (formId) { return app.makeUrl(formId, null); }
         }
     });
+}
+function showLoader() {
+    var progress = document.getElementById("progress");
+    progress.setAttribute('style', 'width:50%');
+    var loader = document.getElementById("loader");
+    loader.setAttribute("class", "");
+}
+function hideLoader() {
+    var loader = document.getElementById("loader");
+    var progress = document.getElementById("progress");
+    progress.setAttribute('style', 'width:100%');
+    setTimeout(function () {
+        loader.setAttribute("class", "hidden");
+    }, 500);
 }
 
 }());

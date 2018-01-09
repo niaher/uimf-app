@@ -1,6 +1,7 @@
 ﻿namespace UimfApp.Core.DataAccess
 {
 	using Microsoft.EntityFrameworkCore;
+	using UimfApp.Core.Domain;
 
 	public class CoreDbContext : DbContext
 	{

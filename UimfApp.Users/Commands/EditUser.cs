@@ -57,8 +57,11 @@ namespace UimfApp.Users.Commands
 				await this.roleManager.EnsureRoles(message.Roles?.Items ?? new string[0]);
 				await this.userManager.AddToRolesAsync(user, message.Roles?.Items ?? new string[0]);
 
-				await this.userManager.SetEmailAsync(user, message.Email);
-				await this.userManager.SetUserNameAsync(user, message.Name);
+				var identityResult = await this.userManager.SetEmailAsync(user, message.Email);
+				identityResult.EnforceSuccess("Failed to save changes.");
+
+				identityResult = await this.userManager.SetUserNameAsync(user, message.UserName);
+				identityResult.EnforceSuccess("Failed to save changes.");
 			}
 
 			return new Response
@@ -87,7 +90,7 @@ namespace UimfApp.Users.Commands
 			public int Id { get; set; }
 
 			[BindToOutput(nameof(Response.Name))]
-			public string Name { get; set; }
+			public string UserName { get; set; }
 
 			[BindToOutput(nameof(Response.Roles))]
 			[TypeaheadInputField(typeof(RoleTypeaheadInlineSource))]

@@ -7,16 +7,27 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>UI Metadata Framework with Svelte</title>
 	<link rel="stylesheet" href="/css/main.css">
+	<link rel="stylesheet" href="/css/bootstrap/bootstrap.min.css">
 </head>
 
 <body>
-	<header class="top">
-		<a href="#" class="logo" tabindex="-1">UimfApp</a>
-		<div class="xmenu" id="topmenu"></div>
-	</header>
+	<div id="container">
+		<header class="top">
+			<div class="container">
+				<a href="#" class="logo" tabindex="-1">UimfApp</a>
+				<div class="xmenu" id="topmenu"></div>
+			</div>
+		</header>
 
-	<div id="main" class="container"></div>
+		<div class='loaderContainer'>
+			<div id='loader'>
+				<div id='progress'></div>
+				<div class='loader'></div>
+			</div>
+		</div>
+		<div id="main" class="container container-body"></div>
+	</div>
+
 	<script src="/js/app.js"></script>
 </body>
-
 </html>

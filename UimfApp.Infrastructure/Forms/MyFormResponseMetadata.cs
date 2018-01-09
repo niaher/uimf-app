@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Infrastructure.Forms
+namespace UimfApp.Infrastructure.Forms
 {
 	using UiMetadataFramework.Core;
 

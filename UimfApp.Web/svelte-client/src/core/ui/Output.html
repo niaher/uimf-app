@@ -1,4 +1,4 @@
-{{#if showLabel === true && !alwaysHideLabel }}
+{{#if showLabel === true && !alwaysHideLabel && field.metadata.label !== ""}}
 <div>
     <strong>{{field.metadata.label}}:</strong>
     <div ref:container class="{{class}}"></div>

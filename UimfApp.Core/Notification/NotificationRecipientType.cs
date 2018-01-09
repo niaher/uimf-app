@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Core.Notification
+namespace UimfApp.Core.Notification
 {
 	public class NotificationRecipientType
 	{

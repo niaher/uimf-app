@@ -62,7 +62,7 @@
 		},
 		computed: {
 			columnsOrdered: (field) => {
-				return field.metadata.customProperties.columns.sort((a, b) => {
+				return field.metadata.customProperties.columns.filter(b => !b.hidden).sort((a, b) => {
             		return a.orderIndex - b.orderIndex;
         		});
 			}
@@ -84,5 +84,33 @@
 		border: none;
 		margin: 0;
 		padding: 0;	
+		text-align: left;
+	}
+
+	.table{
+		border: 1px solid #e5eff8;
+	}
+
+	.table thead th{
+    	border-bottom: 1px solid #e5eff8;
+    	border-left: 1px solid #e5eff8;
+    	font-weight: normal;
+    	background: #f4f9fe;
+    	color: #3f6e94;
+	}
+
+	.table tbody td{
+    	border-top: 1px solid #e9ecef;
+    	color: #678197;
+    	border-bottom: 1px solid #e5eff8;
+    	border-left: 1px solid #e5eff8;
+	}
+
+	.table tbody tr:nth-child(even) td {
+		background: #f4f9fe
+	}
+
+	.table tbody tr:nth-child(odd) td {
+		background: #FFF
 	}
 </style>

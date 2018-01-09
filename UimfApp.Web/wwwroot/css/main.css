@@ -258,12 +258,200 @@
 
 /*=====  End of Choices  ======*/
 
+@font-face {
+  font-family: Trocchi;
+  src: url("./fonts/Trocchi.otf") format("opentype"); }
+
+.loader {
+  font-size: 10px;
+  float: right;
+  margin: 8px;
+  text-indent: -9999em;
+  width: 3em;
+  height: 3em;
+  border-radius: 50%;
+  background: #ffffff;
+  background: -moz-linear-gradient(left, #1eb1c8 10%, rgba(255, 255, 255, 0) 42%);
+  background: -webkit-linear-gradient(left, #1eb1c8 10%, rgba(255, 255, 255, 0) 42%);
+  background: -o-linear-gradient(left, #1eb1c8 10%, rgba(255, 255, 255, 0) 42%);
+  background: -ms-linear-gradient(left, #1eb1c8 10%, rgba(255, 255, 255, 0) 42%);
+  background: linear-gradient(to right, #1eb1c8 10%, rgba(255, 255, 255, 0) 42%);
+  position: relative;
+  -webkit-animation: load3 1.4s infinite linear;
+  animation: load3 1.4s infinite linear;
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0); }
+
+.loader:before {
+  width: 50%;
+  height: 50%;
+  background: #1eb1c8;
+  border-radius: 100% 0 0 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: ''; }
+
+.loader:after {
+  background: #fff;
+  width: 75%;
+  height: 75%;
+  border-radius: 50%;
+  content: '';
+  margin: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0; }
+
+@-webkit-keyframes load3 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+
+@keyframes load3 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+
+.loaderContainer {
+  height: 4px; }
+
+#loader {
+  height: 100%; }
+
+#progress {
+  z-index: 2147483647;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background: #1eb1c8;
+  -moz-border-radius: 1px;
+  -webkit-border-radius: 1px;
+  border-radius: 1px;
+  -moz-transition: width 500ms ease-out, opacity 400ms linear;
+  -ms-transition: width 500ms ease-out, opacity 400ms linear;
+  -o-transition: width 500ms ease-out, opacity 400ms linear;
+  -webkit-transition: width 500ms ease-out, opacity 400ms linear;
+  transition: width 500ms ease-out, opacity 400ms linear; }
+
+input.form-control:not([type="button"]):not([type="submit"]):not([type="reset"]):hover,
+input.form-control:not([type="button"]):not([type="submit"]):not([type="reset"]):focus,
+textarea.form-control:hover, textarea.form-control:focus,
+select.form-control:hover, select.form-control:focus,
+.choices__inner:hover, .choices__inner:focus {
+  border: 1px solid #ced4da !important;
+  box-shadow: inset 0 -10px 10px -11px #1eb1c8 !important;
+  border-bottom: 1px solid #90f0ff !important; }
+
+input:not([type="button"]):not([type="submit"]):not([type="reset"]):invalid, input:not([type="button"]):not([type="submit"]):not([type="reset"]):focus:invalid, textarea:invalid, textarea:focus:invalid, select:invalid, select:focus:invalid {
+  border: 1px solid #ced4da !important;
+  box-shadow: inset 0 -10px 10px -11px #f3818c !important;
+  border-bottom: 1px solid #fba8b0  !important; }
+
+input, textarea, select {
+  margin: 0 !important; }
+
+.form-header {
+  text-align: center;
+  padding-top: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #bbd2d6;
+  background-color: #fff; }
+
+.form-body {
+  padding: 10px 15px;
+  background-color: #f8f8f8;
+  padding-bottom: 0; }
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%; }
+
+#container {
+  min-height: 100%;
+  position: relative;
+  padding-bottom: 60px; }
+
+#header {
+  background: #ff0;
+  padding: 10px; }
+
+.container-body {
+  padding-bottom: 60px;
+  /* Height of the footer */ }
+
+.container {
+  padding-left: 0 !important;
+  padding-right: 0 !important; }
+
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  /* Height of the footer */
+  text-align: center;
+  color: #f8f8f8 !important;
+  background-color: #343d49 !important; }
+
+.btn-default {
+  background-color: #fff !important;
+  border: 1px solid #17a2b8 !important;
+  color: #343d49 !important; }
+
+.btn-default:not([disabled]):not(.disabled).active,
+.btn-default:not([disabled]):not(.disabled):active,
+.show > .btn-default.dropdown-toggle {
+  background-color: #e1e1e1;
+  border-color: #256c77;
+  box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.5); }
+
+.btn-default:hover, .btn-default.focus, .btn-default:focus {
+  border-color: #117a8b !important;
+  background-color: #17a2b8 !important;
+  color: #fff !important; }
+
+.btn-info.focus, .btn-info:focus {
+  box-shadow: 0 0 0 0.1rem rgba(23, 162, 184, 0.5) !important; }
+
+.btn {
+  margin-left: 10px; }
+
 header.top {
   overflow-x: visible;
-  overflow-y: visible; }
+  overflow-y: visible;
+  min-height: 75px; }
+
+@media (max-width: 765px) {
+  header.top {
+    min-height: 186px; } }
 
 header.top .logo {
-  float: left; }
+  float: left;
+  padding-top: 28px;
+  font-family: Trocchi;
+  font-size: 26px;
+  color: #1eb1c8; }
+
+header.top .logo:hover {
+  color: #f3818c;
+  text-decoration: none; }
+
+header {
+  z-index: 5;
+  background: rgba(41, 51, 63, 0.95) !important; }
 
 .sub-nav-check {
   position: absolute;
@@ -271,11 +459,12 @@ header.top .logo {
   left: -9999px; }
 
 .xmenu {
-  float: left;
+  float: right;
   padding: 1px;
   margin: 0;
   border: none;
-  background: #12171a; }
+  padding-top: 20px;
+  padding-left: 40px; }
 
 .xmenu ul {
   list-style: none;
@@ -285,13 +474,36 @@ header.top .logo {
   padding: 0; }
 
 .xmenu ul > li > a,
-.xmenu ul > li > label {
+.xmenu ul > li > label,
+.xmenu ul > li > div.top-menu-div {
   display: block;
-  color: #fff;
+  color: #1eb1c8;
   text-decoration: none;
   line-height: 44px;
-  padding: 0 15px;
+  padding: 2px 15px;
   margin: 0; }
+
+.xmenu ul > li > a:hover,
+.xmenu ul > li > div.top-menu-div:hover,
+.xmenu ul > li > label:hover {
+  color: #f3818c; }
+
+.xmenu ul ul a:hover,
+.xmenu ul ul label:hover {
+  color: #f3818c;
+  background-color: #343d49; }
+
+.xmenu ul ul a,
+.xmenu ul ul label {
+  color: #ccc; }
+
+.xmenu ul > li > div.top-menu-div::before {
+  content: '';
+  border-left: 2px solid #555;
+  position: absolute;
+  height: 50%;
+  left: 0;
+  top: 25%; }
 
 .xmenu ul li {
   position: relative;
@@ -305,15 +517,18 @@ header.top .logo {
 .xmenu ul ul {
   display: none;
   position: absolute;
-  top: 100%;
   left: 0;
-  background: #12171a;
+  background: #2a3038;
   padding: 0;
-  z-index: 10; }
+  z-index: 10;
+  top: 100%;
+  border-bottom: 5px solid #f3818c;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px; }
 
 .xmenu ul ul li {
   float: none;
-  width: 200px; }
+  min-width: 140px; }
 
 .xmenu ul ul a,
 .xmenu ul ul label {
@@ -331,11 +546,12 @@ header.top .logo {
 
 .choices__inner {
   min-width: 250px;
-  min-height: 32px; }
+  min-height: 32px;
+  background-color: #fff !important; }
 
 .choices__input {
   min-width: 100px;
-  background-color: #f9f9f9 !important;
+  background-color: transparent !important;
   margin-bottom: 5px !important;
   border: 0 !important;
   border-radius: 0 !important;
@@ -365,7 +581,8 @@ html, * {
 body {
   margin: 0;
   color: #212121;
-  background: #f8f8f8; }
+  background: #f8f8f8;
+  height: 100%; }
 
 article, aside, section, figcaption, figure, main, details, menu {
   display: block; }
@@ -503,9 +720,6 @@ a {
 
 a:visited {
   color: #01579b; }
-
-a:hover, a:focus {
-  opacity: 0.75; }
 
 figcaption {
   font-size: 0.8125rem;
@@ -897,8 +1111,6 @@ figcaption {
   Definitions for forms and input elements.
 */
 form {
-  background: #eeeeee;
-  border: 0.0625rem solid #c9c9c9;
   margin: 0.5rem;
   padding: 0.75rem 0.5rem 1.125rem; }
 
@@ -1057,14 +1269,6 @@ a[role="button"], label[role="button"], [role="button"] {
   text-decoration: none;
   transition: background 0.3s;
   cursor: pointer; }
-
-button:hover, button:focus, [type="button"]:hover, [type="button"]:focus, [type="submit"]:hover, [type="submit"]:focus, [type="reset"]:hover, [type="reset"]:focus,
-a.button:hover,
-a.button:focus, label.button:hover, label.button:focus, .button:hover, .button:focus,
-a[role="button"]:hover,
-a[role="button"]:focus, label[role="button"]:hover, label[role="button"]:focus, [role="button"]:hover, [role="button"]:focus {
-  background: gainsboro;
-  opacity: 1; }
 
 input:disabled, input[disabled], textarea:disabled, textarea[disabled], select:disabled, select[disabled], button:disabled, button[disabled], .button:disabled, .button[disabled], [role="button"]:disabled, [role="button"][disabled] {
   cursor: not-allowed;
@@ -1981,7 +2185,7 @@ mark.inline-block {
 
 .modal .card {
   margin: 0 auto;
-  max-height: 50vh;
+  max-height: 70vh;
   overflow: auto; }
 
 .modal .card .close {

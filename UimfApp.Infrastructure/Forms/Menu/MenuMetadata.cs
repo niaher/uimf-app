@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Infrastructure.Forms.Menu
+namespace UimfApp.Infrastructure.Forms.Menu
 {
 	public class MenuMetadata
 	{

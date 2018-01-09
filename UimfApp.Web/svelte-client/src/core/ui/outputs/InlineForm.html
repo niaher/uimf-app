@@ -7,6 +7,7 @@
 		oncreate() {
 			var app = this.get("app");
 			var field = this.get("field");
+			var parentFormComponent = this.get("parent");
 
 			var formInstance = app.getFormInstance(field.data.form, true);	
 			
@@ -17,7 +18,8 @@
 						metadata: formInstance.metadata,
 						form: formInstance,
 						app: app,
-						useUrl: false
+						useUrl: false,
+						parent: parentFormComponent
 					}
 				});
 
@@ -25,6 +27,15 @@
 
 				this.set({current: f});
 			});
+
+			this.get("parent").on("destroy", () => this.destroy());
+		},
+		ondestroy() {
+			var form = this.get("current");
+			
+			if (form != null){
+				form.destroy();
+			}
 		}
 	}
 </script>

@@ -1,4 +1,4 @@
-﻿namespace UimfApp.DataSeed
+namespace UimfApp.DataSeed
 {
 	using System.Linq;
 	using System.Threading.Tasks;
@@ -33,6 +33,24 @@
 			}
 		}
 
+		private async Task<ApplicationUser> EnsureUser(string email, string password, params SystemRole[] roles)
+		{
+			await this.userManager.CreateAsync(new ApplicationUser
+			{
+				UserName = email,
+				Email = email
+			}, password);
+
+			var user = await this.userManager.Users.SingleAsync(t => t.Email == email);
+
+			foreach (var role in roles)
+			{
+				await this.userManager.AddToRoleAsync(user, role.Name);
+			}
+
+			return user;
+		}
+
 		private async Task SeedUsers()
 		{
 			var manuallyAssignableSystemRoles = this.actionRegister.GetSystemRoles()
@@ -40,16 +58,7 @@
 
 			await this.roleManager.EnsureRoles(manuallyAssignableSystemRoles);
 
-			await this.userManager.CreateAsync(new ApplicationUser
-			{
-				UserName = "admin@example.com",
-				Email = "admin@example.com"
-			}, "Password1");
-
-			var user = await this.userManager.Users.SingleAsync(t => t.Email == "admin@example.com");
-
-			await this.userManager.AddToRoleAsync(user, CoreRoles.ToolUser.Name);
-			await this.userManager.AddToRoleAsync(user, UserManagementRoles.UserAdmin.Name);
+			await this.EnsureUser("admin@example.com", "Password1", UserManagementRoles.UserAdmin, CoreRoles.ToolUser);
 		}
 	}
 }

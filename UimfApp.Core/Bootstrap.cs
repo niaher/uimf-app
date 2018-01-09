@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Core
+namespace UimfApp.Core
 {
 	using System.Reflection;
 	using UimfApp.Infrastructure;

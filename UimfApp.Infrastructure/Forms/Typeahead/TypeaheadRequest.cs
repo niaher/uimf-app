@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Infrastructure.Forms.Typeahead
+namespace UimfApp.Infrastructure.Forms.Typeahead
 {
 	using MediatR;
 	using UimfApp.Infrastructure.Forms.Inputs;

@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[File] (
+CREATE TABLE [dbo].[File] (
     [Id]                INT            IDENTITY (1, 1) NOT NULL,
     [CompressionFormat] TINYINT        NOT NULL,
     [CreatedByUserId]   INT            NULL,

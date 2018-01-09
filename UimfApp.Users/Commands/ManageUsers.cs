@@ -18,6 +18,7 @@ namespace UimfApp.Users.Commands
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.Core.Binding;
 	using UiMetadataFramework.MediatR;
+	using UimfApp.Infrastructure.User;
 
 	[MyForm(Id = "users", PostOnLoad = true, Label = "Manage users", Menu = UserMenus.Main, MenuOrderIndex = 1)]
 	public class ManageUsers : IForm<ManageUsers.Request, ManageUsers.Response>, ISecureHandler
@@ -120,7 +121,7 @@ namespace UimfApp.Users.Commands
 			[OutputField(OrderIndex = -10)]
 			public ActionList Actions { get; set; }
 
-			[PaginatedData(nameof(Request.Paginator))]
+			[PaginatedData(nameof(Request.Paginator), Label = "")]
 			public PaginatedData<Item> Users { get; set; }
 		}
 

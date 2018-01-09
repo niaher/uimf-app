@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Infrastructure.Forms
+namespace UimfApp.Infrastructure.Forms
 {
 	using System.Collections.Generic;
 	using System.Linq;
@@ -8,6 +8,7 @@
 	using UimfApp.Infrastructure.Security;
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.MediatR;
+	using UimfApp.Infrastructure.User;
 
 	/// <summary>
 	/// Gets all forms available to the current user.

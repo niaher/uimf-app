@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Core.Notification
+namespace UimfApp.Core.Notification
 {
 	using System.Collections.Generic;
 	using System.Linq;
@@ -6,7 +6,7 @@
 	public class NotificationCategory
 	{
 		private static readonly List<NotificationCategory> List;
-		public static NotificationCategory Grant = new NotificationCategory(1, "Grant", "Grant");
+		public static NotificationCategory SomeThing = new NotificationCategory(1, "SomeThing", "SomeThing");
 
 		static NotificationCategory()
 		{

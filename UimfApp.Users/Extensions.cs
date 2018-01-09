@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Users
+namespace UimfApp.Users
 {
 	using System.Collections.Generic;
 	using System.Linq;
@@ -10,6 +10,14 @@
 
 	public static class Extensions
 	{
+		public static void EnforceSuccess(this IdentityResult result, string message)
+		{
+			if (!result.Succeeded)
+			{
+				throw new ApplicationException($"{message}\n{result.Errors.Select(t => t.Description).JoinString("\n")}");
+			}
+		}
+
 		public static async Task EnsureRoles(this RoleManager<ApplicationRole> roleManager, params SystemRole[] roles)
 		{
 			await roleManager.EnsureRoles(roles.Select(t => t.Name));
@@ -40,14 +48,6 @@
 					(await roleManager.AddClaimAsync(role, new Claim(ClaimTypes.Role, systemRole, systemRole)))
 						.EnforceSuccess($"Failed to add claim to role '{systemRole}'.");
 				}
-			}
-		}
-
-		public static void EnforceSuccess(this IdentityResult result, string message)
-		{
-			if (!result.Succeeded)
-			{
-				throw new ApplicationException($"{message}\n{result.Errors.Select(t => t.Description).JoinString("\n")}");
 			}
 		}
 

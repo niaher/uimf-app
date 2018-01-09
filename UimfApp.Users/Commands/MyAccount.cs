@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Users.Commands
+namespace UimfApp.Users.Commands
 {
 	using System.Linq;
 	using CPermissions;
@@ -11,6 +11,7 @@
 	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.Core.Binding;
+	using UimfApp.Infrastructure.User;
 
 	[MyForm(Id = "account", Label = "My account", PostOnLoad = true, Menu = UserMenus.Account)]
 	public class MyAccount : IMyForm<MyAccount.Request, MyAccount.Response>, ISecureHandler
@@ -26,7 +27,7 @@
 
 		public Response Handle(Request message)
 		{
-			var user = this.userManager.Users.SingleOrDefault(t => t.UserName == this.userContext.UserName);
+			var user = this.userManager.Users.SingleOrDefault(t => t.UserName == this.userContext.User.UserName);
 
 			return new Response
 			{

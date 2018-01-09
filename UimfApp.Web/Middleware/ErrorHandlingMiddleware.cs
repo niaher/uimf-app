@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Web.Middleware
+namespace UimfApp.Web.Middleware
 {
 	using System;
 	using System.Net;

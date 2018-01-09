@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[AspNetUsers] (
+CREATE TABLE [dbo].[AspNetUsers] (
     [Id]                   INT                IDENTITY (1, 1) NOT NULL,
     [AccessFailedCount]    INT                NOT NULL,
     [ConcurrencyStamp]     NVARCHAR (MAX)     NULL,

@@ -12,10 +12,19 @@ var server = new UmfServer(
 
 var app = new UmfApp(server, controlRegister);
 
+app.on("request:started", request => {
+    showLoader();
+})
+
+app.on("request:completed", request => {
+    hideLoader();
+})
+
 app.load().then(response => {
     var router = new AppRouter(document.getElementById("main"), app);
     app.useRouter(router);
 
+    app.registerResponseHandler(new handlers.FormComponentResponseHandler());
     app.registerResponseHandler(new handlers.MessageResponseHandler());
     app.registerResponseHandler(new handlers.ReloadResponseHandler((form, inputFieldValues) => {
         return app.load().then(t => {
@@ -30,7 +39,7 @@ app.load().then(response => {
     buildMenu(app);
 });
 
-function buildMenu(app:UmfApp) {
+function buildMenu(app: UmfApp) {
     // Remove old menu.
     var myNode = document.getElementById("topmenu");
     while (myNode.firstChild) {
@@ -51,4 +60,21 @@ function buildMenu(app:UmfApp) {
             makeUrl: (formId: string) => app.makeUrl(formId, null)
         }
     });
+}
+
+function showLoader() {
+    var progress = document.getElementById("progress");
+    progress.setAttribute('style', 'width:50%');
+    var loader = document.getElementById("loader");
+    loader.setAttribute("class", "");
+}
+
+function hideLoader() {
+    var loader = document.getElementById("loader");
+    var progress = document.getElementById("progress");
+    progress.setAttribute('style', 'width:100%');
+
+    setTimeout(function () {
+        loader.setAttribute("class", "hidden");
+    }, 500);
 }

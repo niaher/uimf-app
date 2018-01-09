@@ -1,8 +1,7 @@
-﻿namespace UimfApp.Web
+namespace UimfApp.Web
 {
 	using System;
 	using System.Linq;
-	using System.Security.Claims;
 	using Filer.Core;
 	using Filer.EntityFrameworkCore;
 	using MediatR;
@@ -19,16 +18,17 @@
 	using StructureMap.TypeRules;
 	using UimfApp.Core.Commands;
 	using UimfApp.Core.DataAccess;
-	using UimfApp.Core.Filing;
 	using UimfApp.DataSeed;
+	using UimfApp.Filing;
+	using UimfApp.Filing.Commands;
 	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Decorators;
 	using UimfApp.Infrastructure.Forms;
 	using UimfApp.Infrastructure.Forms.Menu;
 	using UimfApp.Infrastructure.Security;
+	using UimfApp.Infrastructure.User;
 	using UimfApp.Users;
 	using UimfApp.Users.Commands;
-	using UimfApp.Users.Security;
 	using UimfApp.Web.Middleware;
 	using UiMetadataFramework.Basic.Input;
 	using UiMetadataFramework.Core.Binding;
@@ -49,40 +49,36 @@
 
 		public IConfiguration Configuration { get; }
 
-		private static UserContext GetUserContext(IContext ctx)
+		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
 		{
-			var contextAccessor = ctx.GetInstance<IHttpContextAccessor>();
-			var httpContextUser = contextAccessor.HttpContext.User;
+			loggerFactory.AddConsole(this.Configuration.GetSection("Logging"));
+			loggerFactory.AddDebug();
 
-			if (!httpContextUser.Identity.IsAuthenticated)
+			if (env.IsDevelopment())
 			{
-				return new UserContext(null, UserManagementRoles.UnauthenticatedUser.Name);
+				app.UseDeveloperExceptionPage();
+				//app.UseBrowserLink();
+				app.UseDatabaseErrorPage();
+			}
+			else
+			{
+				app.UseExceptionHandler("/Home/Error");
 			}
 
-			var roles = httpContextUser.Claims.Where(t => t.Type == ClaimTypes.Role).Select(t => t.Value)
-				// Ensure that there is at least one role, otherwise "public" 
-				// actions won't work.
-				.Append(UserManagementRoles.AuthenticatedUser.Name)
-				.Distinct()
-				.ToArray();
+			app.UseMiddleware(typeof(ErrorHandlingMiddleware));
+			app.UseStaticFiles();
+			app.UseAuthentication();
+			app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
-			return new UserContext(httpContextUser.Identity.Name, roles);
-		}
+			app.UseMvc(routes =>
+			{
+				routes.MapRoute(
+					name: "default",
+					template: "{controller=Home}/{action=Index}/{id?}");
+			});
 
-		private static EntityFileManagerCollection GetDocumentSecurityRuleCollection(AppDependencyInjectionContainer container)
-		{
-			var ruleCollection = new EntityFileManagerCollection(container);
-
-			ruleCollection.RegisterAssembly(typeof(Core.Bootstrap).GetAssembly());
-
-			return ruleCollection;
-		}
-
-		private static MetadataBinder GetMetadataBinder(IContext context)
-		{
-			var binder = new MetadataBinder(context.GetInstance<UimfDependencyInjectionContainer>());
-			binder.RegisterAssembly(typeof(StringInputFieldBinding).GetAssembly());
-			return binder;
+			app.UseSession();
 		}
 
 		// This method gets called by the runtime. Use this method to add services to the container.
@@ -96,7 +92,7 @@
 			services.AddMediatR(typeof(InvokeForm));
 			services.AddMediatR(typeof(MyForms));
 			services.AddMediatR(typeof(ManageUsers));
-			services.AddMediatR(typeof(Login));
+			services.AddMediatR(typeof(AttachFiles));
 
 			var container = new Container();
 
@@ -106,11 +102,17 @@
 				config.For<FormRegister>().Singleton();
 				config.For<MenuRegister>().Singleton();
 				config.For<ActionRegister>().Singleton();
+				config.For<EntitySecurityConfigurationRegister>().Use(ctx => GetSecurityMapRegister(container)).Singleton();
+				config.For<RequestHandlerGuardRegister>().Singleton();
+
+				// User context.
+				config.For<UserContextAccessor>().Use(ctx => GetUserContextAccessor(container)).Singleton();
+				config.For<UserContext>().Use(ctx => ctx.GetInstance<UserContextAccessor>().GetUserContext());
 
 				config.For<AppDependencyInjectionContainer>().Use(ctx => new AppDependencyInjectionContainer(ctx.GetInstance));
 				config.For<UimfDependencyInjectionContainer>().Use(t => new UimfDependencyInjectionContainer(t.GetInstance));
 				config.For(typeof(IRequestHandler<,>)).DecorateAllWith(typeof(SecurityGuard<,>));
-				config.For<UserContext>().Use(ctx => GetUserContext(ctx));
+				config.For(typeof(IAsyncRequestHandler<,>)).DecorateAllWith(typeof(SecurityGuardAsync<,>));
 				config.For<DataSeed>();
 
 				config.For<EntityFileManagerCollection>()
@@ -154,6 +156,8 @@
 			// ASP.NET use the StructureMap container to resolve its services.
 			var serviceProvider = container.GetInstance<IServiceProvider>();
 
+			container.GetInstance<RequestHandlerGuardRegister>().RegisterAssembly(typeof(InvokeForm).Assembly);
+
 			// Run all assembly bootstrappers.
 			foreach (var bootstrapper in serviceProvider.GetServices<IAssemblyBootstrapper>().OrderByDescending(t => t.Priority))
 			{
@@ -163,36 +167,36 @@
 			return serviceProvider;
 		}
 
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+		private static EntityFileManagerCollection GetDocumentSecurityRuleCollection(AppDependencyInjectionContainer container)
 		{
-			loggerFactory.AddConsole(this.Configuration.GetSection("Logging"));
-			loggerFactory.AddDebug();
+			var ruleCollection = new EntityFileManagerCollection(container);
 
-			if (env.IsDevelopment())
-			{
-				app.UseDeveloperExceptionPage();
-				//app.UseBrowserLink();
-				app.UseDatabaseErrorPage();
-			}
-			else
-			{
-				app.UseExceptionHandler("/Home/Error");
-			}
+			ruleCollection.RegisterAssembly(typeof(Core.Bootstrap).GetAssembly());
 
-			app.UseMiddleware(typeof(ErrorHandlingMiddleware));
-			app.UseStaticFiles();
-			app.UseAuthentication();
-			app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+			return ruleCollection;
+		}
 
-			app.UseMvc(routes =>
-			{
-				routes.MapRoute(
-					name: "default",
-					template: "{controller=Home}/{action=Index}/{id?}");
-			});
+		private static MetadataBinder GetMetadataBinder(IContext context)
+		{
+			var binder = new MetadataBinder(context.GetInstance<UimfDependencyInjectionContainer>());
+			binder.RegisterAssembly(typeof(StringInputFieldBinding).GetAssembly());
+			return binder;
+		}
 
-			app.UseSession();
+		private static EntitySecurityConfigurationRegister GetSecurityMapRegister(IContainer container)
+		{
+			var nested = container.CreateChildContainer();
+			nested.Configure(t => { t.For<IEntityRepository>().AlwaysUnique(); });
+
+			return new EntitySecurityConfigurationRegister(new AppDependencyInjectionContainer(nested.GetInstance));
+		}
+
+		private static UserContextAccessor GetUserContextAccessor(IContainer container)
+		{
+			var nested = container.CreateChildContainer();
+			nested.Configure(t => { t.For<IHttpContextAccessor>().AlwaysUnique(); });
+
+			return new AppUserContextAccessor(new AppDependencyInjectionContainer(nested.GetInstance));
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Users.Commands
+namespace UimfApp.Users.Commands
 {
 	using System.Linq;
 	using System.Threading.Tasks;
@@ -9,6 +9,7 @@
 	using UiMetadataFramework.Basic.Response;
 	using UiMetadataFramework.Core.Binding;
 	using UiMetadataFramework.MediatR;
+	using UimfApp.Infrastructure.User;
 
 	[MyForm(Id = "confirm-account", Label = "Confirming account...", PostOnLoad = true)]
 	public class ConfirmAccount : IAsyncForm<ConfirmAccount.Request, ReloadResponse>

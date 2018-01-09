@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Infrastructure.Domain
+namespace UimfApp.Infrastructure.Domain
 {
 	using System;
 	using System.Collections.Generic;

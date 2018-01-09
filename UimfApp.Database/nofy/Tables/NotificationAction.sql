@@ -1,4 +1,4 @@
-﻿CREATE TABLE [ntf].[NotificationAction] (
+CREATE TABLE [ntf].[NotificationAction] (
     [Id] int NOT NULL IDENTITY,
     [ActionLink] varchar(1000),
     [Label] nvarchar(50),

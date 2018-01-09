@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Users.Security
+namespace UimfApp.Users.Security
 {
 	using UimfApp.Infrastructure.Security;
 

@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Infrastructure.EntityFramework
+namespace UimfApp.Infrastructure.EntityFramework
 {
 	using System;
 	using System.Linq;

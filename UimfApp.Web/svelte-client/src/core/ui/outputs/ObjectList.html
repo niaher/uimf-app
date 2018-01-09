@@ -1,0 +1,43 @@
+{{#if items != null}}
+{{#each items as itemFields}}
+	<div class="object-list-item">
+		{{#each itemFields as itemField}}
+		{{#if itemField.metadata.hidden == false}}
+		<FormOutput field="{{itemField}}" app="{{app}}" form="{{form}}" parent="{{parent}}" />
+		{{/if}}
+		{{/each}}
+	</div>
+{{/each}}
+{{/if}}
+
+<script>
+	import * as umf from "core-framework";
+	import FormOutput from "../Output";
+
+	export default {
+		oncreate() {
+			var field = this.get("field");
+			var metadata = field.data.metadata;
+
+			var items = [];
+			for (let item of field.data.items) {
+				items.push(umf.FormInstance.getOutputFieldValues(metadata, item));
+			}		
+
+			this.set({
+				items: items
+			});
+		},
+		components: {
+			FormOutput
+		}
+	}
+</script>
+
+<style>
+	.object-list-item {
+		margin:10px 0;
+		border-bottom: 1px solid #eee;
+		padding:10px 0;
+	}
+</style>

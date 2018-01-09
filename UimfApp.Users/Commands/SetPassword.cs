@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Users.Commands
+namespace UimfApp.Users.Commands
 {
 	using System.Linq;
 	using System.Threading.Tasks;
@@ -14,6 +14,7 @@
 	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.Core.Binding;
+	using UimfApp.Infrastructure.User;
 
 	[MyForm(Id = "set-password", Label = "Set account password", SubmitButtonLabel = "Confirm password")]
 	public class SetPassword : IMyAsyncForm<SetPassword.Request, SetPassword.Response>, ISecureHandler
@@ -29,7 +30,7 @@
 
 		public async Task<Response> Handle(Request message)
 		{
-			var user = this.userManager.Users.Single(t => t.UserName == this.userContext.UserName);
+			var user = this.userManager.Users.Single(t => t.UserName == this.userContext.User.UserName);
 
 			var result = await this.userManager.AddPasswordAsync(
 				user,

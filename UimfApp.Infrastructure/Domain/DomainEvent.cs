@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Infrastructure.Domain
+namespace UimfApp.Infrastructure.Domain
 {
 	public abstract class DomainEvent : DomainEvent<int>
 	{

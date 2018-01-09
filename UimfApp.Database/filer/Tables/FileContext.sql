@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[FileContext] (
+CREATE TABLE [dbo].[FileContext] (
     [FileId] INT          NOT NULL,
     [Value]  VARCHAR (50) NOT NULL,
     CONSTRAINT [PK_FileContext] PRIMARY KEY CLUSTERED ([FileId] ASC, [Value] ASC),

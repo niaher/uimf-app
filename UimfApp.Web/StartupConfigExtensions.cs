@@ -1,10 +1,11 @@
-﻿namespace UimfApp.Web
+namespace UimfApp.Web
 {
 	using System;
 	using Microsoft.AspNetCore.Identity;
 	using Microsoft.Extensions.Configuration;
 	using Microsoft.Extensions.DependencyInjection;
 	using Newtonsoft.Json.Converters;
+	using Newtonsoft.Json.Serialization;
 	using UimfApp.Infrastructure.Configuration;
 	using UimfApp.Infrastructure.Messages;
 	using UimfApp.Users;
@@ -54,6 +55,14 @@
 				{
 					options.SerializerSettings.Converters.Add(new StringEnumConverter());
 					options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Include;
+					options.SerializerSettings.ContractResolver = new DefaultContractResolver
+					{
+						NamingStrategy = new CamelCaseNamingStrategy
+						{
+							ProcessDictionaryKeys = true,
+							OverrideSpecifiedNames = false
+						}
+					};
 				});
 
 			// Enable session-state.

@@ -1,9 +1,9 @@
-﻿namespace UimfApp.Core.Notification
+namespace UimfApp.Core.Notification
 {
 	using Nofy.Core;
 	using Nofy.Core.Model;
-	using UimfApp.Infrastructure.Domain;
 	using UiMetadataFramework.Basic.Output;
+	using UimfApp.Infrastructure.Domain;
 
 	public static class Extensions
 	{

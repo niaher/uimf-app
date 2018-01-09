@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Web
+namespace UimfApp.Web
 {
 	using StructureMap.TypeRules;
 	using UimfApp.Infrastructure;

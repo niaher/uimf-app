@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Web.Controllers
+namespace UimfApp.Web.Controllers
 {
 	using Microsoft.AspNetCore.Mvc;
 

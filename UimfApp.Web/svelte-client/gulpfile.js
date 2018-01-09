@@ -13,12 +13,14 @@ var gulp = require("gulp"),
 
 const distDir = "../wwwroot";
 
+process.on('unhandledRejection', r => console.log(r));
+
 function build(entry, tsconfig, outfile, moduleName) {
     return rollup.rollup(
         {
             entry: entry,
             plugins: [
-                json(),
+                //json(),
                 resolve({
                     jsnext: true,
                     main: true,
@@ -58,6 +60,10 @@ gulp.task("build-svelte", function () {
     const svelteComponentsDir = "build/svelte";
     gulp.src("node_modules/svelte/shared.js")
         .pipe(gulp.dest(svelteComponentsDir));
+
+    // Copy typescript files associated with output fields.
+    gulp.src("src/core/ui/outputs/*.ts")
+        .pipe(gulp.dest(svelteComponentsDir + "/core/ui/outputs"));
 
     return gulp.src("src/**/*.html")
         .pipe(gulpSvelte({

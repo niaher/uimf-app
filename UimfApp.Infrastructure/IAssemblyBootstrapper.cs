@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Infrastructure
+namespace UimfApp.Infrastructure
 {
 	public interface IAssemblyBootstrapper
 	{

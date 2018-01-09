@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Infrastructure.Forms.Typeahead
+namespace UimfApp.Infrastructure.Forms.Typeahead
 {
 	using System.Collections.Generic;
 	using UiMetadataFramework.Basic.Input.Typeahead;

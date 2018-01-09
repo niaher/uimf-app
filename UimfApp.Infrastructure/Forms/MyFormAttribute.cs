@@ -1,6 +1,7 @@
-﻿namespace UimfApp.Infrastructure.Forms
+namespace UimfApp.Infrastructure.Forms
 {
 	using System;
+	using System.Collections.Generic;
 	using UiMetadataFramework.Core.Binding;
 
 	public class MyFormAttribute : FormAttribute
@@ -21,15 +22,13 @@
 		/// </summary>
 		public string SubmitButtonLabel { get; set; } = "Submit";
 
-		public override object GetCustomProperties(Type type)
+		public override IDictionary<string, object> GetCustomProperties(Type type)
 		{
-			return new
-			{
-				this.SubmitButtonLabel,
-				this.PostOnLoadValidation,
-				this.Menu,
-				this.MenuOrderIndex
-			};
+			return new Dictionary<string, object>()
+				.Set(nameof(this.SubmitButtonLabel), this.SubmitButtonLabel)
+				.Set(nameof(this.PostOnLoadValidation), this.PostOnLoadValidation)
+				.Set(nameof(this.Menu), this.Menu)
+				.Set(nameof(this.MenuOrderIndex), this.MenuOrderIndex);
 		}
 	}
 }

@@ -1,6 +1,8 @@
 namespace UimfApp.Users.Commands
 {
+	using System.Collections.Generic;
 	using System.ComponentModel.DataAnnotations;
+	using System.Security.Claims;
 	using System.Threading.Tasks;
 	using CPermissions;
 	using MediatR;
@@ -30,13 +32,18 @@ namespace UimfApp.Users.Commands
 			var user = new EmailAddressAttribute().IsValid(model.Email)
 				? await this.signInManager.UserManager.FindByEmailAsync(model.Email)
 				: await this.signInManager.UserManager.FindByNameAsync(model.Email);
-
+			
 			if (user != null)
 			{
 				var result = await this.signInManager.PasswordSignInAsync(user, model.Password.Value, model.RememberMe, false);
 
 				if (result.Succeeded)
 				{
+					this.signInManager.Context.User.AddIdentity(new ClaimsIdentity(new List<Claim>
+					{
+						new Claim(ClaimTypes.UserData, user.Id.ToString())
+					}));
+
 					return new ReloadResponse
 					{
 						Form = typeof(MyAccount).GetFormId()

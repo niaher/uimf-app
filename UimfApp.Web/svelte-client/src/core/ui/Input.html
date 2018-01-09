@@ -1,7 +1,13 @@
-<div>
-    <label for="{{id}}">{{field.metadata.label}}</label>
-    <div ref:container class="{{class}}"></div>
+{{#if !alwaysHideLabel && field.metadata.label !== ""}}
+<div class="form-group row">
+    <label for="{{id}}" class="col-sm-2 col-form-label">{{field.metadata.label}}</label>
+    <div ref:container class="{{class}} col-sm-10"></div>
 </div>
+{{else}}
+<div class="form-group row">
+    <div ref:container class="{{class}} col-sm-12"></div>
+</div>
+{{/if}}
 
 <script>
     import * as umf from "core-framework";
@@ -13,8 +19,15 @@
             let field = this.get("field");
             let tabindex = this.get("tabindex");
             let app = this.get("app");
-
+            
             var input = app.controlRegister.getInput(field.metadata.type);
+
+            // Set correct css class based on the field type.
+            var inputDisplayConfig = input.constants || {};
+            this.set({ 
+                class: inputDisplayConfig.block ? "block" : "inline",
+                alwaysHideLabel: inputDisplayConfig.alwaysHideLabel
+            });
 
             var i = new input.component({
                 target: this.refs.container,
@@ -22,18 +35,10 @@
                     field: field,
                     tabindex: tabindex,
                     id: this.get("id"),
-                    app: app
+                    app: app,
+                    form: this.get("form")
                 }
             });
-
-            // Set correct css class based on the field type.
-            var outputDisplayConfig = input.constants || {};
-            if (outputDisplayConfig.block) {
-                this.set({ class: "block" });
-            }
-            else {
-                this.set({ class: "inline" });
-            }
         },
         data() {
             inputId += 1;

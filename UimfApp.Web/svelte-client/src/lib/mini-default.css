@@ -26,6 +26,7 @@ body {
   margin: 0;
   color: #212121;
   background: #f8f8f8;
+  height: 100%
 }
 
 article, aside, section, figcaption, figure, main, details, menu {
@@ -195,10 +196,6 @@ a {
 
 a:visited {
   color: #01579b;
-}
-
-a:hover, a:focus {
-  opacity: 0.75;
 }
 
 figcaption {
@@ -683,8 +680,6 @@ figcaption {
   Definitions for forms and input elements.
 */
 form {
-  background: #eeeeee;
-  border: 0.0625rem solid #c9c9c9;
   margin: 0.5rem;
   padding: 0.75rem 0.5rem 1.125rem;
 }
@@ -871,15 +866,6 @@ a[role="button"], label[role="button"], [role="button"] {
   text-decoration: none;
   transition: background 0.3s;
   cursor: pointer;
-}
-
-button:hover, button:focus, [type="button"]:hover, [type="button"]:focus, [type="submit"]:hover, [type="submit"]:focus, [type="reset"]:hover, [type="reset"]:focus,
-a.button:hover,
-a.button:focus, label.button:hover, label.button:focus, .button:hover, .button:focus,
-a[role="button"]:hover,
-a[role="button"]:focus, label[role="button"]:hover, label[role="button"]:focus, [role="button"]:hover, [role="button"]:focus {
-  background: gainsboro;
-  opacity: 1;
 }
 
 input:disabled, input[disabled], textarea:disabled, textarea[disabled], select:disabled, select[disabled], button:disabled, button[disabled], .button:disabled, .button[disabled], [role="button"]:disabled, [role="button"][disabled] {
@@ -1973,7 +1959,7 @@ mark.inline-block {
 
 .modal .card {
   margin: 0 auto;
-  max-height: 50vh;
+  max-height: 70vh;
   overflow: auto;
 }
 

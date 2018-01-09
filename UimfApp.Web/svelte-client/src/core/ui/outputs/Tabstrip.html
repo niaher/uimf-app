@@ -21,9 +21,7 @@
 
 <style>
 	.tabstrip {
-		border-bottom: 1px solid #ccc;
 		margin: 10px 0;
-		padding: 0 5px;
 	}
 
 	.tabstrip>div {
@@ -31,23 +29,30 @@
 	}
 
 	.tabstrip>div>a {
-		background: #e6e6e6;
-		border-width: 1px 1px 0 1px;
-		border-style: solid;
-		border-color: #ccc;
-		padding: 10px 15px;
-		margin: 0 5px 0 0;
-		display: inline-block;
-		text-decoration: none;
+		background: #eef3f7;
+    	border-width: 1px 1px 1px 1px;
+    	border-style: solid;
+    	border-color: rgb(187, 210, 214);
+    	padding: 10px 15px;
+    	margin: 0 5px 0 0;
+    	display: inline-block;
+    	text-decoration: none;
+    	color: #838c98;
+    	font-weight: bold;
+    	border-radius: 5px;
 	}
 
 	.tabstrip>div>a:hover {
-		text-decoration: underline;
+		color: #f3818c;
 	}
 
 	.tabstrip>div>a.active {
 		margin-bottom: -1px;
 		padding-bottom: 11px;
-		background: #f8f8f8;
+		background: #fff;
+	    border-bottom: none;
+		color: #3287c0;
+    	border-bottom-right-radius: 3px;
+    	border-bottom-left-radius: 3px;
 	}
 </style>

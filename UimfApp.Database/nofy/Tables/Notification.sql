@@ -1,4 +1,4 @@
-﻿CREATE TABLE [ntf].[Notification] (
+CREATE TABLE [ntf].[Notification] (
     [Id] int NOT NULL IDENTITY,
     [ArchivedOn] datetime2,
     [Category] int,

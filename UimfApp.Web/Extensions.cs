@@ -1,6 +1,7 @@
-﻿namespace UimfApp.Web
+namespace UimfApp.Web
 {
 	using System.IO;
+	using System.Linq;
 	using System.Net;
 	using Microsoft.AspNetCore.Hosting;
 	using Microsoft.AspNetCore.Http;

@@ -1,13 +1,17 @@
-<h2>{{responseMetadata.title || metadata.label}}</h2>
+<div class ="form-header">
+	<h2>{{responseMetadata.title || metadata.label}}</h2>
+</div>
 
 {{#if initialized && visibleInputFields.length > 0}}
+<div class="form-body">
 <form on:submit="submit(app, form, event, true)">
 	{{#each visibleInputFields as inputField}}
-	<FormInput field="{{inputField}}" app="{{app}}" tabindex="{{tabindex * 100 + inputField.metadata.orderIndex}}" />
+	<FormInput field="{{inputField}}" app="{{app}}" tabindex="{{tabindex * 100 + inputField.metadata.orderIndex}}" form="{{self}}" />
 	{{/each}}
 
-	<button type="submit" disabled="{{disabled}}" tabindex="-1">{{submitButtonLabel}}</button>
+	<button type="submit" disabled="{{disabled}}" tabindex="-1" class="btn btn-info">{{submitButtonLabel}}</button>
 </form>
+</div>
 {{/if}}
 
 {{#if outputFieldValues != null}}
@@ -25,10 +29,37 @@
 	import FormOutput from "./Output";
 
 	let tabindex = 1;
+	let formCount = 0;
 
+	var openForms = [];
+
+	function bindEventHandlersToCustomEvents(formComponent, eventHandlers) {
+		let formInstance = formComponent.get("form");
+		let app = formComponent.get("app");
+
+		// Bind all "form event handlers". 
+		for (let eventHandler of eventHandlers) {
+			// Don't bind default event handlers, because they are already auto-bound inside FormInstance.
+			if (eventHandler.runAt.indexOf("form:") === 0) {
+				continue;
+			}
+
+			formComponent.on(eventHandler.runAt, e => {
+				// Augment event args with form which is firing the event. This is needed,
+				// so that event handler can know from which particular form this event is coming.
+				e.form = formComponent;
+				
+				formInstance.handleEvent(eventHandler.runAt, eventHandler, e);
+			});
+		}
+	}
+	
 	export default {
+		ondestroy() {
+			openForms = openForms.filter(f => f !== this);
+		},
 		methods: {
-			init: function () {
+			init: async function () {
 				if (!this.get("initialized")) {
 					var form = this.get("form");
 
@@ -45,12 +76,31 @@
 
 					var app = this.get("app");
 
+					bindEventHandlersToCustomEvents(this, form.metadata.eventHandlers);
+					// TODO: bind input and output event handlers.
+
 					form.fire("form:loaded", { app: app });
 
 					// Auto-submit form if necessary.
 					if (form.metadata.postOnLoad) {
-						this.submit(app, form);
+						await this.submit(app, form);
 					}
+
+					openForms.push(this);
+
+					if (this.get("parent") == null) {
+						if(this.get("responseMetadata").title == null){
+							document.title = form.metadata.label;
+						}						
+					}
+				}
+			},
+			fireAndBubbleUp(eventName, eventArgs) {
+				this.fire(eventName, eventArgs);
+				var parentFormComponent = this.get("parent");
+
+				if (parentFormComponent != null) {
+					parentFormComponent.fireAndBubbleUp(eventName, eventArgs);
 				}
 			},
 			enableForm: function() {
@@ -79,6 +129,10 @@
 					outputFieldValues: formInstance.outputs,
 					responseMetadata: response.metadata
 				});
+
+				if(this.get("parent") == null){
+					document.title = response.metadata.title;
+				}
 			},
 			submit: async function (app, formInstance, event, redirect) {
 				var self = this;
@@ -87,16 +141,9 @@
 					event.preventDefault();
 				}
 				
-				var skipValidation =
-					!formInstance.metadata.postOnLoadValidation &&
-					formInstance.metadata.postOnLoad &&
-					// if initialization of the form, i.e. - first post.
-					redirect == null;
-
-				let data = await formInstance.prepareForm(!skipValidation);
-				
 				// If not all required inputs are filled.
-				if (data == null) {
+				var allRequiredInputsHaveValues = await formInstance.allRequiredInputsHaveData(redirect == null);
+				if (!allRequiredInputsHaveValues) {
 					return;
 				}
 
@@ -116,31 +163,10 @@
 					
 					return;
 				}
-
-				await formInstance.fire("form:posting", { response: null, app: app });
 				
 				try {
-					let response = await app.server.postForm(formInstance.metadata.id, data);
-					await formInstance.fire("form:responseReceived", { response: response, app: app });
+					await formInstance.submit(app, redirect == null, { formComponent: self });
 					
-					formInstance.setOutputFieldValues(response);
-
-					// Null response is treated as a server-side error.
-					if (response == null) {
-						throw new Error(`Received null response.`);
-					}
-					
-					await app.runFunctions(response.metadata.functionsToRun);
-				
-					if (response.metadata.handler == "" || response.metadata.handler == null) {
-						self.renderResponse(response);
-					}
-					else {
-						app.handleResponse(response, formInstance);
-					}
-					
-					await formInstance.fire("form:responseHandled", { response: response, app: app });
-				
 					self.enableForm();
 
 					// Signal event to child controls.
@@ -151,6 +177,23 @@
 				}
 				catch(e) {
 					self.enableForm();
+				}
+			},
+			reloadTopForm() {
+				var parentFormComponent = this.get("parent");
+				
+				if (parentFormComponent != null) {
+					parentFormComponent.reloadTopForm();
+				}
+				else {
+					let app = this.get("app");
+					let formInstance = this.get("form");
+					this.submit(app, formInstance, null, true);
+				}
+			},
+			reloadAllForms() {				
+				for (let f of openForms) {
+					f.reloadTopForm();
 				}				
 			}
 		},
@@ -161,7 +204,8 @@
 				urlData: null,
 				initialized: false,
 				responseMetadata: {},
-				useUrl: true
+				useUrl: true,
+				parent: null // Can be set if this is a nested form within another form (i.e. - InlineForm.html)
 			};
 		},
 		components: {
@@ -173,7 +217,9 @@
 
 <style>
 	.response {
-		margin-top:50px;
+		margin-top: 15px;
+		padding-left: 10px;
+		padding-right: 10px;
 	}
 
 	.inline-form .response {

@@ -1,7 +1,8 @@
+{{#if field.data != null && field.data.actions != null && field.data.actions.length > 0}}
 <ul class="actionlist">
 	{{#each field.data.actions as action}}
 	<li>
-		<button on:click="run(action, app)">{{action.label}}</button>
+		<button on:click="run(action, app)" class="btn btn-default">{{action.label}}</button>
 	</li>
 	{{/each}}
 </ul>
@@ -13,9 +14,11 @@
 		<div ref:container></div>
 	</div>
 </div>
+{{/if}}
 
 <script>
 	import FormComponent from "core-ui/Form";
+	import { ActionListEventArguments } from "./ActionListEventArguments";
 
 	var modalId = 0;
 	var modals = [];
@@ -40,14 +43,24 @@
 
 	export default {
 		methods: {
-			run(action, app) {
-				this.set({ open: true });
+			async run(action, app) {
+				var self = this;
 
 				var formInstance = app.getFormInstance(action.form, true);
 				
 				// TODO: find a way to initialize from action.inputFieldValues directly.
 				var serializedInputValues = formInstance.getSerializedInputValuesFromObject(action.inputFieldValues);
-				formInstance.initializeInputFields(serializedInputValues).then(() => {
+				await formInstance.initializeInputFields(serializedInputValues);
+				
+				var allRequiredInputsHaveData = await formInstance.allRequiredInputsHaveData(false);
+				
+				if (action.action === "run" && allRequiredInputsHaveData) {
+					await formInstance.submit(this.get("app"), false);
+					this.onActionRun(formInstance.metadata.id);
+				}
+				else {
+					this.set({ open: true });
+
 					var f = new FormComponent({
 						target: this.refs.container,
 						data: {
@@ -68,9 +81,9 @@
 					});
 
 					this.set({current: f});
-				});
 
-				modals.push(this);
+					modals.push(self);
+				}
 			},
 			close(reloadParentForm) {
 				// Ensure the modal div is hidden.
@@ -78,16 +91,24 @@
 
 				// Destroy underlying form instance.
 				var modalForm = this.get("current");
-				modalForm.destroy();
-
+				
 				if (reloadParentForm) {
-					// Refresh parent form.
-					var app = this.get("app");
-					var form = this.get("form");
-					this.get("parent").submit(app, form, null, true);
+					let formId = modalForm.get("metadata").id;
+					this.onActionRun(formId);
 				}
 
+				modalForm.destroy();
 				modals.pop(this);
+			},
+			async onActionRun(formId) {
+				let parentForm = this.get("parent");
+				let app = parentForm.get("app");
+				let formInstance = parentForm.get("form");
+
+				await parentForm.submit(app, formInstance, null, true);
+
+				var eventArgs = new ActionListEventArguments(app, formId);
+				parentForm.fireAndBubbleUp(`action-list:run`, eventArgs);
 			}
 		},
 		data() {
@@ -102,7 +123,6 @@
 			FormComponent
 		}
 	}
-
 </script>
 
 <style>
@@ -119,17 +139,16 @@
 	}
 
 	.actionlist {
-		margin: 10px 0;
+		margin: 0px 0;
 		padding: 0 5px;
-		background: #f5f5f5;
-		border-width: 1px 0;
-		border-style: solid;
-		border-color: #e8e8e8;
 		text-align: right;
+		background: #fff;
+		margin-bottom: 15px;
 	}
 
 	.actionlist>li {
 		list-style-type: none;
 		display: inline-block;
 	}
+
 </style>

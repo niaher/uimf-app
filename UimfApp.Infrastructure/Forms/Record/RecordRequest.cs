@@ -1,4 +1,4 @@
-﻿namespace UimfApp.Infrastructure.Forms.Record
+namespace UimfApp.Infrastructure.Forms.Record
 {
 	using MediatR;
 	using UiMetadataFramework.Basic.EventHandlers;
