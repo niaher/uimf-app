@@ -172,7 +172,8 @@
 					// Signal event to child controls.
 					self.fire("form:responseHandled", {
 						form: self,
-						invokedByUser: event != null
+						invokedByUser: event != null,
+						response: response
 					});
 				}
 				catch(e) {

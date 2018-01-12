@@ -5,6 +5,7 @@ import { InputController } from "./InputController";
 import { ControlRegister } from "./ControlRegister";
 import { FormEventArguments, FormResponseEventArguments } from "./FormEventArguments";
 import { UmfApp } from "./UmfApp";
+import { FormResponse } from "uimf-core";
 
 export class FormInstance {
     public readonly metadata: umf.FormMetadata;
@@ -33,7 +34,7 @@ export class FormInstance {
         return formData != null;
     }
 
-    async submit(app: UmfApp, asPostOnLoad: boolean, args: any): Promise<void> {
+    async submit(app: UmfApp, asPostOnLoad: boolean, args: any): Promise<FormResponse> {
         if (asPostOnLoad) {
             this.enforceCanPostOnLoad();
         }
@@ -61,6 +62,8 @@ export class FormInstance {
         app.handleResponse(response, this, args);
 
         await this.fire("form:responseHandled", new FormResponseEventArguments(app, response));
+
+        return response;
     }
 
     initializeInputFields(data: any) {
