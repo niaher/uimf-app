@@ -41,8 +41,6 @@
   "dependencies": {
     "@types/axios": "0.14.0",
     "awesomplete": "1.1.2",
-    "choices.js": "^3.0.2",
-    "d3": "^4.12.0",
-    "d3pie": "^0.2.1"
+    "choices.js": "^3.0.2"
   }
 }
