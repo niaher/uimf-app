@@ -1813,7 +1813,7 @@ var FormInstance = (function () {
                         return [4 /*yield*/, this.fire("form:responseHandled", new FormResponseEventArguments(app, response))];
                     case 6:
                         _a.sent();
-                        return [2 /*return*/];
+                        return [2 /*return*/, response];
                 }
             });
         });
@@ -16975,7 +16975,8 @@ var methods$3 = {
 			// Signal event to child controls.
 			self.fire("form:responseHandled", {
 				form: self,
-				invokedByUser: event != null
+				invokedByUser: event != null,
+				response: response
 			});
 		}
 		catch(e) {
@@ -17006,13 +17007,13 @@ function ondestroy() {
 }
 
 function encapsulateStyles$8(node) {
-	setAttribute(node, "svelte-1750191902", "");
+	setAttribute(node, "svelte-1274685619", "");
 }
 
 function add_css$8() {
 	var style = createElement("style");
-	style.id = 'svelte-1750191902-style';
-	style.textContent = "[svelte-1750191902].response,[svelte-1750191902] .response{margin-top:15px;padding-left:10px;padding-right:10px}[svelte-1750191902].inline-form .response,[svelte-1750191902] .inline-form .response{margin-top:0;padding:10px 15px}[svelte-1750191902].inline-form h2,[svelte-1750191902] .inline-form h2{margin:0;background:#eee;padding:10px 15px 15px;font-size:15px}";
+	style.id = 'svelte-1274685619-style';
+	style.textContent = "[svelte-1274685619].response,[svelte-1274685619] .response{margin-top:15px;padding-left:10px;padding-right:10px}[svelte-1274685619].inline-form .response,[svelte-1274685619] .inline-form .response{margin-top:0;padding:10px 15px}[svelte-1274685619].inline-form h2,[svelte-1274685619] .inline-form h2{margin:0;background:#eee;padding:10px 15px 15px;font-size:15px}";
 	appendNode(style, document.head);
 }
 
@@ -17406,7 +17407,7 @@ function SvelteComponent$19(options) {
 
 	this._handlers.destroy = [ondestroy];
 
-	if (!document.getElementById("svelte-1750191902-style")) add_css$8();
+	if (!document.getElementById("svelte-1274685619-style")) add_css$8();
 
 	if (!options._root) {
 		this._oncreate = [];
@@ -17460,7 +17461,7 @@ document.onkeydown = function(evt) {
 	if (isEscape) {
 		if (modals.length > 0) {
 			// Close topmost modal.
-			modals[modals.length - 1].close(false);
+			modals[modals.length - 1].close();
 		}
 	}
 };
@@ -17487,8 +17488,8 @@ var methods$2 = {
 		var allRequiredInputsHaveData = await formInstance.allRequiredInputsHaveData(false);
 		
 		if (action.action === "run" && allRequiredInputsHaveData) {
-			await formInstance.submit(this.get("app"), false);
-			this.onActionRun(formInstance.metadata.id);
+			var response = await formInstance.submit(this.get("app"), false);					
+			this.onActionRun(formInstance.metadata.id, response);
 		}
 		else {
 			this.set({ open: true });
@@ -17508,7 +17509,7 @@ var methods$2 = {
 			var self = this;
 			f.on("form:responseHandled", e => {
 				if (e.invokedByUser && formInstance.metadata.closeOnPostIfModal) {
-					self.close(true);
+					self.close(e.response);
 				}
 			});
 
@@ -17517,27 +17518,36 @@ var methods$2 = {
 			modals.push(self);
 		}
 	},
-	close(reloadParentForm) {
-		// Ensure the modal div is hidden.
-		this.set({ open: false });
+	close(response, fromBtnClick) {
+		// If user clicked "close" button then the "open" would have already
+		// been set to false (because the close button is linked to the hidden input). 
+		// In such case setting "open" to false will actually result in the "open"
+		// being set to true. It is indeed very strange, but to avoid the problem we 
+		// do not set "open" to false if this is a result of the "close" button click.
+		if (!fromBtnClick) {
+			// Ensure the modal div is hidden.
+			this.set({ open: false });
+		}
 
 		// Destroy underlying form instance.
 		var modalForm = this.get("current");
 		
-		if (reloadParentForm) {
+		if (response != null) {
 			let formId = modalForm.get("metadata").id;
-			this.onActionRun(formId);
+			this.onActionRun(formId, response);
 		}
 
 		modalForm.destroy();
 		modals.pop(this);
 	},
-	async onActionRun(formId) {
+	async onActionRun(formId, response) {
 		let parentForm = this.get("parent");
 		let app = parentForm.get("app");
 		let formInstance = parentForm.get("form");
 
-		await parentForm.submit(app, formInstance, null, true);
+		if (response.metadata.handler !== "redirect") {
+			await parentForm.submit(app, formInstance, null, true);
+		}
 
 		var eventArgs = new ActionListEventArguments(app, formId);
 		parentForm.fireAndBubbleUp(`action-list:run`, eventArgs);
@@ -17545,13 +17555,13 @@ var methods$2 = {
 };
 
 function encapsulateStyles$7(node) {
-	setAttribute(node, "svelte-1263416417", "");
+	setAttribute(node, "svelte-2880564093", "");
 }
 
 function add_css$7() {
 	var style = createElement("style");
-	style.id = 'svelte-1263416417-style';
-	style.textContent = "[svelte-1263416417].modal .card,[svelte-1263416417] .modal .card{max-width:85%;padding:10px 15px}[svelte-1263416417].hidden,[svelte-1263416417] .hidden{width:0;height:0;position:absolute;left:-1000px}[svelte-1263416417].actionlist,[svelte-1263416417] .actionlist{margin:0px 0;padding:0 5px;text-align:right;background:#fff;margin-bottom:15px}[svelte-1263416417].actionlist>li,[svelte-1263416417] .actionlist>li{list-style-type:none;display:inline-block}";
+	style.id = 'svelte-2880564093-style';
+	style.textContent = "[svelte-2880564093].modal .card,[svelte-2880564093] .modal .card{max-width:85%;padding:10px 15px}[svelte-2880564093].hidden,[svelte-2880564093] .hidden{width:0;height:0;position:absolute;left:-1000px}[svelte-2880564093].actionlist,[svelte-2880564093] .actionlist{margin:0px 0;padding:0 5px;text-align:right;background:#fff;margin-bottom:15px}[svelte-2880564093].actionlist>li,[svelte-2880564093] .actionlist>li{list-style-type:none;display:inline-block}";
 	appendNode(style, document.head);
 }
 
@@ -17663,7 +17673,7 @@ function create_if_block$7(state, component) {
 	}
 
 	function click_handler_1(event) {
-		component.close(true);
+		component.close(null, true);
 	}
 
 	return {
@@ -17789,7 +17799,7 @@ function SvelteComponent$18(options) {
 	this.refs = {};
 	this._state = assign(data$2(), options.data);
 
-	if (!document.getElementById("svelte-1263416417-style")) add_css$7();
+	if (!document.getElementById("svelte-2880564093-style")) add_css$7();
 
 	this._fragment = create_main_fragment$18(this._state, this);
 
