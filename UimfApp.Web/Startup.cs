@@ -7,7 +7,6 @@ namespace UimfApp.Web
 	using MediatR;
 	using Microsoft.AspNetCore.Builder;
 	using Microsoft.AspNetCore.Hosting;
-	using Microsoft.AspNetCore.Http;
 	using Microsoft.EntityFrameworkCore;
 	using Microsoft.Extensions.Configuration;
 	using Microsoft.Extensions.DependencyInjection;
@@ -104,11 +103,10 @@ namespace UimfApp.Web
 				config.For<ActionRegister>().Singleton();
 				config.For<EntitySecurityConfigurationRegister>().Use(ctx => GetSecurityMapRegister(container)).Singleton();
 				config.For<RequestHandlerGuardRegister>().Singleton();
+				config.For<UserRoleCheckerRegister>().Singleton();
 
-				// User context.
-				config.For<UserContextAccessor>().Use(ctx => GetUserContextAccessor(container)).Singleton();
+				config.For<UserContextAccessor>().Use<AppUserContextAccessor>();
 				config.For<UserContext>().Use(ctx => ctx.GetInstance<UserContextAccessor>().GetUserContext());
-
 				config.For<AppDependencyInjectionContainer>().Use(ctx => new AppDependencyInjectionContainer(ctx.GetInstance));
 				config.For<UimfDependencyInjectionContainer>().Use(t => new UimfDependencyInjectionContainer(t.GetInstance));
 				config.For(typeof(IRequestHandler<,>)).DecorateAllWith(typeof(SecurityGuard<,>));
@@ -189,14 +187,6 @@ namespace UimfApp.Web
 			nested.Configure(t => { t.For<IEntityRepository>().AlwaysUnique(); });
 
 			return new EntitySecurityConfigurationRegister(new AppDependencyInjectionContainer(nested.GetInstance));
-		}
-
-		private static UserContextAccessor GetUserContextAccessor(IContainer container)
-		{
-			var nested = container.CreateChildContainer();
-			nested.Configure(t => { t.For<IHttpContextAccessor>().AlwaysUnique(); });
-
-			return new AppUserContextAccessor(new AppDependencyInjectionContainer(nested.GetInstance));
 		}
 	}
 }

@@ -1,9 +1,7 @@
 namespace UimfApp.Infrastructure.User
 {
 	using System;
-	using System.Collections.Generic;
 	using System.Linq;
-	using System.Reflection;
 	using System.Security.Claims;
 
 	/// <summary>
@@ -12,80 +10,52 @@ namespace UimfApp.Infrastructure.User
 	/// </summary>
 	public abstract class UserContextAccessor
 	{
-		private readonly List<IUserRoleChecker> managers = new List<IUserRoleChecker>();
+		private readonly UserRoleCheckerRegister roleCheckerRegister;
 
-		/// <summary>
-		/// Gets claims for the current user.
-		/// </summary>
-		/// <returns>List of current user's roles.</returns>
-		public abstract IEnumerable<Claim> GetClaims();
+		protected UserContextAccessor(UserRoleCheckerRegister roleCheckerRegister)
+		{
+			this.roleCheckerRegister = roleCheckerRegister;
+		}
 
 		/// <summary>
 		/// Retrieves <see cref="UserContext"/> for the current user.
 		/// </summary>
 		/// <returns><see cref="UserContext"/> instance.</returns>
-		/// <remarks>This method uses <see cref="IUserRoleChecker.GetRoles"/> to populate
+		/// <remarks>This method uses <see cref="IUserRoleChecker.GetDynamicRoles"/> to populate
 		/// <see cref="UserContext.Roles"/>. For this reason this method must not be called
-		/// from <see cref="IUserRoleChecker.GetRoles"/>, because it will cause
+		/// from <see cref="IUserRoleChecker.GetDynamicRoles"/>, because it will cause
 		/// <see cref="StackOverflowException"/>.</remarks>
 		public UserContext GetUserContext()
 		{
-			var roles = this.managers
-				.SelectMany(t => t.GetRoles(this))
+			var systemRoles = this.GetPrincipal().Claims
+				.Where(t => t.Type == ClaimTypes.Role)
+				.Select(t => t.Value)
+				.Distinct()
+				.ToArray();
+
+			var userContextData = this.GetUserContextData();
+
+			var dynamicRoles = this.roleCheckerRegister
+				.GetDynamicRoles(userContextData)
 				.Select(t => t.Name)
 				.Distinct()
 				.ToArray();
 
-			// User is authenticated.
-			var userId = this.GetUserId();
-			if (userId != null)
-			{
-				return new UserContext(
-					this.GetUsername(),
-					userId.Value,
-					roles);
-			}
+			var allRoles = dynamicRoles.Union(systemRoles).Distinct().ToArray();
 
-			// Unauthenticated user.
-			return new UserContext(roles);
+			return new UserContext(userContextData, allRoles);
 		}
 
 		/// <summary>
-		/// Gets id of the current user.
+		/// Gets principal for the current user.
 		/// </summary>
-		/// <returns>Id of the current user or null if user is not authenticated.</returns>
-		public abstract int? GetUserId();
+		/// <returns>List of current user's roles.</returns>
+		protected abstract ClaimsPrincipal GetPrincipal();
 
 		/// <summary>
-		/// Gets username of the current user.
+		/// Gets additional data about the current user.
 		/// </summary>
-		/// <returns>Username of the current user or null if user is not authenticated.</returns>
-		public abstract string GetUsername();
-
-		/// <summary>
-		/// Checks whether current user is authenticated or not.
-		/// </summary>
-		/// <returns>True is user is authenticated, otherwise false.</returns>
-		public bool IsAuthenticated() => this.GetUserId() != null;
-
-		/// <summary>
-		/// Scans assembly for implementations of <see cref="IUserRoleChecker"/> and
-		/// registers them, so that they can be used for construction of <see cref="UserContext"/>
-		/// when using <see cref="GetUserContext"/> method.
-		/// </summary>
-		/// <param name="assembly"></param>
-		public void RegisterAssembly(Assembly assembly)
-		{
-			var roleDecorators = assembly.ExportedTypes
-				.Where(t => t.IsClass && !t.IsAbstract)
-				.Where(t => t.ImplementsAtLeastOneInterface(typeof(IUserRoleChecker)))
-				// Make sure not to register same item twice.
-				.Where(t => this.managers.All(f => f.GetType() != t))
-				.Select(Activator.CreateInstance)
-				.Cast<IUserRoleChecker>()
-				.ToList();
-
-			this.managers.AddRange(roleDecorators);
-		}
+		/// <returns><see cref="UserContextData"/> instance.</returns>
+		protected abstract UserContextData GetUserContextData();
 	}
 }

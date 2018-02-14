@@ -11,8 +11,8 @@ namespace UimfApp.Infrastructure.User
 		/// <summary>
 		/// Gets roles for the current user.
 		/// </summary>
-		/// <param name="userContextAccessor">Instance of <see cref="UserContextAccessor"/>.</param>
+		/// <param name="userData">Instance of <see cref="UserContextData"/> or null if user not authenticated.</param>
 		/// <returns>List of <see cref="SystemRole"/>.</returns>
-		IEnumerable<SystemRole> GetRoles(UserContextAccessor userContextAccessor);
+		IEnumerable<SystemRole> GetDynamicRoles(UserContextData userData);
 	}
 }

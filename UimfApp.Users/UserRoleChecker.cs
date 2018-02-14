@@ -7,9 +7,9 @@ namespace UimfApp.Users
 
 	public class UserRoleChecker : IUserRoleChecker
 	{
-		public IEnumerable<SystemRole> GetRoles(UserContextAccessor userContextAccessor)
+		public IEnumerable<SystemRole> GetDynamicRoles(UserContextData userData)
 		{
-			yield return userContextAccessor.IsAuthenticated()
+			yield return userData != null
 				? UserManagementRoles.AuthenticatedUser
 				: UserManagementRoles.UnauthenticatedUser;
 		}

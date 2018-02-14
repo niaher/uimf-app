@@ -3,12 +3,21 @@ namespace UimfApp.Web
 	using System.IO;
 	using System.Linq;
 	using System.Net;
+	using System.Security.Claims;
 	using Microsoft.AspNetCore.Hosting;
 	using Microsoft.AspNetCore.Http;
 
 	public static class Extensions
 	{
 		private const string NullIpAddress = "::1";
+
+		public static int? GetUserId(this ClaimsPrincipal principal)
+		{
+			return principal.Claims.Where(t => t.Type == ClaimTypes.NameIdentifier)
+				.Select(t => t.Value)
+				.SingleOrDefault()
+				.ToInt();
+		}
 
 		public static bool IsLocal(this HttpRequest req)
 		{

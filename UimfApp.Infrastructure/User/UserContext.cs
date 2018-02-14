@@ -11,30 +11,14 @@ namespace UimfApp.Infrastructure.User
 	public class UserContext
 	{
 		/// <summary>
-		/// Initializes a new instance of <see cref="UserContext"/> class,
-		/// which represents an unauthenticated user.
+		/// Initializes a new instance of <see cref="UserContext"/> class.
 		/// </summary>
-		internal UserContext(params string[] roles)
+		/// <param name="user">Instance of <see cref="UserContextData"/> or null if user is not authenticated.</param>
+		/// <param name="roles">All static and dynamic roles the user holds.</param>
+		internal UserContext(UserContextData user, params string[] roles)
 		{
 			this.Roles = roles;
-		}
-
-		/// <summary>
-		/// Initializes a new instance of <see cref="UserContext"/> class, 
-		/// which represents an authenticated user.
-		/// </summary>
-		/// <param name="userName"></param>
-		/// <param name="userId"></param>
-		/// <param name="roles"></param>
-		internal UserContext(string userName, int userId, params string[] roles)
-			: this(roles)
-		{
-			if (string.IsNullOrWhiteSpace(userName))
-			{
-				throw new ArgumentNullException(nameof(userName));
-			}
-
-			this.User = new UserContextData(userName, userId);
+			this.User = user;
 		}
 
 		public bool IsAuthenticated => this.User != null;

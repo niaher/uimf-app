@@ -1,46 +1,62 @@
 namespace UimfApp.Web
 {
-	using System.Collections.Generic;
-	using System.Linq;
 	using System.Security.Claims;
-	using Microsoft.AspNetCore.Http;
+	using Microsoft.AspNetCore.Identity;
 	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.User;
+	using UimfApp.Users;
 
 	public class AppUserContextAccessor : UserContextAccessor
 	{
-		private readonly DependencyInjectionContainer dependencyInjectionContainer;
+		private readonly CookieManager cookieManager;
+		private readonly SignInManager<ApplicationUser> signInManager;
 
-		public AppUserContextAccessor(DependencyInjectionContainer dependencyInjectionContainer)
+		public AppUserContextAccessor(
+			SignInManager<ApplicationUser> signInManager,
+			CookieManager cookieManager,
+			UserRoleCheckerRegister register) : base(register)
 		{
-			this.dependencyInjectionContainer = dependencyInjectionContainer;
+			this.signInManager = signInManager;
+			this.cookieManager = cookieManager;
 		}
 
-		public override IEnumerable<Claim> GetClaims()
+		protected override ClaimsPrincipal GetPrincipal()
 		{
-			return this.GetHttpContextUser().Claims;
+			return this.signInManager.Context.User;
 		}
 
-		public override int? GetUserId()
+		protected override UserContextData GetUserContextData()
 		{
-			var httpContextUser = this.GetHttpContextUser();
+			var principal = this.GetPrincipal();
 
-			return httpContextUser.Claims.Where(t => t.Type == ClaimTypes.NameIdentifier)
-				.Select(t => t.Value)
-				.SingleOrDefault()
-				.ToInt();
+			if (!principal.Identity.IsAuthenticated)
+			{
+				return null;
+			}
+
+			var data = this.cookieManager.GetUserContextData();
+
+			if (data == null)
+			{
+				var userId = principal.GetUserId();
+
+				if (userId == null)
+				{
+					throw new ApplicationException("Invalid principal. Cannot authenticate.");
+				}
+
+				data = this.GetUserContextDataFromDatabase(userId.Value);
+
+				this.cookieManager.SetUserContextData(data);
+			}
+
+			return data;
 		}
 
-		public override string GetUsername()
+		private UserContextData GetUserContextDataFromDatabase(int userId)
 		{
-			var httpContextUser = this.GetHttpContextUser();
-			return httpContextUser.Identity.Name;
-		}
-
-		private ClaimsPrincipal GetHttpContextUser()
-		{
-			var contextAccessor = this.dependencyInjectionContainer.GetInstance<IHttpContextAccessor>();
-			return contextAccessor.HttpContext.User;
+			var user = this.signInManager.UserManager.Users.SingleOrException(t => t.Id == userId);
+			return new UserContextData(user.UserName, userId);
 		}
 	}
 }

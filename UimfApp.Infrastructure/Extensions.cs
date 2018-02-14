@@ -174,8 +174,8 @@ namespace UimfApp.Infrastructure
 			var handlerSecurityRegister = dependencyInjectionContainer.GetInstance<RequestHandlerGuardRegister>();
 			handlerSecurityRegister.RegisterAssembly(assembly);
 
-			var userContextAccessor = dependencyInjectionContainer.GetInstance<UserContextAccessor>();
-			userContextAccessor.RegisterAssembly(assembly);
+			var userRoleCheckerRegister = dependencyInjectionContainer.GetInstance<UserRoleCheckerRegister>();
+			userRoleCheckerRegister.RegisterAssembly(assembly);
 		}
 
 		public static T SingleOrException<T>(this IQueryable<T> queryable, Expression<Func<T, bool>> where)
