@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Filer.EntityFrameworkCore" Version="0.0.8-beta2" />
-    <PackageReference Include="UiMetadataFramework.Basic" Version="0.0.13-beta" />
+    <PackageReference Include="UiMetadataFramework.Basic" Version="0.0.14-beta" />
     <PackageReference Include="UiMetadataFramework.Mediatr" Version="0.0.11-beta" />
   </ItemGroup>
 
