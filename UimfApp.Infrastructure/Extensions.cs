@@ -35,6 +35,14 @@ namespace UimfApp.Infrastructure
 			return new ObjectList<T>(items, binder);
 		}
 
+		public static ObjectListItem<T> AsObjectListItem<T>(this T item)
+		{
+			return new ObjectListItem<T>
+			{
+				Value = item
+			};
+		}
+
 		public static RedirectResponse AsRedirectResponse(this FormLink formLink)
 		{
 			return new RedirectResponse

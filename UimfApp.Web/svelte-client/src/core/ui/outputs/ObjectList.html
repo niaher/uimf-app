@@ -1,6 +1,6 @@
 {{#if items != null}}
 {{#each items as itemFields}}
-	<div class="object-list-item">
+	<div class="object-list-item {{cssClass}}">
 		{{#each itemFields as itemField}}
 		{{#if itemField.metadata.hidden == false}}
 		<FormOutput field="{{itemField}}" app="{{app}}" form="{{form}}" parent="{{parent}}" />
@@ -25,7 +25,8 @@
 			}		
 
 			this.set({
-				items: items
+				items: items,
+				cssClass: (field.metadata.customProperties || {}).cssClass || ""
 			});
 		},
 		components: {
@@ -39,5 +40,21 @@
 		margin:10px 0;
 		border-bottom: 1px solid #eee;
 		padding:10px 0;
+	}
+
+	.object-list-item.inline {
+		display: inline-block;
+		border-bottom: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	.object-list-item.inline:after { 
+		content: ","; 
+		margin-right:5px; 
+	}
+	
+	.object-list-item.inline:last-child:after { 
+		content: ""; 
 	}
 </style>
