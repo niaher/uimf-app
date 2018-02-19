@@ -107,13 +107,20 @@
 				modalForm.destroy();
 				modals.pop(this);
 			},
-			async onActionRun(formId, response) {
+			async onActionRun(formId, response, action) {
 				let parentForm = this.get("parent");
 				let app = parentForm.get("app");
 				let formInstance = parentForm.get("form");
 
 				if (response.metadata.handler !== "redirect") {
-					await parentForm.submit(app, formInstance, null, true);
+					// If asked to redirect to another form, then we redirect
+					// and do not reload parent form, as that would be a wasted effort.
+					if (action != null && action.redirectTo != null) {
+						app.go(action.redirectTo.form, action.redirectTo.inputFieldValues);
+					}
+					else {
+						await parentForm.submit(null, true);
+					}
 				}
 
 				var eventArgs = new ActionListEventArguments(app, formId);

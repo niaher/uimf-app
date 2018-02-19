@@ -178,6 +178,15 @@ namespace UimfApp.Infrastructure
 			userRoleCheckerRegister.RegisterAssembly(assembly);
 		}
 
+		/// <summary>
+		/// Instructs client that when <see cref="FormLink"/> is clicked, the client should run the action immediately 
+		/// and then redirect to another form.
+		/// </summary>
+		public static FormLinkWithRedirect RunAndRedirectTo(this FormLink self, FormLink redirectTo)
+		{
+			return new FormLinkWithRedirect(self, redirectTo);
+		}
+
 		public static T SingleOrException<T>(this IQueryable<T> queryable, Expression<Func<T, bool>> where)
 		{
 			var item = queryable.SingleOrDefault(where);
