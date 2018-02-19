@@ -4,7 +4,7 @@
 
 {{#if initialized && visibleInputFields.length > 0}}
 <div class="form-body">
-<form on:submit="submit(app, form, event, true)">
+<form on:submit="submit(event, true)">
 	{{#each visibleInputFields as inputField}}
 	<FormInput field="{{inputField}}" app="{{app}}" tabindex="{{tabindex * 100 + inputField.metadata.orderIndex}}" form="{{self}}" />
 	{{/each}}
@@ -83,7 +83,7 @@
 
 					// Auto-submit form if necessary.
 					if (form.metadata.postOnLoad) {
-						await this.submit(app, form);
+						await this.submit();
 					}
 
 					openForms.push(this);
@@ -134,9 +134,11 @@
 					document.title = response.metadata.title;
 				}
 			},
-			submit: async function (app, formInstance, event, redirect) {
+			submit: async function (event, redirect) {
 				var self = this;
-				
+				var formInstance = this.get("form");
+				var app = this.get("app");
+							
 				if (event != null) {
 					event.preventDefault();
 				}
@@ -165,7 +167,7 @@
 				}
 				
 				try {
-					await formInstance.submit(app, redirect == null, { formComponent: self });
+					var response = await formInstance.submit(app, redirect == null, { formComponent: self });
 					
 					self.enableForm();
 
@@ -189,7 +191,7 @@
 				else {
 					let app = this.get("app");
 					let formInstance = this.get("form");
-					this.submit(app, formInstance, null, true);
+					this.submit(null, true);
 				}
 			},
 			reloadAllForms() {				

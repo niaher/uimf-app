@@ -56,7 +56,7 @@
 				
 				if (action.action === "run" && allRequiredInputsHaveData) {
 					var response = await formInstance.submit(this.get("app"), false);					
-					this.onActionRun(formInstance.metadata.id, response);
+					this.onActionRun(formInstance.metadata.id, response, action);
 				}
 				else {
 					this.set({ open: true });

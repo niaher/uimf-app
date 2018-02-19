@@ -14,7 +14,7 @@ export class ReloadFormAfterAction extends FormEventHandler {
 		var isTopLevelForm = args.form.get("parent") == null;
 		
 		if (isTopLevelForm && eventHandlerMetadata.customProperties.formId === args.actionFormId) {
-			args.form.submit(args.app, form, null, false);
+			args.form.submit();
 		}
 
 		return Promise.resolve();

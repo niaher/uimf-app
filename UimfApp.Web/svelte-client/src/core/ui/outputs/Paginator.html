@@ -39,10 +39,9 @@
 				var parent = this.get("parent");
 				var form = parent.get("form");
 				var field = this.get("field");
-				var app = this.get("app");
-
+				
 				form.setInputFields(page.params);
-				parent.submit(app, form, null, false);
+				parent.submit(null, false);
 			}
 		},
 		computed: {
