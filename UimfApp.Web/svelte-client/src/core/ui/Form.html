@@ -17,7 +17,7 @@
 {{#if outputFieldValues != null}}
 <div class="response">
 	{{#each outputFieldValues as outputField}}
-	{{#if outputField.metadata.hidden == false}}
+	{{#if outputField.metadata.hidden == false && !(outputField.metadata.getCustomProperty("hideIfNull") === true && outputField.data === null)}}
 	<FormOutput field="{{outputField}}" app="{{app}}" form="{{form}}" parent="{{self}}" />
 	{{/if}}
 	{{/each}}
