@@ -68,7 +68,7 @@ export class UmfApp implements IAppRouter {
 				this.menusByName = {};
 
 				for (let form of this.forms) {
-					this.formsById[form.id] = form;
+					this.formsById[form.id] = new FormMetadata(form);
 				}
 
 				for (let menu of this.menus) {

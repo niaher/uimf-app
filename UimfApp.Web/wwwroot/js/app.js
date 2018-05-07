@@ -2,8 +2,46 @@
 'use strict';
 
 /**
+ * Represents metadata for a single output field.
+ */
+var OutputFieldMetadata = (function () {
+    function OutputFieldMetadata(metadata) {
+        this.customProperties = metadata.customProperties;
+        this.eventHandlers = metadata.eventHandlers;
+        this.hidden = metadata.hidden;
+        this.id = metadata.id;
+        this.label = metadata.label;
+        this.orderIndex = metadata.orderIndex;
+        this.type = metadata.type;
+    }
+    /**
+     * Gets value of a custom property.
+     * @param name name of the custom property to get.
+     * @returns value of the custom property or null if the property is undefined.
+     */
+    OutputFieldMetadata.prototype.getCustomProperty = function (name) {
+        if (this.customProperties != null && this.customProperties[name]) {
+            return this.customProperties[name];
+        }
+        return null;
+    };
+    return OutputFieldMetadata;
+}());
+
+/**
  * Encapsulates all information needed to render a form.
  */
+var FormMetadata = (function () {
+    function FormMetadata(metadata) {
+        for (var property in metadata) {
+            if (metadata.hasOwnProperty(property)) {
+                this[property] = metadata[property];
+            }
+        }
+        this.outputFields = metadata.outputFields.map(function (t) { return new OutputFieldMetadata(t); });
+    }
+    return FormMetadata;
+}());
 
 /**
  * Represents a reference to a form.
@@ -125,10 +163,6 @@ var FormResponseMetadata = (function () {
     }
     return FormResponseMetadata;
 }());
-
-/**
- * Represents metadata for a single output field.
- */
 
 var bind = function bind(fn, thisArg) {
   return function wrap() {
@@ -2093,7 +2127,7 @@ var UmfApp = (function () {
             _this.menusByName = {};
             for (var _i = 0, _a = _this.forms; _i < _a.length; _i++) {
                 var form = _a[_i];
-                _this.formsById[form.id] = form;
+                _this.formsById[form.id] = new FormMetadata(form);
             }
             for (var _b = 0, _c = _this.menus; _b < _c.length; _b++) {
                 var menu = _c[_b];
@@ -16269,10 +16303,9 @@ var methods$1 = {
 		var parent = this.get("parent");
 		var form = parent.get("form");
 		var field = this.get("field");
-		var app = this.get("app");
-
+		
 		form.setInputFields(page.params);
-		parent.submit(app, form, null, false);
+		parent.submit(null, false);
 	}
 };
 
@@ -16295,13 +16328,13 @@ function oncreate$3() {
 }
 
 function encapsulateStyles$5(node) {
-	setAttribute(node, "svelte-838979378", "");
+	setAttribute(node, "svelte-3536970710", "");
 }
 
 function add_css$5() {
 	var style = createElement("style");
-	style.id = 'svelte-838979378-style';
-	style.textContent = "[svelte-838979378].paginator,[svelte-838979378] .paginator{margin:.5rem 0;padding-left:0}[svelte-838979378].paginator>li,[svelte-838979378] .paginator>li{display:inline-block}[svelte-838979378].paginator>li>a,[svelte-838979378] .paginator>li>a,[svelte-838979378].paginator>li>button,[svelte-838979378] .paginator>li>button{padding:2px 10px;margin:1px;display:inline-block;background:#eee}[svelte-838979378].paginator>li>a.current,[svelte-838979378] .paginator>li>a.current,[svelte-838979378].paginator>li>button.current,[svelte-838979378] .paginator>li>button.current{background:#1eb1c8;color:#fff}[svelte-838979378].paginator>li>a:hover,[svelte-838979378] .paginator>li>a:hover,[svelte-838979378].paginator>li>button:hover,[svelte-838979378] .paginator>li>button:hover{color:#f3818c;text-decoration:none\r\n\t}";
+	style.id = 'svelte-3536970710-style';
+	style.textContent = "[svelte-3536970710].paginator,[svelte-3536970710] .paginator{margin:.5rem 0;padding-left:0}[svelte-3536970710].paginator>li,[svelte-3536970710] .paginator>li{display:inline-block}[svelte-3536970710].paginator>li>a,[svelte-3536970710] .paginator>li>a,[svelte-3536970710].paginator>li>button,[svelte-3536970710] .paginator>li>button{padding:2px 10px;margin:1px;display:inline-block;background:#eee}[svelte-3536970710].paginator>li>a.current,[svelte-3536970710] .paginator>li>a.current,[svelte-3536970710].paginator>li>button.current,[svelte-3536970710] .paginator>li>button.current{background:#1eb1c8;color:#fff}[svelte-3536970710].paginator>li>a:hover,[svelte-3536970710] .paginator>li>a:hover,[svelte-3536970710].paginator>li>button:hover,[svelte-3536970710] .paginator>li>button:hover{color:#f3818c;text-decoration:none\r\n\t}";
 	appendNode(style, document.head);
 }
 
@@ -16583,7 +16616,7 @@ function SvelteComponent$16(options) {
 	this._state = assign(data$1(), options.data);
 	this._recompute({ field: 1, form: 1 }, this._state);
 
-	if (!document.getElementById("svelte-838979378-style")) add_css$5();
+	if (!document.getElementById("svelte-3536970710-style")) add_css$5();
 
 	var _oncreate = oncreate$3.bind(this);
 
@@ -16886,7 +16919,7 @@ var methods$3 = {
 
 			// Auto-submit form if necessary.
 			if (form.metadata.postOnLoad) {
-				await this.submit(app, form);
+				await this.submit();
 			}
 
 			openForms.push(this);
@@ -16937,9 +16970,11 @@ var methods$3 = {
 			document.title = response.metadata.title;
 		}
 	},
-	submit: async function (app, formInstance, event, redirect) {
+	submit: async function (event, redirect) {
 		var self = this;
-		
+		var formInstance = this.get("form");
+		var app = this.get("app");
+					
 		if (event != null) {
 			event.preventDefault();
 		}
@@ -16968,7 +17003,7 @@ var methods$3 = {
 		}
 		
 		try {
-			await formInstance.submit(app, redirect == null, { formComponent: self });
+			var response = await formInstance.submit(app, redirect == null, { formComponent: self });
 			
 			self.enableForm();
 
@@ -16992,7 +17027,7 @@ var methods$3 = {
 		else {
 			let app = this.get("app");
 			let formInstance = this.get("form");
-			this.submit(app, formInstance, null, true);
+			this.submit(null, true);
 		}
 	},
 	reloadAllForms() {				
@@ -17007,13 +17042,13 @@ function ondestroy() {
 }
 
 function encapsulateStyles$8(node) {
-	setAttribute(node, "svelte-1274685619", "");
+	setAttribute(node, "svelte-2691548397", "");
 }
 
 function add_css$8() {
 	var style = createElement("style");
-	style.id = 'svelte-1274685619-style';
-	style.textContent = "[svelte-1274685619].response,[svelte-1274685619] .response{margin-top:15px;padding-left:10px;padding-right:10px}[svelte-1274685619].inline-form .response,[svelte-1274685619] .inline-form .response{margin-top:0;padding:10px 15px}[svelte-1274685619].inline-form h2,[svelte-1274685619] .inline-form h2{margin:0;background:#eee;padding:10px 15px 15px;font-size:15px}";
+	style.id = 'svelte-2691548397-style';
+	style.textContent = "[svelte-2691548397].response,[svelte-2691548397] .response{margin-top:15px;padding-left:10px;padding-right:10px}[svelte-2691548397].inline-form .response,[svelte-2691548397] .inline-form .response{margin-top:0;padding:10px 15px}[svelte-2691548397].inline-form h2,[svelte-2691548397] .inline-form h2{margin:0;background:#eee;padding:10px 15px 15px;font-size:15px}";
 	appendNode(style, document.head);
 }
 
@@ -17149,8 +17184,7 @@ function create_if_block$8(state, component) {
 	var div, form, text, button, text_1;
 
 	function submit_handler(event) {
-		var state = component.get();
-		component.submit(state.app, state.form, event, true);
+		component.submit(event, true);
 	}
 
 	var visibleInputFields = state.visibleInputFields;
@@ -17249,7 +17283,7 @@ function create_if_block$8(state, component) {
 function create_each_block_1$2(state, outputFieldValues, outputField, outputField_index, component) {
 	var if_block_anchor;
 
-	var if_block = (outputField.metadata.hidden == false) && create_if_block_2$3(state, outputFieldValues, outputField, outputField_index, component);
+	var if_block = (outputField.metadata.hidden == false && !(outputField.metadata.getCustomProperty("hideIfNull") === true && outputField.data === null)) && create_if_block_2$3(state, outputFieldValues, outputField, outputField_index, component);
 
 	return {
 		c: function create() {
@@ -17263,7 +17297,7 @@ function create_each_block_1$2(state, outputFieldValues, outputField, outputFiel
 		},
 
 		p: function update(changed, state, outputFieldValues, outputField, outputField_index) {
-			if (outputField.metadata.hidden == false) {
+			if (outputField.metadata.hidden == false && !(outputField.metadata.getCustomProperty("hideIfNull") === true && outputField.data === null)) {
 				if (if_block) {
 					if_block.p(changed, state, outputFieldValues, outputField, outputField_index);
 				} else {
@@ -17289,7 +17323,7 @@ function create_each_block_1$2(state, outputFieldValues, outputField, outputFiel
 	};
 }
 
-// (20:1) {{#if outputField.metadata.hidden == false}}
+// (20:1) {{#if outputField.metadata.hidden == false && !(outputField.metadata.getCustomProperty("hideIfNull") === true && outputField.data === null)}}
 function create_if_block_2$3(state, outputFieldValues, outputField, outputField_index, component) {
 
 	var formoutput = new SvelteComponent$13({
@@ -17407,7 +17441,7 @@ function SvelteComponent$19(options) {
 
 	this._handlers.destroy = [ondestroy];
 
-	if (!document.getElementById("svelte-1274685619-style")) add_css$8();
+	if (!document.getElementById("svelte-2691548397-style")) add_css$8();
 
 	if (!options._root) {
 		this._oncreate = [];
@@ -17489,7 +17523,7 @@ var methods$2 = {
 		
 		if (action.action === "run" && allRequiredInputsHaveData) {
 			var response = await formInstance.submit(this.get("app"), false);					
-			this.onActionRun(formInstance.metadata.id, response);
+			this.onActionRun(formInstance.metadata.id, response, action);
 		}
 		else {
 			this.set({ open: true });
@@ -17540,13 +17574,20 @@ var methods$2 = {
 		modalForm.destroy();
 		modals.pop(this);
 	},
-	async onActionRun(formId, response) {
+	async onActionRun(formId, response, action) {
 		let parentForm = this.get("parent");
 		let app = parentForm.get("app");
 		let formInstance = parentForm.get("form");
 
 		if (response.metadata.handler !== "redirect") {
-			await parentForm.submit(app, formInstance, null, true);
+			// If asked to redirect to another form, then we redirect
+			// and do not reload parent form, as that would be a wasted effort.
+			if (action != null && action.redirectTo != null) {
+				app.go(action.redirectTo.form, action.redirectTo.inputFieldValues);
+			}
+			else {
+				await parentForm.submit(null, true);
+			}
 		}
 
 		var eventArgs = new ActionListEventArguments(app, formId);
@@ -17555,13 +17596,13 @@ var methods$2 = {
 };
 
 function encapsulateStyles$7(node) {
-	setAttribute(node, "svelte-2880564093", "");
+	setAttribute(node, "svelte-3480460783", "");
 }
 
 function add_css$7() {
 	var style = createElement("style");
-	style.id = 'svelte-2880564093-style';
-	style.textContent = "[svelte-2880564093].modal .card,[svelte-2880564093] .modal .card{max-width:85%;padding:10px 15px}[svelte-2880564093].hidden,[svelte-2880564093] .hidden{width:0;height:0;position:absolute;left:-1000px}[svelte-2880564093].actionlist,[svelte-2880564093] .actionlist{margin:0px 0;padding:0 5px;text-align:right;background:#fff;margin-bottom:15px}[svelte-2880564093].actionlist>li,[svelte-2880564093] .actionlist>li{list-style-type:none;display:inline-block}";
+	style.id = 'svelte-3480460783-style';
+	style.textContent = "[svelte-3480460783].modal .card,[svelte-3480460783] .modal .card{max-width:85%;padding:10px 15px}[svelte-3480460783].hidden,[svelte-3480460783] .hidden{width:0;height:0;position:absolute;left:-1000px}[svelte-3480460783].actionlist,[svelte-3480460783] .actionlist{margin:0px 0;padding:0 5px;text-align:right;background:#fff;margin-bottom:15px}[svelte-3480460783].actionlist>li,[svelte-3480460783] .actionlist>li{list-style-type:none;display:inline-block}";
 	appendNode(style, document.head);
 }
 
@@ -17799,7 +17840,7 @@ function SvelteComponent$18(options) {
 	this.refs = {};
 	this._state = assign(data$2(), options.data);
 
-	if (!document.getElementById("svelte-2880564093-style")) add_css$7();
+	if (!document.getElementById("svelte-3480460783-style")) add_css$7();
 
 	this._fragment = create_main_fragment$18(this._state, this);
 
@@ -18486,18 +18527,19 @@ function oncreate$7() {
 	}		
 
 	this.set({
-		items: items
+		items: items,
+		cssClass: (field.metadata.customProperties || {}).cssClass || ""
 	});
 }
 
 function encapsulateStyles$12(node) {
-	setAttribute(node, "svelte-3414328956", "");
+	setAttribute(node, "svelte-3024226224", "");
 }
 
 function add_css$12() {
 	var style = createElement("style");
-	style.id = 'svelte-3414328956-style';
-	style.textContent = "[svelte-3414328956].object-list-item,[svelte-3414328956] .object-list-item{margin:10px 0;border-bottom:1px solid #eee;padding:10px 0}";
+	style.id = 'svelte-3024226224-style';
+	style.textContent = "[svelte-3024226224].object-list-item,[svelte-3024226224] .object-list-item{margin:10px 0;border-bottom:1px solid #eee;padding:10px 0}[svelte-3024226224].object-list-item.inline,[svelte-3024226224] .object-list-item.inline{display:inline-block;border-bottom:none;padding:0;margin:0}[svelte-3024226224].object-list-item.inline:after,[svelte-3024226224] .object-list-item.inline:after{content:\",\";margin-right:5px}[svelte-3024226224].object-list-item.inline:last-child:after,[svelte-3024226224] .object-list-item.inline:last-child:after{content:\"\"}";
 	appendNode(style, document.head);
 }
 
@@ -18546,7 +18588,7 @@ function create_main_fragment$28(state, component) {
 
 // (2:0) {{#each items as itemFields}}
 function create_each_block$8(state, items, itemFields, itemFields_index, component) {
-	var div;
+	var div, div_class_value;
 
 	var itemFields_1 = itemFields;
 
@@ -18568,7 +18610,7 @@ function create_each_block$8(state, items, itemFields, itemFields_index, compone
 
 		h: function hydrate() {
 			encapsulateStyles$12(div);
-			div.className = "object-list-item";
+			div.className = div_class_value = "object-list-item " + state.cssClass;
 		},
 
 		m: function mount(target, anchor) {
@@ -18580,6 +18622,10 @@ function create_each_block$8(state, items, itemFields, itemFields_index, compone
 		},
 
 		p: function update(changed, state, items, itemFields, itemFields_index) {
+			if ((changed.cssClass) && div_class_value !== (div_class_value = "object-list-item " + state.cssClass)) {
+				div.className = div_class_value;
+			}
+
 			var itemFields_1 = itemFields;
 
 			if (changed.items || changed.app || changed.form || changed.parent) {
@@ -18732,7 +18778,7 @@ function create_if_block$13(state, component) {
 		p: function update(changed, state) {
 			var items = state.items;
 
-			if (changed.items || changed.app || changed.form || changed.parent) {
+			if (changed.cssClass || changed.items || changed.app || changed.form || changed.parent) {
 				for (var i = 0; i < items.length; i += 1) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, state, items, items[i], i);
@@ -18769,7 +18815,7 @@ function SvelteComponent$28(options) {
 	init(this, options);
 	this._state = options.data || {};
 
-	if (!document.getElementById("svelte-3414328956-style")) add_css$12();
+	if (!document.getElementById("svelte-3024226224-style")) add_css$12();
 
 	var _oncreate = oncreate$7.bind(this);
 
@@ -18820,7 +18866,7 @@ var ReloadFormAfterAction = (function (_super) {
     ReloadFormAfterAction.prototype.run = function (form, eventHandlerMetadata, args) {
         var isTopLevelForm = args.form.get("parent") == null;
         if (isTopLevelForm && eventHandlerMetadata.customProperties.formId === args.actionFormId) {
-            args.form.submit(args.app, form, null, false);
+            args.form.submit();
         }
         return Promise.resolve();
     };
