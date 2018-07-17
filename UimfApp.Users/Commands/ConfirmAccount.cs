@@ -1,6 +1,7 @@
 namespace UimfApp.Users.Commands
 {
 	using System.Linq;
+	using System.Threading;
 	using System.Threading.Tasks;
 	using MediatR;
 	using Microsoft.AspNetCore.Identity;
@@ -12,7 +13,7 @@ namespace UimfApp.Users.Commands
 	using UimfApp.Infrastructure.User;
 
 	[MyForm(Id = "confirm-account", Label = "Confirming account...", PostOnLoad = true)]
-	public class ConfirmAccount : IAsyncForm<ConfirmAccount.Request, ReloadResponse>
+	public class ConfirmAccount : AsyncForm<ConfirmAccount.Request, ReloadResponse>
 	{
 		private readonly SignInManager<ApplicationUser> signInManager;
 		private readonly UserContext userContext;
@@ -25,7 +26,7 @@ namespace UimfApp.Users.Commands
 			this.userContext = userContext;
 		}
 
-		public async Task<ReloadResponse> Handle(Request message)
+		public override async Task<ReloadResponse> Handle(Request message, CancellationToken cancellationToken)
 		{
 			var user = this.userManager.Users.SingleOrDefault(t => t.Id == message.Id);
 

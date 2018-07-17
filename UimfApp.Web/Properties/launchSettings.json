@@ -3,7 +3,7 @@
 		"windowsAuthentication": false,
 		"anonymousAuthentication": true,
 		"iisExpress": {
-			"applicationUrl": "http://localhost:58336/",
+			"applicationUrl": "http://localhost:58341/",
 			"sslPort": 0
 		}
 	},
@@ -23,7 +23,7 @@
 			"environmentVariables": {
 				"ASPNETCORE_ENVIRONMENT": "Development"
 			},
-			"applicationUrl": "http://localhost:58336/"
+			"applicationUrl": "http://localhost:58341/"
 		}
 	}
 }

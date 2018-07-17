@@ -42,8 +42,7 @@ namespace UimfApp.Web
 
 		public static int? ToInt(this string value)
 		{
-			int result;
-			if (!int.TryParse(value, out result))
+			if (!int.TryParse(value, out var result))
 			{
 				return null;
 			}

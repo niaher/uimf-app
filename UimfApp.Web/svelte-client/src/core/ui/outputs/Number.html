@@ -1,1 +1,21 @@
-{{field.data}}
+{{#if field.data != null}}
+{{formatted}}
+{{/if}}
+
+<script>
+	export default {
+		computed: {
+			formatted: (field) => {
+				if (field.data == null) {
+					return "";
+				}
+
+				var x = field.data;
+				var parts = x.toString().split(".");
+				parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+				
+				return parts.join(".");
+			}
+		}
+	}
+</script>

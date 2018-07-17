@@ -1,87 +1,83 @@
-import { FormMetadata, FormResponse, FormResponseMetadata } from "uimf-core";
-import { FormInstance } from "./FormInstance";
 import * as axiosLib from "axios";
+import { FormMetadata, FormResponse, FormResponseMetadata } from "uimf-core";
 
-var axios = axiosLib.default;
+const axios = axiosLib.default;
 
 export class UmfServer {
-    private readonly getMetadataUrl: string;
-    private readonly postFormUrl: string;
-    private loading: boolean = false;
-    private eventHandlers: { [id: string]: Array<IEventHandler> } = {};
+	private readonly getMetadataUrl: string;
+	private readonly postFormUrl: string;
+	private eventHandlers: { [id: string]: IEventHandler[] } = {};
 
 	/**
 	 * Creates a new instance of UmfApp.
 	 */
-    constructor(getMetadataUrl: string, postFormUrl: string) {
-        this.getMetadataUrl = getMetadataUrl;
-        this.postFormUrl = postFormUrl;
-    }
+	constructor(getMetadataUrl: string, postFormUrl: string) {
+		this.getMetadataUrl = getMetadataUrl;
+		this.postFormUrl = postFormUrl;
+	}
 
-    on(event: string, handler: IEventHandler) {
-        this.eventHandlers[event] = this.eventHandlers[event] || [];
-        this.eventHandlers[event].push(handler);
-    }
+	public on(event: string, handler: IEventHandler): void {
+		this.eventHandlers[event] = this.eventHandlers[event] || [];
+		this.eventHandlers[event].push(handler);
+	}
 
-    private fire(event: string, params?: any) {
-        var handlersForEvent = this.eventHandlers[event];
-        if (handlersForEvent != null && handlersForEvent.length > 0) {
-            for (let handler of handlersForEvent) {
-                handler(params);
-            }
-        }
-    }
+	private fire(event: string, params?: any): void {
+		const handlersForEvent = this.eventHandlers[event];
+		if (handlersForEvent != null && handlersForEvent.length > 0) {
+			for (const handler of handlersForEvent) {
+				handler(params);
+			}
+		}
+	}
 
-    getMetadata(formId: string): Promise<FormMetadata> {
-        this.fire("request:started");
-        return axios.get(`${this.getMetadataUrl}/${formId}`).then((response: axiosLib.AxiosResponse) => {
-            this.fire("request:completed");
-            return <FormMetadata>response.data;
-        }).catch(e => {
-            console.warn(`Did not find form "${formId}".`)
-            this.fire("request:completed");
-            return null;
-        });
-    }
+	public getMetadata(formId: string): Promise<FormMetadata> {
+		this.fire("request:started");
+		return axios.get(`${this.getMetadataUrl}/${formId}`).then((response: axiosLib.AxiosResponse) => {
+			this.fire("request:completed");
+			return response.data as FormMetadata;
+		}).catch((e) => {
+			// tslint:disable-next-line:no-console
+			console.warn(`Did not find form "${formId}".`);
+			this.fire("request:completed");
+			return null;
+		});
+	}
 
-    getAllMetadata(): Promise<{ forms: FormMetadata[], menus: any[] }> {
-        this.fire("request:started");
-        return axios.get(this.getMetadataUrl).then((response: axiosLib.AxiosResponse) => {
-            this.fire("request:completed");
-            return response.data;
-        });
-    }
+	public getAllMetadata(): Promise<{ forms: FormMetadata[], menus: any[] }> {
+		this.fire("request:started");
+		return axios.get(this.getMetadataUrl).then((response: axiosLib.AxiosResponse) => {
+			this.fire("request:completed");
+			return response.data;
+		});
+	}
 
-    postForm(form: string, data: any): Promise<FormResponse> {
-        this.fire("request:started");
-        return axios.post(this.postFormUrl, JSON.stringify([{
-            Form: form,
-            RequestId: 1,
-            InputFieldValues: data
-        }]), <axiosLib.AxiosRequestConfig>{
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }).then((response: axiosLib.AxiosResponse) => {
-            var invokeFormResponses = <InvokeFormResponse[]>response.data;
+	public postForm(form: string, data: any): Promise<any> {
+		this.fire("request:started");
+		return axios.post(this.postFormUrl, JSON.stringify([{
+			Form: form,
+			RequestId: 1,
+			InputFieldValues: data
+		}]), {
+			headers: {
+				"Content-Type": "application/json"
+			}
+		}).then((response: axiosLib.AxiosResponse) => {
+			const invokeFormResponses = response.data as InvokeFormResponse[];
 
-            // Make sure metadata is never null.
-            invokeFormResponses[0].data.metadata = invokeFormResponses[0].data.metadata || new FormResponseMetadata();
-            this.fire("request:completed");
-            return invokeFormResponses[0].data;
-        }).catch((error: axiosLib.AxiosError) => {
-            alert(error.response.data.error);
-            this.fire("request:completed");
-            return null;
-        });
-    }
+			// Make sure metadata is never null.
+			invokeFormResponses[0].data.metadata = invokeFormResponses[0].data.metadata || new FormResponseMetadata();
+			this.fire("request:completed");
+			return invokeFormResponses[0].data;
+		}).catch((error: axiosLib.AxiosError) => {
+			this.fire("request:completed", error.response.data.error);
+			return null;
+		});
+	}
 }
 
-class InvokeFormResponse {
-    public data: FormResponse;
-    public requestId: string;
+interface InvokeFormResponse {
+	data: FormResponse;
+	requestId: string;
 }
 
-interface IEventHandler {
-    (params?: any): any;
-}
+type IEventHandler = (params?: any) => any;

@@ -5,7 +5,7 @@ var axios = axiosLib.default;
 
 export class FileUploaderController extends umf.InputController<FileUploaderValue> {
 	selected: any[];
-
+	filesIds: any[] = [];
 	serializeValue(value: FileUploaderValue | string): string {
 		return value != null ? JSON.stringify(value) : null;
 	}
@@ -28,16 +28,21 @@ export class FileUploaderController extends umf.InputController<FileUploaderValu
 
 		var promises = [];
 		var result = new FileUploaderValue();
+		var files = self.selected;
 
-		for (let f of self.selected) {
-			if (f.fileId != null) {
-				result.files.push(f.fileId);
-				continue;
+		if (self.filesIds.length > 0) {
+			for (let fileId of self.filesIds) {
+				result.files.push(fileId);
 			}
-
+			self.filesIds = [];
+			self.selected = null;
+		} else {
 			let p = new Promise((resolve, reject) => {
+
 				var formData = new FormData();
-				formData.append("file", f);
+				for (let f of files) {
+					formData.append("file", f);
+				}
 
 				// Make http request to upload the files.
 				axios.post("/file/upload", formData, <axiosLib.AxiosRequestConfig>{
@@ -45,8 +50,12 @@ export class FileUploaderController extends umf.InputController<FileUploaderValu
 						"Content-Type": "multipart/form-data"
 					}
 				}).then((response: axiosLib.AxiosResponse) => {
-					f.fileId = response.data.fileId;
-					result.files.push(response.data.fileId);
+					if (response.data.fileIds != null && response.data.fileIds.length > 0) {
+						for (let fileId of response.data.fileIds) {
+							result.files.push(fileId);
+							self.filesIds.push(fileId);
+						}
+					}
 					resolve();
 				}).catch((error: axiosLib.AxiosError) => {
 					alert(error.response.data.error);
@@ -60,18 +69,6 @@ export class FileUploaderController extends umf.InputController<FileUploaderValu
 		return Promise.all(promises).then(t => {
 			return result;
 		});
-	}
-
-	private parse(value: string | FileUploaderValue): FileUploaderValue {
-		var parsed = typeof (value) === "string"
-			? JSON.parse(value)
-			: value;
-
-		if (parsed == null || parsed.files == null || parsed.files.length < 1) {
-			return null;
-		}
-
-		return parsed;
 	}
 }
 

@@ -3,11 +3,13 @@ namespace UimfApp.Infrastructure.Forms
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Reflection;
+	using System.Threading;
+	using System.Threading.Tasks;
 	using MediatR;
-	using UimfApp.Infrastructure.Forms.Menu;
-	using UimfApp.Infrastructure.Security;
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.MediatR;
+	using UimfApp.Infrastructure.Forms.Menu;
+	using UimfApp.Infrastructure.Security;
 	using UimfApp.Infrastructure.User;
 
 	/// <summary>
@@ -15,73 +17,73 @@ namespace UimfApp.Infrastructure.Forms
 	/// </summary>
 	public class MyForms : IRequestHandler<MyForms.Request, MyForms.Response>
 	{
-		private readonly DependencyInjectionContainer container;
 		private readonly FormRegister formRegister;
 		private readonly MenuRegister menuRegister;
 		private readonly SystemPermissionManager permissionManager;
 		private readonly UserContext userContext;
 
-		public MyForms(
-			DependencyInjectionContainer container,
-			UserContext userContext,
+		public MyForms(UserContext userContext,
 			FormRegister formRegister,
 			MenuRegister menuRegister,
 			SystemPermissionManager permissionManager)
 		{
-			this.container = container;
 			this.userContext = userContext;
 			this.formRegister = formRegister;
 			this.menuRegister = menuRegister;
 			this.permissionManager = permissionManager;
 		}
 
-		public Response Handle(Request message)
+		public Task<Response> Handle(Request message, CancellationToken cancellationToken)
 		{
-			// Get forms implementing ISecureHandler (non context based).
-			var secureForms = this.formRegister.RegisteredForms
-				.Where(t => t.FormType.GetTypeInfo().GetInterfaces().Any(i => i == typeof(ISecureHandler)))
+			// Get forms with [SecureForm] attribute, which use non-context-based permissions.
+			var allForms = this.formRegister.RegisteredForms
+				.Select(t => new
+				{
+					Attribute = t.FormType.GetCustomAttribute<SecureAttribute>(),
+					FormInfo = t
+				})
 				.ToList();
 
 			var list = new List<FormMetadata>();
 
-			foreach (var metadata in secureForms)
+			foreach (var form in allForms)
 			{
-				var formInstance = this.container.GetInstance(metadata.FormType);
-				var permission = metadata.FormType.GetTypeInfo().GetMethod(nameof(ISecureHandler.GetPermission)).Invoke(formInstance, null);
-
-				var canDo = this.permissionManager.CanDo((SystemAction)permission, this.userContext);
-
-				if (canDo)
+				if (form.Attribute != null)
 				{
-					list.Add(metadata.Metadata);
+					if (form.Attribute.ContextType == null)
+					{
+						var canDo = this.permissionManager.CanDo(form.Attribute.Permission, this.userContext);
+
+						if (canDo)
+						{
+							// Form with context-less security.
+							list.Add(form.FormInfo.Metadata);
+						}
+					}
+					else if (message.IncludeWithContextBasedSecurity)
+					{
+						// Form with context-based security.
+						list.Add(form.FormInfo.Metadata);
+					}
+				}
+				else
+				{
+					// Form without any security , i.e. - available to all users.
+					list.Add(form.FormInfo.Metadata);
 				}
 			}
 
-			// Get forms without any security , i.e. - available to all users.
-			var publicForms = this.formRegister.RegisteredForms
-				.Where(t =>
-				{
-					return message.IncludeWithContextBasedSecurity
-						? t.FormType.GetTypeInfo().GetInterfaces().All(i => i != typeof(ISecureHandler))
-						: t.FormType.GetTypeInfo().GetInterfaces().All(i => i != typeof(ISecureHandler) &&
-							!(i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == typeof(ISecureHandler<,,>)));
-				})
-				.OrderBy(a => a.FormType.FullName)
-				.ToList();
-
-			list.AddRange(publicForms.Select(t => t.Metadata));
-
-			return new Response
+			return Task.FromResult(new Response
 			{
 				Forms = list,
 				Menus = this.menuRegister.RegisteredMenus
-			};
+			});
 		}
 
 		public class Request : IRequest<Response>
 		{
 			/// <summary>
-			/// Indicates whether to retrieve forms which implement <see cref="ISecureHandler{TContext,TRequest}"/>.
+			/// Indicates whether to retrieve forms which use context-based security.
 			/// </summary>
 			public bool IncludeWithContextBasedSecurity { get; set; }
 		}

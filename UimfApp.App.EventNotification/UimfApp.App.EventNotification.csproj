@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Emails\Templates\WorkItemAssignedTemplate.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Emails\Templates\WorkItemAssignedTemplate.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UimfApp.Core\UimfApp.Core.csproj" />
+    <ProjectReference Include="..\UimfApp.Infrastructure\UimfApp.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

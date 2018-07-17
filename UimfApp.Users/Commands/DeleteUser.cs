@@ -2,20 +2,21 @@ namespace UimfApp.Users.Commands
 {
 	using System.Collections.Generic;
 	using System.Linq;
+	using System.Threading;
 	using System.Threading.Tasks;
-	using CPermissions;
 	using MediatR;
 	using Microsoft.AspNetCore.Identity;
+	using UiMetadataFramework.Basic.Output;
+	using UiMetadataFramework.Core;
+	using UiMetadataFramework.Core.Binding;
 	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Forms;
 	using UimfApp.Infrastructure.Security;
 	using UimfApp.Users.Security;
-	using UiMetadataFramework.Basic.Output;
-	using UiMetadataFramework.Core;
-	using UiMetadataFramework.Core.Binding;
 
 	[MyForm(Id = "delete-user", PostOnLoad = true)]
-	public class DeleteUser : IMyAsyncForm<DeleteUser.Request, DeleteUser.Response>, ISecureHandler
+	[Secure(typeof(UserActions), nameof(UserActions.ManageUsers))]
+	public class DeleteUser : MyAsyncForm<DeleteUser.Request, DeleteUser.Response>
 	{
 		private readonly UserManager<ApplicationUser> userManager;
 
@@ -24,7 +25,7 @@ namespace UimfApp.Users.Commands
 			this.userManager = userManager;
 		}
 
-		public async Task<Response> Handle(Request message)
+		public override async Task<Response> Handle(Request message, CancellationToken cancellationToken)
 		{
 			var user = this.userManager.Users.SingleOrDefault(t => t.Id == message.Id);
 
@@ -44,17 +45,12 @@ namespace UimfApp.Users.Commands
 			return new Response();
 		}
 
-		public UserAction GetPermission()
-		{
-			return UserActions.ManageUsers;
-		}
-
-		public static FormLink Button(int userId)
+		public static FormLink Button(int userId, string label = null)
 		{
 			return new FormLink
 			{
 				Form = typeof(DeleteUser).GetFormId(),
-				Label = "Delete",
+				Label = label ?? "Delete",
 				InputFieldValues = new Dictionary<string, object>
 				{
 					{ nameof(Request.Id), userId }

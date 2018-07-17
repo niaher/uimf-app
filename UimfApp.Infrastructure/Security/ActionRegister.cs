@@ -29,6 +29,17 @@ namespace UimfApp.Infrastructure.Security
 		}
 
 		/// <summary>
+		/// Attempts to get <see cref="SystemRole"/> given its name.
+		/// </summary>
+		/// <param name="role">Name of the role. Case-sensitive.</param>
+		/// <returns><see cref="SystemRole"/> instance or null if specified role was not registered.</returns>
+		public SystemRole GetRoleByName(string role)
+		{
+			this.roles.TryGetValue(role, out var result);
+			return result;
+		}
+
+		/// <summary>
 		/// Gets list of all registered roles.
 		/// </summary>
 		/// <returns></returns>
@@ -82,17 +93,6 @@ namespace UimfApp.Infrastructure.Security
 					this.roles.TryAdd(role.Name, role);
 				}
 			}
-		}
-
-		/// <summary>
-		/// Attempts to get <see cref="SystemRole"/> given its name.
-		/// </summary>
-		/// <param name="role">Name of the role. Case-sensitive.</param>
-		/// <returns><see cref="SystemRole"/> instance or null if specified role was not registered.</returns>
-		public SystemRole GetRoleByName(string role)
-		{
-			this.roles.TryGetValue(role, out var result);
-			return result;
 		}
 	}
 }

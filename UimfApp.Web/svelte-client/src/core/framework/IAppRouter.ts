@@ -1,6 +1,6 @@
 import { UmfApp } from "./UmfApp";
 
 export interface IAppRouter {
-	go: (form: string, values) => void;
-	makeUrl: (form: string, values) => string;
+	go: (form: string, values: any) => void;
+	makeUrl: (form: string, values: any) => string;
 }

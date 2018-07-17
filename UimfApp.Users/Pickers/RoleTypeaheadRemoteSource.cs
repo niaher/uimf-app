@@ -2,15 +2,14 @@ namespace UimfApp.Users.Pickers
 {
 	using System;
 	using System.Linq;
-	using CPermissions;
 	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Forms;
 	using UimfApp.Infrastructure.Forms.Typeahead;
 	using UimfApp.Infrastructure.Security;
 	using UimfApp.Users.Security;
 
-	public class RoleTypeaheadRemoteSource : ITypeaheadRemoteSource<RoleTypeaheadRemoteSource.Request, string>,
-		ISecureHandler
+	[Secure(typeof(UserActions), nameof(UserActions.ManageUsers))]
+	public class RoleTypeaheadRemoteSource : TypeaheadRemoteSource<RoleTypeaheadRemoteSource.Request, string>
 	{
 		private readonly ActionRegister actionRegister;
 
@@ -19,12 +18,7 @@ namespace UimfApp.Users.Pickers
 			this.actionRegister = actionRegister;
 		}
 
-		public UserAction GetPermission()
-		{
-			return UserActions.ManageUsers;
-		}
-
-		public TypeaheadResponse<string> Handle(Request message)
+		protected override TypeaheadResponse<string> Handle(Request message)
 		{
 			var manuallyAssignableRoles = this.actionRegister.GetSystemRoles()
 				.Where(t => t.IsDynamicallyAssigned == false);

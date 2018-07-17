@@ -5,7 +5,9 @@
 	bind:checked="field.value"
 	tabindex="{{tabindex}}">
 {{else}}
-<select bind:value="field.value">
+<select bind:value="field.value"
+	id="{{id}}"
+	class="form-control">
 	<option></option>
 	<option value="{{true}}">Yes</option>
 	<option value="{{false}}">No</option>

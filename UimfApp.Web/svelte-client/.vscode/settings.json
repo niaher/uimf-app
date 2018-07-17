@@ -1,10 +1,32 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-    // Controls the rendering size of tabs in characters.
-    // If set to auto, the value will be guessed based on the opened file.
-    "editor.tabSize": 4,
-    
-    // Controls if the editor will insert spaces for tabs.
-    // If set to auto, the value will be guessed based on the opened file.
-    "editor.insertSpaces": false
+	// Controls the rendering size of tabs in characters.
+	// If set to auto, the value will be guessed based on the opened file.
+	"editor.tabSize": 4,
+	// Controls if the editor will insert spaces for tabs.
+	// If set to auto, the value will be guessed based on the opened file.
+	"editor.insertSpaces": false,
+	// Format a file on save. A formatter must be available, the file must not be auto-saved, and editor must not be shutting down.
+	"editor.formatOnSave": false,
+	"files.autoSave": "off",
+	"eslint.options": {
+		"configFile": ".eslintrc.json"
+	},
+	"eslint.autoFixOnSave": true,
+	"eslint.provideLintTask": true,
+	"eslint.run": "onType",
+	"eslint.validate": [
+		{
+			"language": "javascript",
+			"autoFix": true
+		},
+		{
+			"language": "html",
+			"autoFix": true
+		}
+	],
+	"tslint.autoFixOnSave": true,
+	"tslint.configFile": "tslint.json",
+	"tslint.enable": true,
+	"tslint.exclude": ["node_modules"]
 }

@@ -5,11 +5,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CEvents" Version="1.1.0" />
-    <PackageReference Include="CPermissions" Version="1.1.0" />
-    <PackageReference Include="UiMetadataFramework.Basic" Version="0.0.14-beta" />
-    <PackageReference Include="UiMetadataFramework.Core" Version="0.0.12-beta" />
-    <PackageReference Include="UiMetadataFramework.MediatR" Version="0.0.11-beta" />
+    <Compile Remove="Domain\AuditEntryPropertyView.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="CEvents" Version="1.1.0" />
+    <PackageReference Include="CPermissions" Version="1.1.0" />
+    <PackageReference Include="FluentValidation" Version="7.5.2" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.0" />
+    <PackageReference Include="microsoft.extensions.configuration.json" Version="2.1.0" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.1.0-rc1-final" />
+    <PackageReference Include="RazorLight" Version="2.0.0-beta1" />
+    <PackageReference Include="UiMetadataFramework.Basic" Version="0.0.16-beta" />
+    <PackageReference Include="UiMetadataFramework.Core" Version="0.0.15-beta" />
+    <PackageReference Include="UiMetadataFramework.MediatR" Version="0.0.12-beta" />
+    <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="1.7.20" />
+  </ItemGroup>
 </Project>

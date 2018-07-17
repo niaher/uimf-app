@@ -1,0 +1,12 @@
+@model dynamic
+
+<p>Dear @Model.AssigneeName,</p>
+<p>
+	<a href="@Model.Url">Work item #@Model.Id</a> was assigned to you.
+</p>
+
+<p>
+	<blockquote>
+		@Model.Description
+	</blockquote>
+</p>

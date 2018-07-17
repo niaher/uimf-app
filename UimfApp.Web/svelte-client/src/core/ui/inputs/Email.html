@@ -1,0 +1,22 @@
+
+<input type="Email"
+    id="{{id}}"
+    bind:value="field.selected"
+    required="{{field.metadata.required}}"
+    tabindex="{{tabindex}}"
+    class="form-control"
+    ref:container>
+
+<script>
+  
+    export default {
+        oncreate() {
+            var field = this.get("field");
+            var formElement = this.refs.container;
+            formElement.addEventListener("change", function (e) {
+                    field.init(field.selected);
+            });
+        }
+    }
+
+</script>

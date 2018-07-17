@@ -1,5 +1,5 @@
+import { FormInstance, IFormResponseHandler } from "core-framework";
 import * as umf from "uimf-core";
-import { IFormResponseHandler, FormInstance } from "core-framework";
 
 export class RedirectResponseHandler implements IFormResponseHandler {
 	public readonly name: string = "redirect";
@@ -9,19 +9,19 @@ export class RedirectResponseHandler implements IFormResponseHandler {
 		this.goToForm = goToForm;
 	}
 
-	handle(response: RedirectResponse, form: FormInstance) {
+	public handle(response: IRedirectResponse, form: FormInstance): void {
 		this.goToForm(response.form, response.inputFieldValues);
 	}
 }
 
-class RedirectResponse extends umf.FormResponse {
+interface IRedirectResponse extends umf.FormResponse {
 	/**
 	 * Gets or sets name of the form to redirect to.
 	 */
-	public form: string;
+	form: string;
 
 	/**
 	 * Gets or sets values for the input fields of the form (i.e. - <see cref="FormMetadata.InputFields"/>).
 	 */
-	public inputFieldValues: any;
+	inputFieldValues: any;
 }

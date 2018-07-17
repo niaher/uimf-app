@@ -1,42 +1,147 @@
-{{#if field.data.length > 0}}
-<table class="table">
-	<thead>
-		<tr>
-			{{#each columnsOrdered as column}}
-			<th>{{column.label}}</th>
+{{#if visible && field.data != null && field.data.length > 0}}
+	<table class="table" ref:table>
+		<thead>
+			{{#if bulkActions.length > 0 }}
+			<tr>
+				<td colspan="{{columnsOrdered.length + 1}}" class="btn-row">
+					{{#each bulkActions as action}}
+						{{#if selectedItemsCount > 0 }}
+							<button class="btn btn-default" on:click="runBulkAction(action)">{{action.label}} <small>({{selectedItemsCount}})</small></button>
+						{{else}}
+							<button class="btn btn-default" disabled>{{action.label}}</button>
+						{{/if}}
+					{{/each}}
+				</td>
+			</tr>
+			{{/if}}
+			<tr>
+				{{#if bulkActions.length > 0}}
+				<th>
+					<input type="checkbox" class="checkbox" on:change="selectAllItems(this)">
+				</th>
+				{{/if}}
+
+				{{#each columnsOrdered as column}}
+				{{#if column.customProperties != null && column.customProperties["sortableBy"] != null}}
+					{{#if column.ascending}}
+					<th class="sortable-column" on:click="sortData(column,columnsOrdered)">{{column.label}} <i class="fa fa-sort-down"></i></th>
+					{{else}}
+					<th class="sortable-column" on:click="sortData(column,columnsOrdered)">{{column.label}} <i class="fa fa-sort-up"></i></th>
+					{{/if}}
+				{{else}}
+				<th>
+					{{#if column.customProperties != null && column.customProperties["documentation"] != null}}
+					<div class="help-tooltip">{{column.label}}
+						<Tooltip data="{{column.customProperties.documentation[0]}}"></Tooltip>
+					</div>
+					{{else}}
+					{{column.label}}
+					{{/if}}
+				</th>
+				{{/if}}
+				{{/each}}
+			</tr>
+		</thead>
+		<tbody>
+			{{#if map != null}}
+			{{#each field.data as row}}
+			<tr class="{{getRowCssClass(row)}}">
+				{{#if bulkActions.length > 0}}
+					<td>
+						<div class="form-group form-check">
+							<input type="checkbox" class="checkbox" on:change="selectItem(this, row)">
+						</div>
+					</td>
+				{{/if}}
+
+				{{#each columnsOrdered as column}}
+				<td>
+					{{#if !(getField(row, column).metadata.getCustomProperty("hideIfNull") === true && getField(row, column).data === null)}}
+					 <FormOutput field="{{getField(row, column)}}" app="{{app}}" form="{{form}}" parent="{{parent}}" showLabel="false" />
+				 	{{/if}}
+				</td>
+				{{/each}}
+			</tr>
 			{{/each}}
-		</tr>
-	</thead>
-	<tbody>
-		{{#if map != null}}
-		{{#each field.data as row}}
-		<tr>
-			{{#each columnsOrdered as column}}
-			<td>
-				<FormOutput field="{{getField(row, column)}}" app="{{app}}" form="{{form}}" parent="{{parent}}" showLabel="false" />
-			</td>
-			{{/each}}
-		</tr>
-		{{/each}}
-		{{/if}}
-	</tbody>
-</table>
+			{{/if}}
+		</tbody>
+	</table>
+
+	{{#if bulkActions.length > 0}}
+		<input type="checkbox" bind:checked="isBulkActionModalOpen" class="hidden" />
+		<div class="modal">
+			<div class="card">
+				<label class="close" on:click="closeBulkActionModal(null)"></label>
+				<div ref:bulkActionContainer></div>
+			</div>
+		</div>
+	{{/if}}
 {{else}}
-<div class="alert-nodata">
-	No data.
-</div>
+	<div class="alert-nodata">
+		No data.
+	</div>
 {{/if}}
 
 <script>
 	import FormOutput from "../Output";
+	import FormComponent from "core-ui/Form";
+	import Tooltip from '../help/Tooltip';
+
+	function buildFilter(currentFormInstance, parameters) {
+		var promise;
+
+		var filter = {};
+		if (parameters != null && parameters.length > 0) {
+			promise = currentFormInstance.getSerializedInputValues().then(data => {
+				for (let p of parameters) {
+					filter[p] = data[p];
+				}
+
+				return filter;
+			});
+		}
+		else {
+			promise = Promise.resolve(filter);
+		}
+
+		return promise;
+	}
+
+	var modalId = 0;
+	var modals = [];
+
+	// https://stackoverflow.com/a/3369743/111438
+	// Close topmost modal when user presses escape key.
+	document.addEventListener("keydown", function(evt) {
+		evt = evt || window.event;
+		var isEscape = false;
+		if ("key" in evt) {
+			isEscape = (evt.key == "Escape" || evt.key == "Esc");
+		} else {
+			isEscape = (evt.keyCode == 27);
+		}
+		if (isEscape) {
+			if (modals.length > 0) {
+				// Close topmost modal.
+				modals[modals.length - 1].closeBulkActionModal();
+			}
+		}
+	});
 
 	export default {
 		oncreate() {
 			var data = this.get("field").data;
+
+			if (data == null) {
+				return;
+			}
+
 			var app = this.get("app");
+			var metadata = this.get("field").metadata;
+			var rowCssClass = (metadata.customProperties || {}).rowCssClass;
 
 			// Create map, with key being the lowercase version of the property name
-			// and value being the actual property name. 
+			// and value being the actual property name.
 			var map = {};
 			if (data.length > 0) {
 				let firstRow = data[0];
@@ -49,15 +154,33 @@
 			}
 
 			this.set({
+				// Show table only after the `oncreate` method has run.
+				visible: true,
+				bulkActions: (metadata.customProperties || {}).bulkAction || [],
 				map: map,
 				getField: function(row, column) {
 					var data = row[map[column.id.toLowerCase()]];
-					
+
 					return {
 						data: data,
 						metadata: column
 					};
-				}
+				},
+				getRowCssClass: function (row) {
+					var cssClass = "";
+
+					if (rowCssClass != null)
+					{
+						cssClass = rowCssClass.cssClass || "";
+
+						if (rowCssClass.suffix != null) {
+							cssClass += row[map[rowCssClass.suffix.toLowerCase()]];
+						}
+					}
+
+					return cssClass;
+				},
+				selectedItemsCount:0
 			});
 		},
 		computed: {
@@ -67,50 +190,136 @@
         		});
 			}
 		},
+		methods: {
+			async runBulkAction(action) {
+				var selectedItems = this.get("field").data.filter(t => t.__selected === true);
+				var map = this.get("map");
+				var selectedItemIds = selectedItems.map(t => t[map[action.itemIdentifierField.toLowerCase()]]);
+
+				this.set({
+					isBulkActionModalOpen: true
+				});
+
+				var app = this.get("app");
+				var formInstance = app.getFormInstance(action.formId, true);
+
+				var inputFieldValues = {
+					Items: {
+						items: selectedItemIds
+					}
+				};
+
+				var filter = await buildFilter(this.get("form"), action.parameters);
+				filter.Items = { items: selectedItemIds };
+				formInstance.setInputFields(filter);
+
+				var f = new FormComponent({
+					target: this.refs.bulkActionContainer,
+					data: {
+						metadata: formInstance.metadata,
+						form: formInstance,
+						app: app,
+						useUrl: false
+					}
+				});
+
+				f.init();
+
+				var self = this;
+				f.on("form:responseHandled", e => {
+					self.closeBulkActionModal(e.response);
+				});
+
+				this.set({
+					currentBulkActionForm: f
+				})
+
+				modals.push(this);
+			},
+			async closeBulkActionModal(response) {
+				var currentBulkActionForm = this.get("currentBulkActionForm");
+
+				this.set({
+					isBulkActionModalOpen: false,
+					currentBulkActionForm: null
+				});
+
+				currentBulkActionForm.destroy();
+
+				var parentFormComponent = this.get("parent");
+
+				if (response != null &&
+					response.metadata.handler !== "redirect" &&
+					response.metadata.handler !== "reload") {
+					// If asked to redirect to another form, then we redirect
+					// and do not reload parent form, as that would be a wasted effort.
+					await parentFormComponent.submit(null, true);
+				}
+
+				modals.pop();
+			},
+			selectItem(checkboxElement, row) {
+				row.__selected = checkboxElement.checked;
+				
+				var selectedItems = this.get("field").data.filter(t => t.__selected === true);
+				this.set({"selectedItemsCount":selectedItems.length})
+			},
+			selectAllItems(checkboxElement) {
+				for (var row of this.get("field").data) {
+					row.__selected = checkboxElement.checked;
+				}
+
+				var checkboxes = this.refs.table.querySelectorAll(`tbody>tr>td .checkbox`);
+
+				for (var checkbox of checkboxes) {
+					checkbox.checked = checkboxElement.checked;
+				}
+
+				var selectedItems = this.get("field").data.filter(t => t.__selected === true);
+				this.set({"selectedItemsCount":selectedItems.length})
+			},
+			sortData(column, columns) {
+					var parent = this.get("parent");
+					var form = parent.get("form");
+					var field = this.get("field");
+					var paginatorInput = form.inputs.find(t => t.metadata.id == field.metadata.customProperties.customizations.paginator);
+					if(paginatorInput != null){
+						paginatorInput.value.orderBy = column.customProperties["sortableBy"];
+						for (let i of columns) {
+							i.ascending = false;
+						}
+						column.ascending = paginatorInput.value.ascending = !paginatorInput.value.ascending;
+						
+						var params = {};
+						for (let i of form.inputs) {
+							params[i.metadata.id] = i.value;
+						}
+						form.setInputFields(params);
+						parent.submit(null, false);
+					}
+				},
+		},
         components: {
-            FormOutput
+			FormOutput,
+			FormComponent,
+			Tooltip
         }
 	};
 </script>
 
 <style>
-	.alert-nodata {
-		padding: 5px 15px;
-    	font-style: italic;
+	.btn-row {
+		text-align: right;
 	}
 
-	.table>tbody>tr>td .actionlist {
-		background: none;
-		border: none;
-		margin: 0;
-		padding: 0;	
-		text-align: left;
+	.checkbox {
+		clip:unset;
+		clip-path:unset;
+		position: unset;
+		width: 15px;
+    	height: 15px;
 	}
-
-	.table{
-		border: 1px solid #e5eff8;
-	}
-
-	.table thead th{
-    	border-bottom: 1px solid #e5eff8;
-    	border-left: 1px solid #e5eff8;
-    	font-weight: normal;
-    	background: #f4f9fe;
-    	color: #3f6e94;
-	}
-
-	.table tbody td{
-    	border-top: 1px solid #e9ecef;
-    	color: #678197;
-    	border-bottom: 1px solid #e5eff8;
-    	border-left: 1px solid #e5eff8;
-	}
-
-	.table tbody tr:nth-child(even) td {
-		background: #f4f9fe
-	}
-
-	.table tbody tr:nth-child(odd) td {
-		background: #FFF
+	.sortable-column{
+		cursor: pointer
 	}
 </style>

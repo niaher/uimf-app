@@ -5,7 +5,7 @@
 $choices-selector: 'choices' !default;
 $choices-font-size-lg: 16px !default;
 $choices-font-size-md: 14px !default;
-$choices-font-size-sm: 12px !default;
+$choices-font-size-sm: 11px !default;
 $choices-guttering: 24px !default;
 $choices-border-radius: 2.5px !default;
 $choices-border-radius-item: 20px !default;
@@ -121,10 +121,9 @@ $choices-button-offset: 8px !default;
   vertical-align: top;
   width: 100%;
   background-color: $choices-bg-color;
-  padding: 7.5px 7.5px 3.75px;
   border: 1px solid $choices-keyline-color;
   border-radius: $choices-border-radius;
-  font-size: $choices-font-size-md;
+  font-size: $choices-font-size-sm;
   min-height: 44px;
   overflow: hidden;
   .is-focused &, .is-open & { border-color: darken($choices-keyline-color, 15%); }
@@ -155,11 +154,10 @@ $choices-button-offset: 8px !default;
     display: inline-block;
     vertical-align: middle;
     border-radius: $choices-border-radius-item;
-    padding: 4px 10px;
+    padding: 3px 8px;
     font-size: $choices-font-size-sm;
     font-weight: 500;
-    margin-right: 3.75px;
-    margin-bottom: 3.75px;
+    margin: 3px;
     background-color: $choices-primary-color;
     border: 1px solid darken($choices-primary-color, 5%);
     color: #FFFFFF;
@@ -212,7 +210,7 @@ $choices-button-offset: 8px !default;
   .#{$choices-selector}__item {
     position: relative;
     padding: 10px;
-    font-size: $choices-font-size-md;
+    font-size: $choices-font-size-sm;
     [dir="rtl"] & { text-align: right; }
   }
   .#{$choices-selector}__item--selectable {
@@ -276,7 +274,7 @@ $choices-button-offset: 8px !default;
   display: inline-block;
   vertical-align: baseline;
   background-color: mix(#000000, #FFFFFF, 2.5%);
-  font-size: $choices-font-size-md;
+  font-size: $choices-font-size-sm;
   margin-bottom: 5px;
   border: 0;
   border-radius: 0;

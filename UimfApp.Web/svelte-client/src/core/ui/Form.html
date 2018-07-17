@@ -1,44 +1,54 @@
-<div class ="form-header">
-	<h2>{{responseMetadata.title || metadata.label}}</h2>
-</div>
+{{#if initialized}}
+<div class="inputs-horizontal-one-column {{cssClass}}">
+	 {{#if (responseMetadata.title != null && responseMetadata.title != "") || (metadata.label != null && metadata.label != "")}}
+	  <div class="form-header">
+		<h2>{{responseMetadata.title || metadata.label}}</h2>
 
-{{#if initialized && visibleInputFields.length > 0}}
-<div class="form-body">
-<form on:submit="submit(event, true)">
-	{{#each visibleInputFields as inputField}}
-	<FormInput field="{{inputField}}" app="{{app}}" tabindex="{{tabindex * 100 + inputField.metadata.orderIndex}}" form="{{self}}" />
-	{{/each}}
-
-	<button type="submit" disabled="{{disabled}}" tabindex="-1" class="btn btn-info">{{submitButtonLabel}}</button>
-</form>
-</div>
-{{/if}}
-
-{{#if outputFieldValues != null}}
-<div class="response">
-	{{#each outputFieldValues as outputField}}
-	{{#if outputField.metadata.hidden == false && !(outputField.metadata.getCustomProperty("hideIfNull") === true && outputField.data === null)}}
-	<FormOutput field="{{outputField}}" app="{{app}}" form="{{form}}" parent="{{self}}" />
+		{{#if documentation }}
+			{{#each documentation as document }}
+				<Help data={{document}}/>
+			{{/each}}
+		{{/if}}
+	  </div>
 	{{/if}}
-	{{/each}}
+
+	{{#if initialized && visibleInputFields.length > 0}}
+	<div class="form-body">
+	<form on:submit="submit(event, true)">
+		{{#each visibleInputFields as inputField}}
+		<FormInput field="{{inputField}}" app="{{app}}" tabindex="{{tabindex * 100 + inputField.metadata.orderIndex}}" form="{{self}}" />
+		{{/each}}
+		<div style="width:100%">
+			<button type="submit" disabled="{{disabled}}" tabindex="-1" class="btn btn-info">{{{submitButtonLabel}}}</button>
+		</div>
+	</form>
+	</div>
+	{{/if}}
+
+	{{#if outputFieldValues != null}}
+	<div class="response">
+		{{#each outputFieldValues as outputField }}
+		{{#if outputField.metadata.hidden == false && !(outputField.metadata.getCustomProperty("hideIfNull") === true && outputField.data === null)}}
+		<FormOutput field="{{outputField}}" app="{{app}}" form="{{form}}" parent="{{self}}" />
+		{{/if}}
+		{{/each}}
+	</div>
+	{{/if}}
 </div>
 {{/if}}
 
 <script>
 	import FormInput from "./Input";
 	import FormOutput from "./Output";
+	import Help from "./help/Help";
 
 	let tabindex = 1;
-	let formCount = 0;
-
-	var openForms = [];
+	let openForms = [];
 
 	function bindEventHandlersToCustomEvents(formComponent, eventHandlers) {
-		let formInstance = formComponent.get("form");
-		let app = formComponent.get("app");
+		const formInstance = formComponent.get("form");
 
-		// Bind all "form event handlers". 
-		for (let eventHandler of eventHandlers) {
+		for (const eventHandler of eventHandlers) {
 			// Don't bind default event handlers, because they are already auto-bound inside FormInstance.
 			if (eventHandler.runAt.indexOf("form:") === 0) {
 				continue;
@@ -48,38 +58,43 @@
 				// Augment event args with form which is firing the event. This is needed,
 				// so that event handler can know from which particular form this event is coming.
 				e.form = formComponent;
-				
+
 				formInstance.handleEvent(eventHandler.runAt, eventHandler, e);
 			});
 		}
 	}
-	
+
 	export default {
 		ondestroy() {
 			openForms = openForms.filter(f => f !== this);
 		},
 		methods: {
-			init: async function () {
+			async init() {
 				if (!this.get("initialized")) {
-					var form = this.get("form");
+					const form = this.get("form");
 
 					this.set({
 						self: this,
 						initialized: true,
-						visibleInputFields: form.inputs.filter(t => t.metadata.hidden == false),
-						submitButtonLabel: form.metadata.customProperties != null && form.metadata.customProperties.submitButtonLabel
-							? form.metadata.customProperties.submitButtonLabel
-							: "Submit"
+						visibleInputFields: form.inputs.filter(t => t.metadata.hidden === false),
+						submitButtonLabel: form.metadata.getCustomProperty("submitButtonLabel") || "Submit",
+						cssClass: form.metadata.getCustomProperty("cssClass") || "",
+						documentation: form.metadata.getCustomProperty("documentation")
 					});
 
 					tabindex += 1;
 
-					var app = this.get("app");
+					const app = this.get("app");
 
-					bindEventHandlersToCustomEvents(this, form.metadata.eventHandlers);
-					// TODO: bind input and output event handlers.
+					// Subscribe all event handlers (form, inputs, outputs).
+					const formMetadata = form.metadata;
+					const handlers = [];
+					formMetadata.inputFields.forEach(t => t.eventHandlers.forEach(h => handlers.push(h)));
+					formMetadata.outputFields.forEach(t => t.eventHandlers.forEach(h => handlers.push(h)));
+					formMetadata.eventHandlers.forEach(h => handlers.push(h));
+					bindEventHandlersToCustomEvents(this, handlers);
 
-					form.fire("form:loaded", { app: app });
+					form.fire("form:loaded", { app });
 
 					// Auto-submit form if necessary.
 					if (form.metadata.postOnLoad) {
@@ -89,36 +104,36 @@
 					openForms.push(this);
 
 					if (this.get("parent") == null) {
-						if(this.get("responseMetadata").title == null){
+						if (this.get("responseMetadata").title == null) {
 							document.title = form.metadata.label;
-						}						
+						}
 					}
 				}
 			},
 			fireAndBubbleUp(eventName, eventArgs) {
 				this.fire(eventName, eventArgs);
-				var parentFormComponent = this.get("parent");
+				const parentFormComponent = this.get("parent");
 
 				if (parentFormComponent != null) {
 					parentFormComponent.fireAndBubbleUp(eventName, eventArgs);
 				}
 			},
-			enableForm: function() {
-				var formInstance = this.get("form");
+			enableForm() {
+				const formInstance = this.get("form");
 
 				// Hide all inputs, to re-render them. This is needed due to the way that
 				// Svelte *seems* to work - it doesn't re-render nested components, unless they are recreated.
 				this.set({ visibleInputFields: [] });
 
 				this.set({
-					// Show inputs again.
-					visibleInputFields: formInstance.inputs.filter(t => t.metadata.hidden == false),
+				// Show inputs again.
+					visibleInputFields: formInstance.inputs.filter(t => t.metadata.hidden === false),
 
 					disabled: false
 				});
 			},
-			renderResponse: function(response) {
-				var formInstance = this.get("form");
+			renderResponse(response) {
+				const formInstance = this.get("form");
 
 				// Force Svelte to re-render outputs.
 				this.set({
@@ -130,21 +145,21 @@
 					responseMetadata: response.metadata
 				});
 
-				if(this.get("parent") == null){
+				if (this.get("parent") == null) {
 					document.title = response.metadata.title;
 				}
 			},
-			submit: async function (event, redirect) {
-				var self = this;
-				var formInstance = this.get("form");
-				var app = this.get("app");
-							
+			async submit(event, redirect) {
+				const self = this;
+				const formInstance = this.get("form");
+				const app = this.get("app");
+
 				if (event != null) {
 					event.preventDefault();
 				}
-				
+
 				// If not all required inputs are filled.
-				var allRequiredInputsHaveValues = await formInstance.allRequiredInputsHaveData(redirect == null);
+				const allRequiredInputsHaveValues = await formInstance.allRequiredInputsHaveData(redirect == null);
 				if (!allRequiredInputsHaveValues) {
 					return;
 				}
@@ -158,62 +173,65 @@
 				// with postOnLoad == false, because those forms are usually for creating new data
 				// and hence should not be tracked in browser's history based on parameters.
 				if (formInstance.metadata.postOnLoad && redirect && this.get("useUrl")) {
-					let urlParams = await formInstance.getSerializedInputValues();
-					
+					const urlParams = await formInstance.getSerializedInputValues();
+
 					// Update url in the browser.
 					app.go(formInstance.metadata.id, urlParams);
-					
+
 					return;
 				}
-				
+
 				try {
-					var response = await formInstance.submit(app, redirect == null, { formComponent: self });
-					
+					const response = await formInstance.submit(app, redirect == null, { formComponent: self });
+
 					self.enableForm();
 
 					// Signal event to child controls.
 					self.fire("form:responseHandled", {
 						form: self,
 						invokedByUser: event != null,
-						response: response
+						response
 					});
 				}
-				catch(e) {
+				catch (e) {
 					self.enableForm();
 				}
 			},
 			reloadTopForm() {
-				var parentFormComponent = this.get("parent");
-				
+				const parentFormComponent = this.get("parent");
+
 				if (parentFormComponent != null) {
 					parentFormComponent.reloadTopForm();
 				}
 				else {
-					let app = this.get("app");
-					let formInstance = this.get("form");
 					this.submit(null, true);
 				}
 			},
-			reloadAllForms() {				
-				for (let f of openForms) {
+			reloadAllForms() {
+				for (const f of openForms) {
 					f.reloadTopForm();
-				}				
+				}
+			},
+			getInputComponent(inputId) {
+				return this.get("inputs").find(t => t.get("field").metadata.id === inputId);
 			}
 		},
-		data: function () {
+		data() {
 			return {
 				disabled: false,
-				tabindex: tabindex,
+				tabindex,
 				urlData: null,
 				initialized: false,
 				responseMetadata: {},
 				useUrl: true,
-				parent: null // Can be set if this is a nested form within another form (i.e. - InlineForm.html)
+				parent: null, // Can be set if this is a nested form within another form (i.e. - InlineForm.html)
+				inputs: []
 			};
 		},
 		components: {
 			FormInput,
-			FormOutput
+			FormOutput,
+			Help
 		}
 	};
 </script>
@@ -225,15 +243,19 @@
 		padding-right: 10px;
 	}
 
-	.inline-form .response {
-		margin-top:0;
-		padding: 10px 15px;
+	.form-header {
+		text-align: center;
+		padding-top: 20px;
+		border-bottom: 1px solid #bbd2d6;
+		background-color: #fff;
+		position: relative;
 	}
 
-	.inline-form h2 {
-		margin: 0;
-		background: #eee;
-		padding: 10px 15px 15px;
-		font-size: 15px;
+	.form-header h2 {
+		display: inline-block;
+	}
+
+	.help-content {
+		text-align: left;
 	}
 </style>

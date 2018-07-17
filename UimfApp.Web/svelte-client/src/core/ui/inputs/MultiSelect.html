@@ -1,4 +1,5 @@
-<select class="multi-select form-control" id="{{id}}" required="{{field.metadata.required}}" tabindex="{{tabindex}}" ref:input multiple>
+<select on:change="onChange()" class="multi-select form-control" id="{{id}}" tabindex="{{tabindex}}"
+ ref:input multiple>
 </select>
 
 <script>
@@ -81,6 +82,44 @@
 		return promise;
 	}
 
+	function populateChoicesWithAjax(choicesComponent, multiSelectComponent, existingChoices, query, selectedItemIds) {
+		var componentData = multiSelectComponent.get();
+		var parameters = componentData.field.metadata.customProperties.parameters;
+		var source = componentData.field.metadata.customProperties.source;
+		var parentForm = componentData.form;
+		var app = componentData.app;
+
+		return new Promise((resolve, reject) => {
+			choicesComponent.ajax(callback => {
+				return buildFilter(parentForm, parameters, query).then(filter => {
+					if (selectedItemIds != null) {
+						filter.ids = { items: selectedItemIds };
+					}
+
+					return app.server.postForm(source, filter).then(data => {
+						// Mark items as added as "choices".
+						var toAdd = data.items.filter(t => {
+							var key = JSON.stringify(t.value);
+							if (existingChoices[key] == null) {
+								existingChoices[key] = true;
+
+								// Add item.
+								return true;
+							}
+
+							// Don't add item.
+							return false;
+						});
+
+						callback(mapToTypeaheadItems(toAdd), "value", "label");
+
+						resolve();
+					});
+				});
+			});
+		});
+	}
+
 	export default {
 		oncreate() {
 			var field = this.get("field");
@@ -92,7 +131,16 @@
 				duplicateItems: true,
 				searchResultLimit: 10,
 				removeItemButton: true,
-				maxItemCount: field.maxItemCount
+				maxItemCount: field.maxItemCount,
+				noChoicesText: "Please start typing to search..."
+			});
+
+			var formElement = this.refs.input.closest("form");
+			var self = this;
+			formElement.addEventListener("submit", function (e) {
+				if (typeof field.value.value == 'undefined' && field.metadata.required) {
+					self.refs.input.parentElement.classList.add("divError");
+				}
 			});
 
 			if (typeof (source) === "string") {
@@ -111,45 +159,17 @@
 					// Search when user types something, but introduce a short delay
 					// to avoid excessive http requests.
 					timer = setTimeout(function () {
-						a.ajax(callback => {
-							buildFilter(parentForm, parameters, query).then(filter => {
-								app.server.postForm(source, filter).then(data => {
-									var toAdd = data.items.filter(t => {
-										var key = JSON.stringify(t.value);
-										if (addedItems[key] == null) {
-											addedItems[key] = true;
-
-											// Add item.
-											return true;
-										}
-
-										// Don't add item.
-										return false;
-									});
-
-									callback(toAdd, "value", "label");
-								});
-							});
-						});
+						populateChoicesWithAjax(a, self, addedItems, query);
 					}, 300);
 				});
 
 				var currentValue = getIdsQuery(field);
-				
+				populateChoicesWithAjax(a, self, addedItems, "");
+
 				// If the field has a value, we need to load it.
 				if (currentValue.length > 0) {
-					a.ajax(callback => {
-						return app.server.postForm(source, { ids: { items: currentValue } }).then(data => {
-							// Mark items as added as "choices".
-							for (let t of data.items) {
-								var key = JSON.stringify(t.value);
-								addedItems[key] = true;
-							}
-
-							callback(mapToTypeaheadItems(data.items), "value", "label");
-							setInputValue(a, field);
-						});
-					});
+					populateChoicesWithAjax(a, self, addedItems, query, currentValue)
+						.then(() => setInputValue(a, field));
 				}
 			}
 			else {
@@ -167,7 +187,15 @@
 			a.passedElement.addEventListener("change", function (e) {
 				setFieldValue(field, a.getValue());
 			});
+		},
+		methods: {
+			onChange() {
+				this.get("form").fireAndBubbleUp('input:changed', {
+					app: this.get('app'),
+					form: this.get('form'),
+					input: this
+				});
+			}
 		}
 	}
 </script>
-

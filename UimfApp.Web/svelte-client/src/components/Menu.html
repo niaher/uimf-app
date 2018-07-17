@@ -1,5 +1,5 @@
 {{#if menus != null}}
-<ul>
+<ul class="menu">
 	{{#each menus as menu}}
 	<li>
 		<MenuItem menu="{{menu}}">
@@ -14,7 +14,7 @@
 	function nestedSort(array, comparison) {
 		array.sort(comparison);
 
-		for (let item of array) {
+		for (const item of array) {
 			if (item.items != null) {
 				nestedSort(item.items, comparison);
 			}
@@ -23,26 +23,24 @@
 
 	export default {
 		oncreate() {
-			var forms = this.get("forms");
-			var getMenu = this.get("getMenu");
-			var makeUrl = this.get("makeUrl");
+			const forms = this.get("forms"),
+				getMenu = this.get("getMenu"),
+				makeUrl = this.get("makeUrl"),
+				tree = [];
 
-			var menus = [];
-			var tree = [];
-
-			for (let form of forms) {
-				let formMenu = getMenu(form);
+			for (const form of forms) {
+				const formMenu = getMenu(form);
 				if (formMenu != null) {
-					var currentFolder = {
+					let currentFolder = {
 						items: tree
 					};
 
 					// If it's a "folder" menu.
 					if (formMenu.name !== "") {
-						var path = formMenu.name.split("/");
+						const path = formMenu.name.split("/");
 
-						for (let folder of path) {
-							let subfolder = currentFolder.items.find(t => t.id == folder);
+						for (const folder of path) {
+							let subfolder = currentFolder.items.find(t => t.id === folder);
 
 							if (subfolder == null) {
 								subfolder = {
@@ -59,7 +57,6 @@
 							}
 						}
 					}
-
 					currentFolder.items.push({
 						label: form.label,
 						url: makeUrl(form.id),
@@ -68,16 +65,12 @@
 					});
 				}
 			}
-
-			nestedSort(tree, (a, b) => {
-				return a.orderIndex - b.orderIndex;
-			});
+			nestedSort(tree, (a, b) => a.orderIndex - b.orderIndex);
 
 			this.set({ menus: tree });
 		},
 		components: {
 			MenuItem
 		}
-	}
-
+	};
 </script>

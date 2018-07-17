@@ -1,14 +1,15 @@
-import {
-	InputFieldEventHandler,
-	InputController,
-	FormInstance,
-	FormEventArguments
-} from "../../framework/index";
 import * as umf from "uimf-core";
+import {
+	FormEventArguments,
+	FormInstance,
+	InputController,
+	InputFieldEventHandler
+} from "../../framework/index";
 
 export class InputLogToConsole extends InputFieldEventHandler {
-	run(input: InputController<any>, eventHandlerMetadata: umf.EventHandlerMetadata, args: FormEventArguments): Promise<any> {
-		return input.serialize().then(t => {
+	public run(input: InputController<any>, eventHandlerMetadata: umf.EventHandlerMetadata, args: FormEventArguments): Promise<any> {
+		return input.serialize().then((t) => {
+			// tslint:disable-next-line:no-console
 			console.log(`[${eventHandlerMetadata.runAt}] input event handler '${eventHandlerMetadata.id}' from '${input.metadata.id}'`);
 		});
 	}

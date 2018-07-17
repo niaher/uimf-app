@@ -1,45 +1,25 @@
 namespace UimfApp.Filing
 {
-	using System;
-	using System.Collections.Concurrent;
-	using System.Linq;
 	using System.Reflection;
 	using UimfApp.Infrastructure;
 
-	public class EntityFileManagerCollection
+	public class EntityFileManagerCollection : Register<IEntityFileManager>
 	{
-		private readonly DependencyInjectionContainer dependencyInjectionContainer;
-
-		private readonly ConcurrentDictionary<string, Func<IEntityFileManager>> managers =
-			new ConcurrentDictionary<string, Func<IEntityFileManager>>();
-
-		public EntityFileManagerCollection(DependencyInjectionContainer dependencyInjectionContainer)
+		public EntityFileManagerCollection(DependencyInjectionContainer dependencyInjectionContainer) : base(dependencyInjectionContainer)
 		{
-			this.dependencyInjectionContainer = dependencyInjectionContainer;
 		}
 
-		public IEntityFileManager GetManager(string entityType)
+		public static string ContextTypeOf<T>()
 		{
-			if (this.managers.TryGetValue(entityType, out var factory))
+			var typeInfo = typeof(T).GetTypeInfo();
+			var attribute = typeInfo.GetCustomAttribute<FileContainerAttribute>();
+
+			if (attribute == null)
 			{
-				return factory.Invoke();
+				throw new ApplicationException($"Cannot retrieve files for entity '{typeInfo.FullName}', because it is not a FileContainer.");
 			}
 
-			throw new Exception($"Conversation manager '{entityType}' is not registered.");
-		}
-
-		public void RegisterAssembly(Assembly assembly)
-		{
-			var assemblyManagers = assembly.ExportedTypes
-				.Where(t => t.GetTypeInfo().IsClass && !t.GetTypeInfo().IsAbstract && !t.GetTypeInfo().IsGenericType)
-				.Where(t => t.GetInterfaces().Any(i => i == typeof(IEntityFileManager)))
-				.ToList();
-
-			foreach (var manager in assemblyManagers)
-			{
-				var attribute = manager.GetTypeInfo().GetCustomAttribute<EntityFileManagerAttribute>();
-				this.managers.TryAdd(attribute.EntityType, () => (IEntityFileManager)this.dependencyInjectionContainer.GetInstance(manager));
-			}
+			return attribute.ContextKey;
 		}
 	}
 }

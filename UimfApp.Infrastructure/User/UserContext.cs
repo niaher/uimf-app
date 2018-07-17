@@ -39,9 +39,14 @@ namespace UimfApp.Infrastructure.User
 			return this.Roles.Any(t => t.Equals(role.Name, StringComparison.OrdinalIgnoreCase));
 		}
 
+		public bool HasRole(string role)
+		{
+			return this.Roles.Any(t => t.Equals(role, StringComparison.OrdinalIgnoreCase));
+		}
+
 		public override string ToString()
 		{
-			return this.User?.UserName;
+			return this.User?.UserName ?? string.Empty;
 		}
 	}
 }

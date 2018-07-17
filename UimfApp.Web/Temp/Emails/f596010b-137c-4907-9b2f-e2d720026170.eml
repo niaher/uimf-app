@@ -1,0 +1,16 @@
+X-Sender: noreply@example.com
+X-Receiver: admin@example.com
+MIME-Version: 1.0
+From: noreply@example.com
+To: admin@example.com
+Date: 25 Jun 2018 11:39:30 +0300
+Subject: Assign Fund Manager
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: base64
+
+DQo8cD5EZWFyIGFkbWluQGV4YW1wbGUuY29tLDwvcD4NCjxwPg0KICAgIDxhIGhyZWY9
+Imh0dHA6Ly9sb2NhbGhvc3Q6NTgzNDEvL2Zvcm0vRnVuZERldGFpbHMvMyI+RnVuZCAj
+MzwvYT4gd2FzIGFzc2lnbmVkIHRvIHlvdS4NCjwvcD48YnI+PGJyPjxocj48c21hbGw+
+WW91IGFyZSByZWNlaXZpbmcgdGhpcyBlbWFpbCBiZWNhdXNlIHlvdSBhcmUgcmVnaXN0
+ZXJlZCBvbiA8YSBocmVmPSdodHRwOi8vbG9jYWxob3N0OjU4MzQxLyc+aHR0cDovL2xv
+Y2FsaG9zdDo1ODM0MS88L2E+Ljwvc21hbGw+

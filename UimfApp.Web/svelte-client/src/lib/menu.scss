@@ -1,9 +1,10 @@
-$mainColor: #1eb1c8 !default;
+$mainColor: #3fcae0 !default;
 $secondColor:#f3818c !default;
 header.top {
+	min-height: 75px;
 	overflow-x: visible;
 	overflow-y: visible;
-	min-height: 75px;
+	padding: 0rem 1rem;
 }
 
 @media (max-width: 765px)
@@ -12,27 +13,33 @@ header.top {
     min-height: 186px;
 	}
 }
+
 header.top .logo {
 	float:left;
-	padding-top: 28px;
+	padding-top: 15px;
 	font-family: Trocchi;
     font-size: 26px;
-    color: #1eb1c8;
+    color: $mainColor;
 }
-
+header{
+	height: inherit !important;
+	position: relative;
+}
 header.top .logo:hover {
 	color: $secondColor;
 	text-decoration: none;
 }
 
-header{
-z-index: 5;
-background: rgba(41,51,63,.95) !important;
+header {
+	z-index: 5;
+	background: rgba(41,51,63,.95) !important;
 }
+
 .sub-nav-check { position:absolute; top:-9999px; left:-9999px }
 
 .xmenu
 {
+	position: relative;
 	float: right;
     padding: 1px;
     margin: 0;
@@ -48,6 +55,7 @@ background: rgba(41,51,63,.95) !important;
 	float:left;
 	margin:0;
 	padding:0;
+	padding-right: 15px;
 }
 
 .xmenu ul>li>a,
@@ -62,9 +70,16 @@ background: rgba(41,51,63,.95) !important;
 	margin:0;
 }
 
+.xmenu ul>li>div.top-menu-div>a
+{
+	color: $mainColor;
+	text-decoration:none;
+}
+
 .xmenu ul>li>a:hover,
 .xmenu ul>li>div.top-menu-div:hover,
-.xmenu ul>li>label:hover
+.xmenu ul>li>label:hover,
+.xmenu ul > li > div.top-menu-div > a:hover
 {
 	color:$secondColor;
 }
@@ -81,7 +96,6 @@ background: rgba(41,51,63,.95) !important;
 {
 	color: #ccc;
 }
-
 
 .xmenu ul>li> div.top-menu-div::before {
     content: '';
@@ -129,7 +143,7 @@ background: rgba(41,51,63,.95) !important;
 .xmenu ul ul label
 {
 	line-height:120%;
-	padding:10px 15px;	
+	padding:10px 15px;
 	border: 1px solid #404040;
     border-width: 1px 1px 0 0;
 }

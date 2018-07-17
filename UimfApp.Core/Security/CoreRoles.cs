@@ -4,6 +4,7 @@ namespace UimfApp.Core.Security
 
 	public class CoreRoles : RoleContainer
 	{
-		public static readonly SystemRole ToolUser = new SystemRole(nameof(ToolUser));
+		public static readonly SystemRole AuthenticatedUser = new SystemRole(nameof(AuthenticatedUser), true);
+		public static readonly SystemRole Admin = new SystemRole(nameof(Admin));
 	}
 }

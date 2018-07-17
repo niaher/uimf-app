@@ -1,11 +1,14 @@
 import * as umf from "core-framework";
+import {RouteParameterBuilder} from "RouteParameterBuilder";
 import { FormMetadata } from "uimf-core";
 import * as abstractStateRouter from "../node_modules/abstract-state-router/index";
 import * as svelteStateRenderer from "../node_modules/svelte-state-renderer/index";
 
-import Form from "core-ui/Form";
-import Menu from "components/Menu";
 import Home from "components/Home";
+import Menu from "components/Menu";
+import Form from "core-ui/Form";
+
+type ResolveCallback =  (error: boolean, content: any) => string;
 
 export class AppRouter implements umf.IAppRouter {
 	private readonly stateRenderer: any;
@@ -15,23 +18,28 @@ export class AppRouter implements umf.IAppRouter {
 
 	constructor(element: HTMLElement, app: umf.UmfApp) {
 		this.element = element;
-		this.stateRenderer = (<any>svelteStateRenderer).default({});
-		this.stateRouter = (<any>abstractStateRouter).default(this.stateRenderer, this.element);
-		var rpb = this.rpb = new RouteParameterBuilder("_", app);
+		this.stateRenderer = (svelteStateRenderer as any).default({});
+		this.stateRouter = (abstractStateRouter as any).default(this.stateRenderer, this.element);
+		const rpb = this.rpb = new RouteParameterBuilder("_", app);
 
 		this.stateRouter.addState({
 			name: "home",
-			data: {},
 			route: "/home",
-			template: Home
+			template: Home,
+			resolve(data: any, parameters: any, cb: ResolveCallback): void {
+				cb(false, {
+					app,
+					parent: Form
+				});
+			}
 		});
 
-		var self = this;
+		const self = this;
 		this.stateRouter.addState({
 			name: "menu",
 			route: "/menu",
 			template: Menu,
-			resolve: function (data, parameters, cb) {
+			resolve(data: any, parameters: any, cb: ResolveCallback): void {
 				cb(false, {
 					forms: app.forms,
 					getMenu: (form: FormMetadata) => {
@@ -60,20 +68,20 @@ export class AppRouter implements umf.IAppRouter {
 			querystringParameters: [rpb.parameterName],
 			defaultParameters: rpb.defaultParameters,
 
-			activate: function (context) {
+			activate(context: any): void {
 				context.domApi.init();
 
 				rpb.currentForm = context.parameters._id;
 				context.on("destroy", () => rpb.currentForm = null);
+				self.fire("router:activated", null);
 			},
-			resolve: function (data, parameters, cb) {
-				var formInstance = app.getFormInstance(parameters._id, true);
-
+			resolve(data: any, parameters: any, cb: ResolveCallback): void {
+				const formInstance = app.getFormInstance(parameters._id, true);
 				formInstance.initializeInputFields(parameters).then(() => {
 					cb(false, {
 						metadata: formInstance.metadata,
 						form: formInstance,
-						app: app
+						app
 					});
 				});
 			}
@@ -82,53 +90,22 @@ export class AppRouter implements umf.IAppRouter {
 		this.stateRouter.evaluateCurrentRoute("home");
 	}
 
-	go(form: string, values) {
+	public fire(eventName: string, params: any): void {
+		const event = new Event(eventName, params);
+		this.element.dispatchEvent(event);
+	}
+
+	public on(eventName: string, fn: () => void): void {
+		this.element.addEventListener(eventName, function(): void {
+			fn();
+		});
+	}
+
+	public go(form: string, values: any): void {
 		this.stateRouter.go("form", this.rpb.buildFormRouteParameters(form, values));
-	};
-
-	makeUrl(form: string, values): string {
-		return this.stateRouter.makePath('form', this.rpb.buildFormRouteParameters(form, values));
-	};
-}
-
-class RouteParameterBuilder {
-	readonly parameterName: string;
-	currentForm: string;
-	getFormInstance: (formId: string, throwError: boolean) => umf.FormInstance;
-	defaultParameters: any = {};
-
-	constructor(parameterName: string, app: umf.UmfApp) {
-		this.getFormInstance = (formId: string, throwError: boolean) => app.getFormInstance(formId, null);
-		this.parameterName = parameterName;
-		this.defaultParameters[parameterName] = "";
 	}
 
-	buildFormRouteParameters(form, values) {
-		var formInstance = this.getFormInstance(form, true);
-		var base = formInstance.getSerializedInputValuesFromObject(values);
-
-		if (form === this.currentForm) {
-			var d = RouteParameterBuilder.parseQueryStringParameters(location.hash)[this.parameterName] || 0;
-			var dAsNumber = parseInt(d, 10);
-			base[this.parameterName] = isNaN(dAsNumber) ? 0 : dAsNumber + 1;
-		}
-
-		return Object.assign(base, { _id: form });
-	}
-
-	static parseQueryStringParameters(url): any {
-		var queryStartsAt = url.indexOf("?");
-
-		var result = {};
-
-		// If there is a query string.
-		if (queryStartsAt !== -1 && url.length > queryStartsAt) {
-			url.substr(queryStartsAt + 1).split("&").filter(t => {
-				var value = t.split("=");
-				result[value[0]] = value[1];
-			});
-		}
-
-		return result;
+	public makeUrl(form: string, values: any): string {
+		return this.stateRouter.makePath("form", this.rpb.buildFormRouteParameters(form, values));
 	}
 }

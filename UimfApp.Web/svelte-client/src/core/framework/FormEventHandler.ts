@@ -1,9 +1,9 @@
-import { FormInstance } from "./FormInstance";
-import { FormEventArguments } from "./FormEventArguments";
 import { EventHandlerMetadata } from "uimf-core";
+import { FormEventArguments } from "./FormEventArguments";
+import { FormInstance } from "./FormInstance";
 
 export abstract class FormEventHandler {
-	id: string;
+	public id: string;
 
-	abstract run(form: FormInstance, eventHandlerMetadata: EventHandlerMetadata, args: FormEventArguments): Promise<void>;
+	public abstract run(form: FormInstance, eventHandlerMetadata: EventHandlerMetadata, args: FormEventArguments): Promise<void>;
 }

@@ -1,89 +1,102 @@
-import * as umf from "uimf-core";
 import {
-    InputController,
-    StringInputController,
-    OutputFieldValue,
-    InputFieldEventHandler,
-    OutputFieldEventHandler,
-    FormEventHandler,
-    IFunctionRunner
+	FormEventHandler,
+	IFunctionRunner,
+	InputController,
+	InputFieldEventHandler,
+	OutputFieldEventHandler,
+	OutputFieldValue,
+	StringInputController
 } from "core-framework";
+import * as umf from "uimf-core";
+import {OutputControlConfiguration} from "./OutputControlConfiguration";
 
 interface InputFieldControllerConstructor {
-    new(metadata: umf.InputFieldMetadata): InputController<any>;
+	new(metadata: umf.InputFieldMetadata): InputController<any>;
 }
 
-class InputControlEntry {
-    controller: InputFieldControllerConstructor;
-    component: any;
-    constants: any;
+interface InputControlEntry {
+	controller: InputFieldControllerConstructor;
+	component: any;
+	constants: OutputControlConfiguration;
+}
+
+interface IOutputControlEntry {
+	constructor: any;
+	constants: OutputControlConfiguration;
 }
 
 export class ControlRegister {
-    inputs: { [id: string]: InputControlEntry } = {};
-    outputs: { [id: string]: any } = {};
-    inputFieldEventHandlers: { [id: string]: InputFieldEventHandler } = {};
-    outputFieldEventHandlers: { [id: string]: OutputFieldEventHandler } = {};
-    formEventHandlers: { [id: string]: FormEventHandler } = {};
-    functions: { [id: string]: IFunctionRunner } = {};
+	public inputs: { [id: string]: InputControlEntry } = {};
+	public outputs: { [id: string]: IOutputControlEntry } = {};
+	public inputFieldEventHandlers: { [id: string]: InputFieldEventHandler } = {};
+	public outputFieldEventHandlers: { [id: string]: OutputFieldEventHandler } = {};
+	public formEventHandlers: { [id: string]: FormEventHandler } = {};
+	public functions: { [id: string]: IFunctionRunner } = {};
 
-    createInputControllers(fields: umf.InputFieldMetadata[]) {
-        var result = [];
+	public createInputControllers(fields: umf.InputFieldMetadata[]): Array<InputController<any>> {
+		const result: Array<InputController<any>> = [];
 
-        for (let field of fields) {
-            // Instantiate new input controller.
-            var entry = this.inputs[field.type] || <InputControlEntry>{};
-            let ctor = entry.controller || StringInputController;
-            result.push(new ctor(field));
-        }
+		for (const field of fields) {
+			// Instantiate new input controller.
+			const entry = this.inputs[field.type];
+			const ctor = entry != null && entry.controller != null
+				? entry.controller
+				: StringInputController;
 
-        result.sort((a: InputController<any>, b: InputController<any>) => {
-            return a.metadata.orderIndex - b.metadata.orderIndex;
-        });
+			result.push(new ctor(field));
+		}
 
-        return result;
-    }
+		result.sort((a: InputController<any>, b: InputController<any>) => {
+			return a.metadata.orderIndex - b.metadata.orderIndex;
+		});
 
-    getOutput(field: OutputFieldValue) {
-        return field != null
-            ? this.outputs[field.metadata.type] || this.outputs["text"]
-            : this.outputs["text"];
-    }
+		return result;
+	}
 
-    getInput(type: string) {
-        return type != null
-            ? this.inputs[type] || this.inputs["text"]
-            : this.inputs["text"];
-    }
+	public getOutput(field: OutputFieldValue): IOutputControlEntry {
+		return field != null
+			? this.outputs[field.metadata.type] || this.outputs.text
+			: this.outputs.text;
+	}
 
-    registerInputFieldControl(name: string, svelteComponent: any, controller: InputFieldControllerConstructor, constants: any = null) {
-        this.inputs[name] = {
-            controller: controller,
-            component: svelteComponent,
-            constants: constants
-        };
-    }
+	public getInput(type: string): InputControlEntry {
+		return type != null
+			? this.inputs[type] || this.inputs.text
+			: this.inputs.text;
+	}
 
-    registerOutputFieldControl(name: string, control: any, constants: any = null) {
-        this.outputs[name] = {
-            constructor: control,
-            constants: constants
-        };
-    }
+	public registerInputFieldControl(
+		name: string,
+		svelteComponent: any,
+		controller: InputFieldControllerConstructor,
+		constants: OutputControlConfiguration = null): void {
+		this.inputs[name] = {
+			controller,
+			component: svelteComponent,
+			constants
+		};
+	}
 
-    registerFormEventHandler(name: string, handler: FormEventHandler) {
-        this.formEventHandlers[name] = handler;
-    }
+	public registerOutputFieldControl(name: string, svelteComponent: any, constants: OutputControlConfiguration = null): void {
+		this.outputs[name] = {
+			constructor: svelteComponent,
+			constants
+		};
+	}
 
-    registerInputFieldEventHandler(name: string, handler: InputFieldEventHandler) {
-        this.inputFieldEventHandlers[name] = handler;
-    }
+	public registerFormEventHandler(name: string, handler: FormEventHandler): void {
+		this.formEventHandlers[name] = handler;
+	}
 
-    registerOutputFieldEventHandler(name: string, handler: OutputFieldEventHandler) {
-        this.outputFieldEventHandlers[name] = handler;
-    }
+	public registerInputFieldEventHandler(name: string, handler: InputFieldEventHandler): void {
+		this.inputFieldEventHandlers[name] = handler;
+	}
 
-    registerFunction(name: string, fn: IFunctionRunner) {
-        this.functions[name] = fn;
-    }
+	public registerOutputFieldEventHandler(name: string, handler: OutputFieldEventHandler): void {
+		this.outputFieldEventHandlers[name] = handler;
+	}
+
+	public registerFunction(name: string, fn: IFunctionRunner): void {
+		this.functions[name] = fn;
+	}
 }

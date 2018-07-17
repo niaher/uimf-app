@@ -21,5 +21,7 @@ namespace UimfApp.Users
 		public virtual ICollection<ApplicationUserLogin> Logins { get; } = new List<ApplicationUserLogin>();
 
 		public bool HasLoggedIn => this.EmailConfirmed || this.PasswordHash != null;
+
+		public bool Active { get; set; } = true;
 	}
 }

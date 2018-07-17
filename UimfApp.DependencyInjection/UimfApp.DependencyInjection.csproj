@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.1.0" />
+    <PackageReference Include="StructureMap.Microsoft.DependencyInjection" Version="1.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UimfApp.App.EventNotification\UimfApp.App.EventNotification.csproj" />
+    <ProjectReference Include="..\UimfApp.Core\UimfApp.Core.csproj" />
+    <ProjectReference Include="..\UimfApp.Filing\UimfApp.Filing.csproj" />
+    <ProjectReference Include="..\UimfApp.Notifications\UimfApp.Notifications.csproj" />
+    <ProjectReference Include="..\UimfApp.Users\UimfApp.Users.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -27,7 +27,9 @@ namespace UimfApp.Infrastructure.User
 		/// <see cref="StackOverflowException"/>.</remarks>
 		public UserContext GetUserContext()
 		{
-			var systemRoles = this.GetPrincipal().Claims
+			var claimsPrincipal = this.GetPrincipal() ?? new ClaimsPrincipal();
+
+			var systemRoles = claimsPrincipal.Claims
 				.Where(t => t.Type == ClaimTypes.Role)
 				.Select(t => t.Value)
 				.Distinct()

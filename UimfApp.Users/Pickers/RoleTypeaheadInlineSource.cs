@@ -5,7 +5,9 @@ namespace UimfApp.Users.Pickers
 	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Security;
 	using UiMetadataFramework.Basic.Input.Typeahead;
+	using UimfApp.Users.Security;
 
+	[Secure(typeof(UserActions), nameof(UserActions.ManageUsers))]
 	public class RoleTypeaheadInlineSource : ITypeaheadInlineSource<string>
 	{
 		private readonly ActionRegister actionRegister;

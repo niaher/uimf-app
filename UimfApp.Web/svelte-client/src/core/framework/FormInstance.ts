@@ -1,286 +1,282 @@
 import * as umf from "uimf-core";
-import { InputFieldValue } from "./InputFieldValue";
-import { OutputFieldValue } from "./OutputFieldValue";
-import { InputController } from "./InputController";
 import { ControlRegister } from "./ControlRegister";
-import { FormEventArguments, FormResponseEventArguments } from "./FormEventArguments";
+import { FormEventArguments, FormResponseEventArguments } from "./index";
+import { InputController } from "./InputController";
+import { OutputFieldValue } from "./OutputFieldValue";
 import { UmfApp } from "./UmfApp";
-import { FormResponse } from "uimf-core";
 
 export class FormInstance {
-    public readonly metadata: umf.FormMetadata;
-    public outputs: Array<OutputFieldValue> = [];
-    public inputs: Array<InputController<any>> = [];
+	public readonly metadata: umf.FormMetadata;
+	public outputs: OutputFieldValue[] = [];
+	public inputs: Array<InputController<any>> = [];
 
-    constructor(metadata: umf.FormMetadata, controlRegister: ControlRegister) {
-        this.metadata = metadata;
-        this.inputs = controlRegister.createInputControllers(this.metadata.inputFields);
-    }
+	constructor(metadata: umf.FormMetadata, controlRegister: ControlRegister) {
+		this.metadata = metadata;
+		this.inputs = controlRegister.createInputControllers(this.metadata.inputFields);
+	}
 
-    private enforceCanPostOnLoad() {
-        // If user is trying to auto-submit a form which is not enabled for `PostOnLoad`.
-        if (!this.metadata.postOnLoad) {
-            throw new Error(`Invalid invocation of form '${this.metadata.id}'. Form cannot be auto-posted, because *PostOnLoad* is set to false.`);
-        }
-    }
+	private enforceCanPostOnLoad(): void {
+		// If user is trying to auto-submit a form which is not enabled for `PostOnLoad`.
+		if (!this.metadata.postOnLoad) {
+			throw new Error(`Invalid invocation of form '${this.metadata.id}'. Form cannot be auto-posted, because *PostOnLoad* is set to false.`);
+		}
+	}
 
-    async allRequiredInputsHaveData(asPostOnLoad: boolean): Promise<boolean> {
-        if (asPostOnLoad) {
-            this.enforceCanPostOnLoad();
-        }
+	public async allRequiredInputsHaveData(asPostOnLoad: boolean): Promise<boolean> {
+		if (asPostOnLoad) {
+			this.enforceCanPostOnLoad();
+		}
 
-        let formData = await this.getFormData(asPostOnLoad);
+		const formData = await this.getFormData(asPostOnLoad);
 
-        return formData != null;
-    }
+		return formData != null;
+	}
 
-    async submit(app: UmfApp, asPostOnLoad: boolean, args: any): Promise<FormResponse> {
-        if (asPostOnLoad) {
-            this.enforceCanPostOnLoad();
-        }
+	public async submit(app: UmfApp, asPostOnLoad: boolean, args: any): Promise<umf.FormResponse> {
+		if (asPostOnLoad) {
+			this.enforceCanPostOnLoad();
+		}
 
-        let formData = await this.getFormData(asPostOnLoad);
+		const formData = await this.getFormData(asPostOnLoad);
 
-        // If not all required inputs are filled.
-        if (formData == null) {
-            throw new Error(`Form '${this.metadata.id}' cannot be submitted, because some required input fields do not have values.`);
-        }
+		// If not all required inputs are filled.
+		if (formData == null) {
+			throw new Error(`Form '${this.metadata.id}' cannot be submitted, because some required input fields do not have values.`);
+		}
 
-        await this.fire("form:posting", new FormEventArguments(app));
+		await this.fire("form:posting", new FormEventArguments(app));
 
-        let response = await app.server.postForm(this.metadata.id, formData);
-        await this.fire("form:responseReceived", new FormResponseEventArguments(app, response));
+		const response = await app.server.postForm(this.metadata.id, formData);
+		await this.fire("form:responseReceived", new FormResponseEventArguments(app, response));
 
-        this.setOutputFieldValues(response);
+		this.setOutputFieldValues(response);
 
-        // Null response is treated as a server-side error.
-        if (response == null) {
-            throw new Error(`Received null response.`);
-        }
+		// Null response is treated as a server-side error.
+		if (response == null) {
+			throw new Error(`Received null response.`);
+		}
 
-        await app.runFunctions(response.metadata.functionsToRun);
-        app.handleResponse(response, this, args);
+		await app.runFunctions(response.metadata.functionsToRun);
+		app.handleResponse(response, this, args);
 
-        await this.fire("form:responseHandled", new FormResponseEventArguments(app, response));
+		await this.fire("form:responseHandled", new FormResponseEventArguments(app, response));
 
-        return response;
-    }
+		return response;
+	}
 
-    initializeInputFields(data: any) {
-        var promises = [];
+	public initializeInputFields(data: any): Promise<Array<InputController<any>>> {
+		const promises: Array<Promise<InputController<any>>> = [];
 
-        for (let fieldMetadata of this.inputs) {
-            let value = null;
+		for (const fieldMetadata of this.inputs) {
+			let value = null;
 
-            if (data != null) {
-                for (let prop in data) {
-                    if (data.hasOwnProperty(prop) && prop.toLowerCase() == fieldMetadata.metadata.id.toLowerCase()) {
-                        value = data[prop];
-                        break;
-                    }
-                }
-            }
+			if (data != null) {
+				for (const prop in data) {
+					if (data.hasOwnProperty(prop) && prop.toLowerCase() === fieldMetadata.metadata.id.toLowerCase()) {
+						value = data[prop];
+						break;
+					}
+				}
+			}
 
-            promises.push(fieldMetadata.init(value));
-        }
+			promises.push(fieldMetadata.init(value));
+		}
 
-        return Promise.all(promises);
-    }
+		return Promise.all(promises);
+	}
 
-    setInputFields(data: any) {
-        for (let field of this.inputs) {
-            field.value = data[field.metadata.id];
-        }
-    }
+	public setInputFields(data: any): void {
+		for (const field of this.inputs) {
+			field.value = data[field.metadata.id];
+		}
+	}
 
-    getSerializedInputValues(): Promise<any> {
-        var data = {};
-        var promises = [];
+	public getSerializedInputValues(): Promise<any> {
+		const data = {};
+		const promises = [];
 
-        for (let input of this.inputs) {
-            var promise = input.serialize().then(t => {
-                // Don't include inputs without values, because we only
-                // want to serialize "non-default" values.
-                if (t.value != null && t.value != "") {
-                    data[input.metadata.id] = t.value;
-                }
-            });
+		for (const input of this.inputs) {
+			const promise = input.serialize().then((t) => {
+				// Don't include inputs without values, because we only
+				// want to serialize "non-default" values.
+				if (t.value != null && t.value !== "") {
+					data[input.metadata.id] = t.value;
+				}
+			});
 
-            promises.push(promise);
-        }
+			promises.push(promise);
+		}
 
-        return Promise.all(promises).then(() => data);
-    }
+		return Promise.all(promises).then(() => data);
+	}
 
-    getSerializedInputValuesFromObject(value: any): any {
-        var data = {};
+	public getSerializedInputValuesFromObject(value: any): any {
+		const data = {};
 
-        var normalizedObject = {};
-        for (let prop in value) {
-            if (value.hasOwnProperty(prop)) {
-                normalizedObject[prop.toLowerCase()] = value[prop];
-            }
-        }
+		const normalizedObject = {};
+		for (const prop in value) {
+			if (value.hasOwnProperty(prop)) {
+				normalizedObject[prop.toLowerCase()] = value[prop];
+			}
+		}
 
-        for (let input of this.inputs) {
-            var valueAsString = input.serializeValue(normalizedObject[input.metadata.id.toLowerCase()]);
+		for (const input of this.inputs) {
+			const valueAsString = input.serializeValue(normalizedObject[input.metadata.id.toLowerCase()]);
 
-            // Don't include inputs without values, because we only
-            // want to serialize "non-default" values.
-            if (valueAsString != null && valueAsString != "") {
-                data[input.metadata.id] = valueAsString;
-            }
-        }
+			// Don't include inputs without values, because we only
+			// want to serialize "non-default" values.
+			if (valueAsString != null && valueAsString !== "") {
+				data[input.metadata.id] = valueAsString;
+			}
+		}
 
-        return data;
-    }
+		return data;
+	}
 
-    static getOutputFieldValues(outputFieldsMetadata: umf.OutputFieldMetadata[], response: any): Array<OutputFieldValue> {
-        var fields = Array<OutputFieldValue>();
-        
-        var normalizedResponse = FormInstance.getNormalizedObject(response);
+	public static getOutputFieldValues(outputFieldsMetadata: umf.OutputFieldMetadata[], response: any): OutputFieldValue[] {
+		const fields = Array<OutputFieldValue>();
 
-        for (let field of outputFieldsMetadata) {
-            var normalizedId = field.id.toLowerCase();
+		const normalizedResponse = FormInstance.getNormalizedObject(response);
 
-            fields.push({
-                metadata: field,
-                data: normalizedResponse[normalizedId]
-            });
-        }
+		for (const field of outputFieldsMetadata) {
+			const normalizedId = field.id.toLowerCase();
 
-        fields.sort((a: OutputFieldValue, b: OutputFieldValue) => {
-            return a.metadata.orderIndex - b.metadata.orderIndex;
-        });
+			fields.push({
+				metadata: field,
+				data: normalizedResponse[normalizedId]
+			});
+		}
 
-        return fields;
-    }
+		fields.sort((a: OutputFieldValue, b: OutputFieldValue) => {
+			return a.metadata.orderIndex - b.metadata.orderIndex;
+		});
 
-    setOutputFieldValues(response: umf.FormResponse) {
-        if (response == null) {
-            this.outputs = [];
-            return;
-        }
+		return fields;
+	}
 
-        var fields = Array<OutputFieldValue>();
+	public setOutputFieldValues(response: umf.FormResponse): void {
+		if (response == null) {
+			this.outputs = [];
+			return;
+		}
 
-        var normalizedResponse = FormInstance.getNormalizedObject(response);
+		const fields = Array<OutputFieldValue>();
 
-        for (let field of this.metadata.outputFields) {
-            fields.push({
-                metadata: field,
-                data: normalizedResponse[field.id.toLowerCase()]
-            });
-        }
+		const normalizedResponse = FormInstance.getNormalizedObject(response);
 
-        fields.sort((a: OutputFieldValue, b: OutputFieldValue) => {
-            return a.metadata.orderIndex - b.metadata.orderIndex;
-        });
+		for (const field of this.metadata.outputFields) {
+			fields.push({
+				metadata: field,
+				data: normalizedResponse[field.id.toLowerCase()]
+			});
+		}
 
-        this.outputs = fields;
-    }
+		fields.sort((a: OutputFieldValue, b: OutputFieldValue) => {
+			return a.metadata.orderIndex - b.metadata.orderIndex;
+		});
 
-    async handleEvent(eventName: string, eventMetadata: umf.EventHandlerMetadata, parameters: FormEventArguments): Promise<void> {
-        await this.fire(eventName, parameters);
-    }
+		this.outputs = fields;
+	}
 
-    private async fire(eventName: string, parameters: FormEventArguments): Promise<void> {
-        var promises = [];
+	public async handleEvent(eventName: string, eventMetadata: umf.EventHandlerMetadata, parameters: FormEventArguments): Promise<void> {
+		await this.fire(eventName, parameters);
+	}
 
-        // Run input event handlers.
-        for (let input of this.inputs) {
-            if (input.metadata.eventHandlers != null) {
-                for (let eventHandlerMetadata of input.metadata.eventHandlers) {
-                    if (eventHandlerMetadata.runAt === eventName) {
-                        let handler = parameters.app.controlRegister.inputFieldEventHandlers[eventHandlerMetadata.id];
-                        if (handler == null) {
-                            throw new Error(`Could not find input event handler '${eventHandlerMetadata.id}'.`);
-                        }
+	private async fire(eventName: string, parameters: FormEventArguments): Promise<void> {
+		const promises = [];
 
-                        let promise = handler.run(input, eventHandlerMetadata, parameters);
-                        promises.push(promise);
-                    }
-                }
-            }
-        }
+		// Run input event handlers.
+		for (const input of this.inputs) {
+			if (input.metadata.eventHandlers != null) {
+				for (const eventHandlerMetadata of input.metadata.eventHandlers) {
+					if (eventHandlerMetadata.runAt === eventName) {
+						const handler = parameters.app.controlRegister.inputFieldEventHandlers[eventHandlerMetadata.id];
+						if (handler == null) {
+							throw new Error(`Could not find input event handler '${eventHandlerMetadata.id}'.`);
+						}
 
-        // Run output event handlers.
-        for (let output of this.outputs) {
-            if (output.metadata.eventHandlers != null) {
-                for (let eventHandlerMetadata of output.metadata.eventHandlers) {
-                    if (eventHandlerMetadata.runAt === eventName) {
-                        let handler = parameters.app.controlRegister.outputFieldEventHandlers[eventHandlerMetadata.id];
-                        if (handler == null) {
-                            throw new Error(`Could not find output event handler '${eventHandlerMetadata.id}'.`);
-                        }
+						const promise = handler.run(input, eventHandlerMetadata, parameters);
+						promises.push(promise);
+					}
+				}
+			}
+		}
 
-                        let promise = handler.run(output, eventHandlerMetadata, parameters);
-                        promises.push(promise);
-                    }
-                }
-            }
-        }
+		// Run output event handlers.
+		for (const output of this.outputs) {
+			if (output.metadata.eventHandlers != null) {
+				for (const eventHandlerMetadata of output.metadata.eventHandlers) {
+					if (eventHandlerMetadata.runAt === eventName) {
+						const handler = parameters.app.controlRegister.outputFieldEventHandlers[eventHandlerMetadata.id];
+						if (handler == null) {
+							throw new Error(`Could not find output event handler '${eventHandlerMetadata.id}'.`);
+						}
 
-        // Run form event handlers.
-        this.metadata.eventHandlers
-            .filter(t => t.runAt === eventName)
-            .forEach(t => {
-                let handler = parameters.app.controlRegister.formEventHandlers[t.id];
-                if (handler == null) {
-                    throw new Error(`Could not find form event handler '${t.id}'.`);
-                }
+						const promise = handler.run(output, eventHandlerMetadata, parameters);
+						promises.push(promise);
+					}
+				}
+			}
+		}
 
-                let promise = handler.run(this, t, parameters);
-                promises.push(promise);
-            });
+		// Run form event handlers.
+		this.metadata.eventHandlers
+			.filter((t) => t.runAt === eventName)
+			.forEach((t) => {
+				const handler = parameters.app.controlRegister.formEventHandlers[t.id];
+				if (handler == null) {
+					throw new Error(`Could not find form event handler '${t.id}'.`);
+				}
 
+				const promise = handler.run(this, t, parameters);
+				promises.push(promise);
+			});
 
-        await Promise.all(promises);
-    }
+		await Promise.all(promises);
+	}
 
-    private async getFormData(asPostOnLoad: boolean): Promise<any> {
-        var data = {};
-        var promises = [];
-        var hasRequiredMissingInput = false;
+	private async getFormData(asPostOnLoad: boolean): Promise<any> {
+		const data = {};
+		const promises = [];
+		let hasRequiredMissingInput = false;
 
-        for (let input of this.inputs) {
-            var promise = input.getValue().then(value => {
-                data[input.metadata.id] = value;
+		for (const input of this.inputs) {
+			const promise = input.getValue().then((value) => {
+				data[input.metadata.id] = value;
 
-                if (input.metadata.required && (value == null || (typeof (value) === "string" && value == ""))) {
-                    hasRequiredMissingInput = true;
-                }
-            });
+				if (input.metadata.required && (value == null || (typeof (value) === "string" && value === ""))) {
+					hasRequiredMissingInput = true;
+				}
+			});
 
-            promises.push(promise);
-        }
+			promises.push(promise);
+		}
 
-        await Promise.all(promises);
+		await Promise.all(promises);
 
-        var skipValidation =
-            !this.metadata.postOnLoadValidation &&
-            this.metadata.postOnLoad &&
-            // if initialization of the form, i.e. - first post.
-            asPostOnLoad;
+		const skipValidation =
+			!this.metadata.postOnLoadValidation &&
+			this.metadata.postOnLoad &&
+			// if initialization of the form, i.e. - first post.
+			asPostOnLoad;
 
+		// If not all required inputs were entered, then do not post.
+		if (hasRequiredMissingInput &&
+			!skipValidation) {
+			return null;
+		}
 
-        // If not all required inputs were entered, then do not post.
-        if (hasRequiredMissingInput &&
-            !skipValidation) {
-            return null;
-        }
+		return data;
+	}
 
-        return data;
-    }
+	private static getNormalizedObject(response: umf.FormResponse): any {
+		const normalizedResponse = {};
+		for (const field in response) {
+			if (response.hasOwnProperty(field) && field !== "metadata") {
+				normalizedResponse[field.toLowerCase()] = response[field];
+			}
+		}
 
-    private static getNormalizedObject(response: umf.FormResponse): any {
-        var normalizedResponse = {};
-        for (let field in response) {
-            if (response.hasOwnProperty(field) && field !== "metadata") {
-                normalizedResponse[field.toLowerCase()] = response[field];
-            }
-        }
-
-        return normalizedResponse;
-    }
+		return normalizedResponse;
+	}
 }

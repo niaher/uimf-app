@@ -2,7 +2,11 @@
 <ul class="actionlist">
 	{{#each field.data.actions as action}}
 	<li>
-		<button on:click="run(action, app)" class="btn btn-default">{{action.label}}</button>
+		{{#if action.action !== "redirect"}}
+		<button on:click="run(action, app)" class="btn btn-default {{action.cssClass}}">{{{action.label}}}</button>
+		{{else }}
+		<a href="{{app.makeUrl(action.form, action.inputFieldValues)}}" class="btn btn-default {{action.cssClass}}">{{action.label}}</a>
+		{{/if}}
 	</li>
 	{{/each}}
 </ul>
@@ -10,7 +14,7 @@
 <input id="modal-{{modalId}}" type="checkbox" bind:checked="open" class="hidden" />
 <div class="modal">
 	<div class="card">
-		<label for="modal-{{modalId}}" class="close" on:click="close(null, true)"></label>
+		<label class="close" on:click="close()"></label>
 		<div ref:container></div>
 	</div>
 </div>
@@ -19,13 +23,15 @@
 <script>
 	import FormComponent from "core-ui/Form";
 	import { ActionListEventArguments } from "./ActionListEventArguments";
+	import * as alertifyLib from "alertifyjs";
+	var alertify = alertifyLib.default;
 
 	var modalId = 0;
 	var modals = [];
 
 	// https://stackoverflow.com/a/3369743/111438
 	// Close topmost modal when user presses escape key.
-	document.onkeydown = function(evt) {
+	document.addEventListener("keydown", function (evt) {
 		evt = evt || window.event;
 		var isEscape = false;
 		if ("key" in evt) {
@@ -39,24 +45,33 @@
 				modals[modals.length - 1].close();
 			}
 		}
-	};
+	});
 
 	export default {
 		methods: {
 			async run(action, app) {
 				var self = this;
-
 				var formInstance = app.getFormInstance(action.form, true);
-				
+
 				// TODO: find a way to initialize from action.inputFieldValues directly.
 				var serializedInputValues = formInstance.getSerializedInputValuesFromObject(action.inputFieldValues);
 				await formInstance.initializeInputFields(serializedInputValues);
-				
+
 				var allRequiredInputsHaveData = await formInstance.allRequiredInputsHaveData(false);
-				
 				if (action.action === "run" && allRequiredInputsHaveData) {
-					var response = await formInstance.submit(this.get("app"), false);					
-					this.onActionRun(formInstance.metadata.id, response, action);
+					if (action.confirmationMessage) {
+						alertify.confirm("Warning",
+						action.confirmationMessage,
+						async function(){
+							var response = await formInstance.submit(self.get("app"), false);
+							self.onActionRun(formInstance.metadata.id, response, action);
+						   }, 
+						  function(){ return;});
+
+					} else {
+						var response = await formInstance.submit(this.get("app"), false);
+						this.onActionRun(formInstance.metadata.id, response, action);
+					}
 				}
 				else {
 					this.set({ open: true });
@@ -80,47 +95,35 @@
 						}
 					});
 
-					this.set({current: f});
+					this.set({ current: f });
 
 					modals.push(self);
 				}
 			},
-			close(response, fromBtnClick) {
-				// If user clicked "close" button then the "open" would have already
-				// been set to false (because the close button is linked to the hidden input). 
-				// In such case setting "open" to false will actually result in the "open"
-				// being set to true. It is indeed very strange, but to avoid the problem we 
-				// do not set "open" to false if this is a result of the "close" button click.
-				if (!fromBtnClick) {
-					// Ensure the modal div is hidden.
-					this.set({ open: false });
-				}
+			close(response) {
+				this.set({ open: false });
 
 				// Destroy underlying form instance.
 				var modalForm = this.get("current");
-				
+
 				if (response != null) {
 					let formId = modalForm.get("metadata").id;
 					this.onActionRun(formId, response);
 				}
 
 				modalForm.destroy();
-				modals.pop(this);
+				modals.pop();
 			},
 			async onActionRun(formId, response, action) {
 				let parentForm = this.get("parent");
 				let app = parentForm.get("app");
 				let formInstance = parentForm.get("form");
 
-				if (response.metadata.handler !== "redirect") {
+				if (response.metadata.handler !== "redirect" &&
+					response.metadata.handler !== "reload") {
 					// If asked to redirect to another form, then we redirect
 					// and do not reload parent form, as that would be a wasted effort.
-					if (action != null && action.redirectTo != null) {
-						app.go(action.redirectTo.form, action.redirectTo.inputFieldValues);
-					}
-					else {
-						await parentForm.submit(null, true);
-					}
+					await parentForm.submit(null, true);
 				}
 
 				var eventArgs = new ActionListEventArguments(app, formId);
@@ -142,11 +145,6 @@
 </script>
 
 <style>
-	.modal .card {
-		max-width: 85%;
-		padding: 10px 15px;
-	}
-
 	.hidden {
 		width: 0;
 		height: 0;
@@ -158,7 +156,6 @@
 		margin: 0px 0;
 		padding: 0 5px;
 		text-align: right;
-		background: #fff;
 		margin-bottom: 15px;
 	}
 

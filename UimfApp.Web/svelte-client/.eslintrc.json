@@ -1,0 +1,127 @@
+{
+	"root": true,
+	"extends": [
+		"eslint:recommended",
+		"airbnb-base"
+	],
+	"plugins": [
+		"html",
+		"import"
+	],
+	"settings": {
+		"html/indent": "tab",
+		"html/report-bad-indent": "error"
+	},
+	"parserOptions": {
+		"ecmaVersion": 2018,
+		"sourceType": "module"
+	},
+	"rules": {
+		"no-plusplus": [
+			"error",
+			{
+				"allowForLoopAfterthoughts": true
+			}
+		],
+		"no-continue": "off",
+		"arrow-parens": [
+			"error",
+			"as-needed"
+		],
+		"brace-style": [
+			"error",
+			"stroustrup",
+			{
+				"allowSingleLine": false
+			}
+		],
+		"no-mixed-operators": [
+			"error"
+		],
+		"operator-linebreak": [
+			"error",
+			"after"
+		],
+		"function-paren-newline": [
+			"error",
+			"multiline"
+		],
+		"no-var": "error",
+		"import/no-unresolved": [
+			"warn",
+			{
+				"commonjs": true,
+				"caseSensitive": true
+			}
+		],
+		"semi": "error",
+		"indent": [
+			"error",
+			"tab"
+		],
+		"no-tabs": "off",
+		"one-var": [
+			"off",
+			"consecutive"
+		],
+		"no-multiple-empty-lines": [
+			"error",
+			{
+				"max": 1,
+				"maxEOF": 0,
+				"maxBOF": 1
+			}
+		],
+		"max-len": [
+			"warn",
+			{
+				"code": 120
+			}
+		],
+		"comma-dangle": [
+			"error",
+			"never"
+		],
+		"quotes": [
+			"error",
+			"double"
+		],
+		"linebreak-style": [
+			"error",
+			"windows"
+		],
+		"require-jsdoc": [
+			"error",
+			{
+				"require": {
+					"FunctionDeclaration": false,
+					"MethodDefinition": false,
+					"ClassDeclaration": false,
+					"ArrowFunctionExpression": false,
+					"FunctionExpression": false
+				}
+			}
+		],
+		"no-restricted-syntax": [
+			"error",
+			{
+				"selector": "ForInStatement",
+				"message": "for..in loops iterate over the entire prototype chain, which is virtually never what you want. Use Object.{keys,values,entries}, and iterate over the resulting array."
+			},
+			{
+				"selector": "LabeledStatement",
+				"message": "Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand."
+			},
+			{
+				"selector": "WithStatement",
+				"message": "`with` is disallowed in strict mode because it makes code impossible to predict and optimize."
+			}
+		]
+	},
+	"env": {
+		"es6": true,
+		"browser": true,
+		"node": true,
+		"amd": true
+	}
+}

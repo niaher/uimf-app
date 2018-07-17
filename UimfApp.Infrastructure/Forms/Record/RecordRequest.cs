@@ -2,7 +2,7 @@ namespace UimfApp.Infrastructure.Forms.Record
 {
 	using MediatR;
 	using UiMetadataFramework.Basic.EventHandlers;
-	using UiMetadataFramework.Basic.Input;
+	using UiMetadataFramework.Basic.Input.Dropdown;
 	using UiMetadataFramework.Core.Binding;
 
 	public class RecordRequest<T> : IRequest<T>

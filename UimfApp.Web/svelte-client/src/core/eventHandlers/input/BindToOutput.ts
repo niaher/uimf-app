@@ -1,21 +1,20 @@
-import {
-	InputFieldEventHandler,
-	InputController,
-	FormInstance,
-	FormResponseEventArguments
-} from "../../framework/index";
 import * as umf from "uimf-core";
+import {
+	FormResponseEventArguments,
+	InputController,
+	InputFieldEventHandler
+} from "../../framework/index";
 
 export class BindToOutput extends InputFieldEventHandler {
-	run(input: InputController<any>, eventHandler: umf.EventHandlerMetadata, args: FormResponseEventArguments): Promise<any> {
-		var promises = [];
+	public run(input: InputController<any>, eventHandler: umf.EventHandlerMetadata, args: FormResponseEventArguments): Promise<any> {
+		const promises = [];
 
-		let lowercaseInputId = eventHandler.customProperties.outputFieldId.toLowerCase();
-		
-		for (let prop in args.response) {
+		const lowercaseInputId = eventHandler.customProperties.outputFieldId.toLowerCase();
+
+		for (const prop in args.response) {
 			if (args.response.hasOwnProperty(prop) && prop.toLowerCase() === lowercaseInputId) {
-				var serializedValue = input.serializeValue(args.response[prop]);				
-				let promise = input.init(serializedValue);
+				const serializedValue = input.serializeValue(args.response[prop]);
+				const promise = input.init(serializedValue);
 
 				promises.push(promise);
 				break;

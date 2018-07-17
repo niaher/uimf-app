@@ -3,22 +3,25 @@ namespace UimfApp.Users.Commands
 	using System.Collections.Generic;
 	using System.ComponentModel.DataAnnotations;
 	using System.Security.Claims;
+	using System.Threading;
 	using System.Threading.Tasks;
-	using CPermissions;
 	using MediatR;
 	using Microsoft.AspNetCore.Identity;
 	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Forms;
-	using UimfApp.Infrastructure.Security;
 	using UimfApp.Users;
 	using UimfApp.Users.Security;
 	using UiMetadataFramework.Basic.Input;
 	using UiMetadataFramework.Basic.Response;
 	using UiMetadataFramework.Core.Binding;
 	using UiMetadataFramework.MediatR;
+	using UimfApp.Infrastructure.Forms.CustomProperties;
+	using UimfApp.Infrastructure.Security;
 
 	[MyForm(Id = "login", Label = "Login", Menu = UserMenus.TopLevel)]
-	public class Login : IAsyncForm<Login.Request, ReloadResponse>, ISecureHandler
+	[Secure(typeof(UserActions), nameof(UserActions.Login))]
+	[CssClass(UiFormConstants.CardLayout)]
+	public class Login : AsyncForm<Login.Request, ReloadResponse>
 	{
 		private readonly SignInManager<ApplicationUser> signInManager;
 
@@ -27,7 +30,7 @@ namespace UimfApp.Users.Commands
 			this.signInManager = signInManager;
 		}
 
-		public async Task<ReloadResponse> Handle(Request model)
+		public override async Task<ReloadResponse> Handle(Request model, CancellationToken cancellationToken)
 		{
 			var user = new EmailAddressAttribute().IsValid(model.Email)
 				? await this.signInManager.UserManager.FindByEmailAsync(model.Email)
@@ -35,6 +38,10 @@ namespace UimfApp.Users.Commands
 			
 			if (user != null)
 			{
+				if (!user.Active)
+				{
+					throw new BusinessException("This account is disabled. Please contact administrator.");
+				}
 				var result = await this.signInManager.PasswordSignInAsync(user, model.Password.Value, model.RememberMe, false);
 
 				if (result.Succeeded)
@@ -57,11 +64,6 @@ namespace UimfApp.Users.Commands
 			}
 
 			throw new BusinessException("Invalid login attempt.");
-		}
-
-		public UserAction GetPermission()
-		{
-			return UserActions.Login;
 		}
 
 		public class Request : IRequest<ReloadResponse>

@@ -1,17 +1,19 @@
 namespace UimfApp.Users.Commands
 {
+	using System.Threading;
 	using System.Threading.Tasks;
 	using MediatR;
 	using Microsoft.AspNetCore.Identity;
-	using UimfApp.Infrastructure;
-	using UimfApp.Infrastructure.Forms;
 	using UiMetadataFramework.Basic.Input;
 	using UiMetadataFramework.Basic.Response;
 	using UiMetadataFramework.Core.Binding;
 	using UiMetadataFramework.MediatR;
+	using UimfApp.Infrastructure;
+	using UimfApp.Infrastructure.Forms;
+	using UimfApp.Users.Forms;
 
 	[MyForm(Id = "reset-password", Label = "Set new password", SubmitButtonLabel = "Confirm new password")]
-	public class ResetPassword : IAsyncForm<ResetPassword.Request, ReloadResponse>
+	public class ResetPassword : AsyncForm<ResetPassword.Request, ReloadResponse>
 	{
 		private readonly SignInManager<ApplicationUser> signInManager;
 		private readonly UserManager<ApplicationUser> userManager;
@@ -22,7 +24,7 @@ namespace UimfApp.Users.Commands
 			this.signInManager = signInManager;
 		}
 
-		public async Task<ReloadResponse> Handle(Request message)
+		public override async Task<ReloadResponse> Handle(Request message, CancellationToken cancellationToken)
 		{
 			var user = this.userManager.Users.SingleOrException(t => t.Id == message.Id);
 
@@ -47,16 +49,17 @@ namespace UimfApp.Users.Commands
 			public int Id { get; set; }
 
 			/// <summary>
+			/// Gets or sets new password for the account.
+			/// </summary>
+			[InputField(Required = true)]
+			[UimfAppPasswordInputConfig(true)]
+			public Password Password { get; set; }
+
+			/// <summary>
 			/// Gets or sets password reset token.
 			/// </summary>
 			[InputField(Required = true, Hidden = true)]
 			public string Token { get; set; }
-
-			/// <summary>
-			/// Gets or sets new password for the account.
-			/// </summary>
-			[InputField(Required = true)]
-			public Password Password { get; set; }
 		}
 	}
 }

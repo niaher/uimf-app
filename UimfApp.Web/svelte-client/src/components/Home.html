@@ -1,1 +1,17 @@
-This is home.
+{{#if canViewHelpFiles === true}}
+<p style="margin-top:20px">
+	Welcome to the UimfApp. To help you get started, please <a href="/#/form/help?FileId=intro.md">read the documentation</a>.
+</p>
+{{else}}
+<p style="margin-top:20px">Welcome to UimfApp.</p>
+{{/if}}
+
+<script>
+	export default {
+		oncreate() {
+			this.set({
+				canViewHelpFiles: window.app.getForm("help") != null
+			});
+		}
+	};
+</script>

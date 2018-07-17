@@ -1,23 +1,24 @@
 namespace UimfApp.Users.Commands
 {
+	using System.Threading;
 	using System.Threading.Tasks;
-	using System.Web;
-	using CPermissions;
 	using MediatR;
 	using Microsoft.AspNetCore.Identity;
 	using Microsoft.Extensions.Options;
+	using UiMetadataFramework.Basic.Input.Typeahead;
+	using UiMetadataFramework.Basic.Output;
+	using UiMetadataFramework.Core.Binding;
 	using UimfApp.Infrastructure.Configuration;
 	using UimfApp.Infrastructure.Forms;
+	using UimfApp.Infrastructure.Forms.Inputs;
 	using UimfApp.Infrastructure.Messages;
 	using UimfApp.Infrastructure.Security;
 	using UimfApp.Users.Pickers;
 	using UimfApp.Users.Security;
-	using UiMetadataFramework.Basic.Input.Typeahead;
-	using UiMetadataFramework.Basic.Output;
-	using UiMetadataFramework.Core.Binding;
 
 	[MyForm(Id = "add-user", Label = "Add user")]
-	public class AddUser : IMyAsyncForm<AddUser.Request, AddUser.Response>, ISecureHandler
+	[Secure(typeof(UserActions), nameof(UserActions.ManageUsers))]
+	public class AddUser : MyAsyncForm<AddUser.Request, AddUser.Response>
 	{
 		private readonly AppConfig appConfig;
 		private readonly IEmailSender emailSender;
@@ -36,17 +37,26 @@ namespace UimfApp.Users.Commands
 			this.appConfig = appConfig.Value;
 		}
 
-		public async Task<Response> Handle(Request message)
+		public static FormLink Button()
+		{
+			return new FormLink
+			{
+				Form = typeof(AddUser).GetFormId(),
+				Label = "Add user"
+			};
+		}
+
+		public override async Task<Response> Handle(Request message, CancellationToken cancellationToken)
 		{
 			var applicationUser = new ApplicationUser
 			{
-				Email = message.Email,
+				Email = message.Email?.Value,
 				UserName = message.Name
 			};
 
 			var identityResult = await this.userManager.CreateAsync(applicationUser);
 
-			await this.SendConfirmationEmail(applicationUser);
+			await applicationUser.SendConfirmationEmail(this.appConfig, this.emailSender, this.userManager);
 
 			identityResult.EnforceSuccess("Account was not created.");
 
@@ -61,38 +71,10 @@ namespace UimfApp.Users.Commands
 			return new Response();
 		}
 
-		public UserAction GetPermission()
-		{
-			return UserActions.ManageUsers;
-		}
-
-		public static FormLink Button()
-		{
-			return new FormLink
-			{
-				Form = typeof(AddUser).GetFormId(),
-				Label = "Add user"
-			};
-		}
-
-		private async Task SendConfirmationEmail(ApplicationUser applicationUser)
-		{
-			var code = await this.userManager.GenerateEmailConfirmationTokenAsync(applicationUser);
-
-			var confirmAccountUrl = $"{this.appConfig.SiteRoot}#/form/confirm-account" +
-				$"?{nameof(ConfirmAccount.Request.Token)}={HttpUtility.UrlEncode(code)}" +
-				$"&{nameof(ConfirmAccount.Request.Id)}={applicationUser.Id}";
-
-			await this.emailSender.SendEmailAsync(
-				applicationUser.Email,
-				"Confirm your account",
-				$"Please confirm your account by clicking this link: <a href=\"{confirmAccountUrl}\">{confirmAccountUrl}</a>");
-		}
-
 		public class Request : IRequest<Response>
 		{
 			[InputField(OrderIndex = 10)]
-			public string Email { get; set; }
+			public Email Email { get; set; }
 
 			[InputField(OrderIndex = 0)]
 			public string Name { get; set; }

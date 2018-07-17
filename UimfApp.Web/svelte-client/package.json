@@ -5,16 +5,28 @@
   "license": "MIT",
   "scripts": {
     "build": "gulp build",
-    "dev": "gulp watch"
+    "dev": "gulp watch",
+    "eslint": "npx eslint --fix --ext .html,.js ."
   },
   "files": [
     "src/core",
     "src/index.ts"
   ],
   "devDependencies": {
+    "@types/d3": "^4.13.0",
     "abstract-state-router": "5.16.2",
-    "axios": "0.16.2",
-    "browser-sync": "2.18.12",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^17.0.0",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-config-google": "^0.9.1",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-html": "^4.0.5",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.8.0",
+    "eslint-plugin-react": "^7.9.1",
+    "eslint-plugin-standard": "^3.1.0",
     "gulp": "3.9.1",
     "gulp-concat": "2.6.1",
     "gulp-sass": "3.1.0",
@@ -35,12 +47,18 @@
     "svelte-state-renderer": "1.2.1",
     "ts-loader": "2.1.0",
     "tslib": "1.7.1",
+    "tslint": "^5.10.0",
+    "tslint-eslint-rules": "^5.3.1",
     "typescript": "2.3.4",
-    "uimf-core": "0.0.6"
+    "uimf-core": "0.0.7"
   },
   "dependencies": {
     "@types/axios": "0.14.0",
+    "axios": "0.16.2",
+    "alertifyjs": "^1.11.1",
     "awesomplete": "1.1.2",
-    "choices.js": "^3.0.2"
+    "choices.js": "^3.0.2",
+    "humanize": "0.0.9",
+    "pikaday": "^1.7.0"
   }
 }

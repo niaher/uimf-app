@@ -1,0 +1,67 @@
+{
+	"extends": [
+		"tslint:latest",
+		"tslint-eslint-rules"
+	],
+	"linterOptions": {
+		"exclude": ["node_modules"]
+	},
+	"rules": {
+		"member-ordering": [
+			false,
+			{
+				"order": [
+					"public-instance-field",
+					"protected-instance-field",
+					"private-instance-field",
+
+					"public-static-field",
+					"protected-static-field",
+					"private-static-field",
+
+					"public-constructor",
+					"protected-constructor",
+					"private-constructor",
+
+					"public-instance-method",
+					"protected-instance-method",
+					"private-instance-method",
+
+					"public-static-method",
+					"protected-static-method",
+					"private-static-method"
+				]
+			}
+		],
+		"only-arrow-functions": false,
+		"no-implicit-dependencies": false,
+		"no-submodule-imports": false,
+		"object-literal-sort-keys": false,
+		"no-this-assignment": false,
+		"comment-format": false,
+		"no-double-space": true,
+		"trailing-comma": [
+			true,
+			{
+				"singleline": "never",
+				"multiline": "never"
+			}
+		],
+		"indent": [
+			true,
+			"tabs"
+		],
+		"no-irregular-whitespace": true,
+		"no-trailing-whitespace": true,
+		"max-line-length": false,
+		"typedef": [
+			true,
+			"call-signature",
+			"parameter",
+			"member-variable-declaration",
+			"property-declaration",
+			"object-destructuring",
+			"array-destructuring"
+		]
+	}
+}

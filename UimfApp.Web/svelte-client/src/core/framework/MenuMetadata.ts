@@ -1,4 +1,4 @@
 export class MenuMetadata {
-	name:string;
-	orderIndex:number;
+	public name: string;
+	public orderIndex: number;
 }

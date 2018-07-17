@@ -1,112 +1,188 @@
-<ul class="paginator">
-	{{#if pages.length > 1}}
-	{{#each pages as page}}
-		{{#if parent.get('useUrl')}}
-		<li><a href="{{app.makeUrl(form.metadata.id, page.params)}}" class="{{page.cssClass}}">{{page.number}}</a></li>
-		{{else}}
-		<li><button on:click="goToPage(page)" class="{{page.cssClass}}">{{page.number}}</button></li>
-		{{/if}}
-	{{/each}}
-	{{/if}}
-</ul>
+{{#if field.data != null && pages.length > 0}}
+<div>
+	<select class="pagination-size input-sm" bind:value="field.pageSize" on:change="changePageSize()">
+		<option value="10">10</option>
+		<option value="20">20</option>
+		<option value="50">50</option>
+		<option value="100">100</option>
+	</select>
+
+	<ul class="pagination pagination-sm">
+		{{#each pages as page}}
+			{{#if parent.get('useUrl')}}
+			<li class="page-item"><a href="{{app.makeUrl(form.metadata.id, page.params)}}" class="{{page.cssClass}} page-link">{{page.text}}</a></li>
+			{{else}}
+			<li class="page-item"><button on:click="goToPage(page)" class="{{page.cssClass}} page-link">{{page.text}}</button></li>
+			{{/if}}
+		{{/each}}
+	</ul>
+</div>
+<div class="paginator-summary">showing {{field.data.results.length}} out of {{field.data.totalCount}} items</div>
+{{/if}}
 
 <div ref:container></div>
 
 <script>
-	import TableOutput from "./Table";
 	import { OutputFieldValue } from "core-framework";
+	import TableOutput from "./Table";
 
 	export default {
 		oncreate() {
-			var field = this.get("field");
+			const field = this.get("field");
+			const form = this.get("form");
 
-			var tableField = new OutputFieldValue();
+			if (field.data == null) {
+				return;
+			}
+
+			const paginatorInput = form.inputs
+				.find(t => t.metadata.id === field.metadata.customProperties.customizations.paginator);
+
+			field.pageSize = paginatorInput.value.pageSize;
+			this.set({
+				pageSize: field.pageSize
+			});
+			const tableField = new OutputFieldValue();
 			tableField.data = field.data.results;
 			tableField.metadata = field.metadata;
 
-			var i = new TableOutput({
+			// eslint-disable-next-line no-new
+			new TableOutput({
 				target: this.refs.container,
 				data: {
 					field: tableField,
 					app: this.get("app"),
-					form: this.get("form"),
+					form,
 					parent: this.get("parent")
 				}
 			});
 		},
 		methods: {
 			goToPage(page) {
-				var parent = this.get("parent");
-				var form = parent.get("form");
-				var field = this.get("field");
-				
+				const parent = this.get("parent");
+				const form = parent.get("form");
+
 				form.setInputFields(page.params);
+				parent.submit(null, false);
+			},
+			changePageSize() {
+				const parent = this.get("parent");
+				const form = parent.get("form");
+				const field = this.get("field");
+
+				const paginatorInput = form.inputs.find(t => t.metadata.id === field.metadata.customProperties.customizations.paginator);
+				paginatorInput.value.pageSize = field.pageSize;
+				paginatorInput.value.pageIndex = 1;
+				const params = {};
+				for (const i of form.inputs) {
+					params[i.metadata.id] = i.value;
+				}
+				form.setInputFields(params);
 				parent.submit(null, false);
 			}
 		},
 		computed: {
-			pages: (field, form) => {
-				var paginatorInput = form.inputs.find(t => t.metadata.id == field.metadata.customProperties.customizations.paginator);
+			pages: (field, form, parent) => {
+				const paginatorInput = form.inputs.find(t => t.metadata.id === field.metadata.customProperties.customizations.paginator);
 
-				var pageCount = Math.ceil(field.data.totalCount / paginatorInput.value.pageSize);
+				const pageCount = Math.ceil(field.data.totalCount / paginatorInput.value.pageSize);
 
-				var params = {};
-				for (let i of form.inputs) {
+				const params = {};
+				for (const i of form.inputs) {
 					params[i.metadata.id] = i.value;
 				}
 
-				var pages = [];
-				for (let p = 1; p <= pageCount; ++p) {
-					let pageParams = Object.assign({}, params);
-					pageParams[paginatorInput.metadata.id] = Object.assign({}, pageParams[paginatorInput.metadata.id]);
-					pageParams[paginatorInput.metadata.id].pageIndex = p;
+				if (pageCount > 0) {
+					if (pageCount < paginatorInput.value.pageIndex) {
+						paginatorInput.value.pageIndex = 1;
+						form.setInputFields(params);
+						parent.submit(null, false);
+					}
+					const pages = [];
 
-					pages.push({
-						number: p,
-						params: pageParams,
-						cssClass: paginatorInput.value.pageIndex == p ? "current" : ""
-					});
+					for (let p = 1; p <= pageCount; ++p) {
+						const pageParams = Object.assign({}, params);
+						pageParams[paginatorInput.metadata.id] = Object.assign({}, pageParams[paginatorInput.metadata.id]);
+						pageParams[paginatorInput.metadata.id].pageIndex = p;
+
+						pages.push({
+							text: p,
+							params: pageParams,
+							cssClass: paginatorInput.value.pageIndex === p ? "current" : ""
+						});
+					}
+
+					const firstParams = Object.assign({}, params);
+					firstParams[paginatorInput.metadata.id] = Object.assign({}, firstParams[paginatorInput.metadata.id]);
+					firstParams[paginatorInput.metadata.id].pageIndex = 1;
+
+					const first = {
+						text: "First",
+						params: firstParams,
+						cssClass: paginatorInput.value.pageIndex === 1 ? "btn disabled" : ""
+					};
+					const prevParams = Object.assign({}, params);
+					prevParams[paginatorInput.metadata.id] = Object.assign({}, prevParams[paginatorInput.metadata.id]);
+					prevParams[paginatorInput.metadata.id].pageIndex = paginatorInput.value.pageIndex - 1;
+
+					const previous = {
+						text: "Previous",
+						params: prevParams,
+						cssClass: paginatorInput.value.pageIndex === 1 ? "btn disabled" : ""
+					};
+
+					const nextParams = Object.assign({}, params);
+					nextParams[paginatorInput.metadata.id] = Object.assign({}, nextParams[paginatorInput.metadata.id]);
+					nextParams[paginatorInput.metadata.id].pageIndex = paginatorInput.value.pageIndex + 1;
+
+					const next = {
+						text: "Next",
+						params: nextParams,
+						cssClass: paginatorInput.value.pageIndex === pageCount ? "btn disabled" : ""
+					};
+
+					const lastParams = Object.assign({}, params);
+					lastParams[paginatorInput.metadata.id] = Object.assign({}, lastParams[paginatorInput.metadata.id]);
+					lastParams[paginatorInput.metadata.id].pageIndex = pageCount;
+
+					const last = {
+						text: "Last",
+						params: lastParams,
+						cssClass: paginatorInput.value.pageIndex === pageCount ? "btn disabled" : ""
+					};
+
+					let from = paginatorInput.value.pageIndex;
+					let to = paginatorInput.value.pageIndex;
+
+					if (from < 5) {
+						from = 0; to = 10;
+					}
+					else if (from > pageCount - 5 && pageCount > 10) {
+						to = pageCount; from = pageCount - 10;
+					}
+					else {
+						from -= 5;
+						to += 5;
+					}
+
+					const innerPages = pages.slice(from, to);
+					innerPages.unshift(previous);
+					innerPages.unshift(first);
+					innerPages.push(next);
+					innerPages.push(last);
+					return innerPages;
 				}
 
-				return pages;
+				return [];
 			}
 		},
 		data() {
 			return {
 				totalCount: 0
-			}
+			};
 		},
 		components: {
 			TableOutput
 		}
-	}
-
+	};
 </script>
-
-<style>
-	.paginator {
-		margin: .5rem 0;
-		padding-left: 0;
-	}
-
-	.paginator>li {
-		display: inline-block;
-	}
-
-	.paginator>li>a, .paginator>li>button {
-		padding: 2px 10px;
-		margin: 1px;
-		display: inline-block;
-		background: #eee;
-	}
-
-	.paginator>li>a.current, .paginator>li>button.current {
-		background: #1eb1c8;
-		color: #fff;
-	}
-
-	.paginator>li>a:hover, .paginator>li>button:hover {
-		color: #f3818c;
-		text-decoration: none
-	}
-</style>

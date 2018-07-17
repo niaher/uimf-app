@@ -8,19 +8,14 @@ namespace UimfApp.Infrastructure.Domain
 
 	public class EventManager
 	{
-		public static readonly EventManager Instance = new EventManager();
-		private readonly StreamManager eventStreamManager = new StreamManager();
+		private readonly StreamManager eventStreamManager;
 
-		static EventManager()
+		public EventManager(DependencyInjectionContainer di)
 		{
-			Instance.RegisterAssembly(typeof(EventManager).GetTypeInfo().Assembly);
+			this.eventStreamManager = new StreamManager(di, this);
 		}
 
-		private EventManager()
-		{
-		}
-
-		public static EventStreamManager Streams => Instance.eventStreamManager;
+		public EventStreamManager Streams => this.eventStreamManager;
 
 		public void RegisterAssembly(Assembly assembly)
 		{
@@ -39,7 +34,15 @@ namespace UimfApp.Infrastructure.Domain
 
 		private class StreamManager : EventStreamManager
 		{
+			private readonly DependencyInjectionContainer dependencyInjectionContainer;
+			private readonly EventManager eventManager;
 			private readonly List<Assembly> registeredAssemblies = new List<Assembly>();
+
+			public StreamManager(DependencyInjectionContainer di, EventManager eventManager)
+			{
+				this.dependencyInjectionContainer = di;
+				this.eventManager = eventManager;
+			}
 
 			public void RegisterAssembly(Assembly assembly)
 			{
@@ -85,14 +88,54 @@ namespace UimfApp.Infrastructure.Domain
 
 				foreach (var handler in handlers)
 				{
-					var type = Activator.CreateInstance(handler);
-					this.RegisterHandler(type);
+					// Create instance of Handler<T> (i.e. - new Handler<T>(handler, this.eventManager, this.dependencyInjectionContainer).
+					// We do this to wrap `handler` inside Handler<T>, ensuring that a new instance of `handler` is
+					// used for each event invokation. Alternatively we could do `this.RegisterHandler(handler)` 
+					// directly, but that would mean that we'll have a singleton instance of our event
+					// handler, which is far from ideal.
+					var eventType = handler.GetInterfaces()
+						.Single(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEventHandler<>))
+						.GenericTypeArguments[0];
+
+					var handlerType = typeof(Handler<>).MakeGenericType(eventType);
+					object outer = Activator.CreateInstance(
+						handlerType,
+						handler,
+						this.eventManager,
+						this.dependencyInjectionContainer);
+
+					this.RegisterHandler(outer);
 				}
 			}
 
 			public IEventStream<T> Stream<T>()
 			{
 				return this.EventStream<T>();
+			}
+
+			private class Handler<T> : AppEventHandler<T>
+			{
+				private readonly DependencyInjectionContainer container;
+				private readonly Type inner;
+
+				public Handler(Type inner, EventManager manager, DependencyInjectionContainer container) : base(manager)
+				{
+					this.inner = inner;
+					this.container = container;
+				}
+
+				public override void HandleEvent(T @event)
+				{
+					try
+					{
+						var handler = (AppEventHandler<T>)this.container.GetInstance(this.inner);
+						handler.HandleEvent(@event);
+					}
+					catch (Exception)
+					{
+						//TODO: implement error log
+					}
+				}
 			}
 		}
 	}

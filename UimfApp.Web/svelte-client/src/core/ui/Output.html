@@ -1,52 +1,68 @@
 {{#if showLabel === true && !alwaysHideLabel && field.metadata.label !== ""}}
 <div>
-    <strong>{{field.metadata.label}}:</strong>
-    <div ref:container class="{{class}}"></div>
+        {{#if field.metadata.customProperties != null && field.metadata.customProperties["documentation"] != null}}
+        <label class="help-tooltip output-label">{{field.metadata.label}}:
+            <Tooltip data="{{field.metadata.customProperties.documentation[0]}}"></Tooltip>
+        </label>
+        {{else}}
+		<label class="output-label">
+        {{field.metadata.label}}:
+		</label>
+        {{/if}}
+    <div ref:container class="output-container {{class}}"></div>
 </div>
 {{else}}
-<div ref:container class="{{class}}"></div>
+<div ref:container class="output-container {{class}}"></div>
 {{/if}}
 
 <script>
-    export default {
-        oncreate() {
-            var field = this.get("field");
-            var app = this.get("app");
-            var parent = this.get("parent");
-            var form = this.get("form");
-            
-            var output = app.controlRegister.getOutput(field);
-            
-            // Never show label if `alwaysHideLabel` is set to true.
-            var outputDisplayConfig = output.constants || {};
-            this.set({
-                alwaysHideLabel: outputDisplayConfig.alwaysHideLabel
-            });
-            
-            new output.constructor({
-                target: this.refs.container,
-                data: {
-                    field: field,
-                    app: app,
-                    form: form,
-                    parent: parent
-                }
-            });
+	import Tooltip from "./help/Tooltip";
 
-            // Set correct css class based on the field type.
-            if (outputDisplayConfig.block) {
-                this.set({ class: "block" });
-            }
-            else {
-                this.set({ class: "inline" });
-            }
-        },
-        data () {
-            return {
-                showLabel: true
-            };
-        }
-    }
+	export default {
+		oncreate() {
+			const field = this.get("field");
+			const app = this.get("app");
+			const parent = this.get("parent");
+			const form = this.get("form");
+
+			const output = app.controlRegister.getOutput(field);
+
+			// Never show label if `alwaysHideLabel` is set to true.
+			const outputDisplayConfig = output.constants || {};
+			this.set({
+				alwaysHideLabel: outputDisplayConfig.alwaysHideLabel
+			});
+
+			// eslint-disable-next-line
+			new output.constructor({
+				target: this.refs.container,
+				data: {
+					field,
+					app,
+					form,
+					parent
+				}
+			});
+
+			const cssClass = field.metadata.customProperties != null ? field.metadata.customProperties.cssClass : null;
+
+			// Set correct css class based on the field type.
+			if (outputDisplayConfig.block) {
+				this.set({ class: `block ${cssClass}` });
+			}
+			else {
+				this.set({ class: `inline ${cssClass}` });
+			}
+		},
+		data() {
+			return {
+				showLabel: true
+			};
+		},
+		components: {
+			Tooltip
+		}
+	};
 </script>
 
 <style>

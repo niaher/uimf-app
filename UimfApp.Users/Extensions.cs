@@ -4,9 +4,13 @@ namespace UimfApp.Users
 	using System.Linq;
 	using System.Security.Claims;
 	using System.Threading.Tasks;
+	using System.Web;
 	using Microsoft.AspNetCore.Identity;
 	using UimfApp.Infrastructure;
+	using UimfApp.Infrastructure.Configuration;
+	using UimfApp.Infrastructure.Messages;
 	using UimfApp.Infrastructure.Security;
+	using UimfApp.Users.Commands;
 
 	public static class Extensions
 	{
@@ -14,7 +18,7 @@ namespace UimfApp.Users
 		{
 			if (!result.Succeeded)
 			{
-				throw new ApplicationException($"{message}\n{result.Errors.Select(t => t.Description).JoinString("\n")}");
+				throw new ApplicationException($"{message}\n{result.Errors.Select(t => t.Description).Join("\n")}");
 			}
 		}
 
@@ -51,9 +55,22 @@ namespace UimfApp.Users
 			}
 		}
 
-		private static string JoinString(this IEnumerable<string> items, string separator)
+		public static async Task SendConfirmationEmail(
+			this ApplicationUser applicationUser,
+			AppConfig appConfig,
+			IEmailSender emailSender,
+			UserManager<ApplicationUser> userManager)
 		{
-			return string.Join(separator, items);
+			var code = await userManager.GenerateEmailConfirmationTokenAsync(applicationUser);
+
+			var confirmAccountUrl = $"{appConfig.SiteRoot}#/form/confirm-account" +
+				$"?{nameof(ConfirmAccount.Request.Token)}={HttpUtility.UrlEncode(code)}" +
+				$"&{nameof(ConfirmAccount.Request.Id)}={applicationUser.Id}";
+
+			await emailSender.SendEmailAsync(
+				applicationUser.Email,
+				"Confirm your account",
+				$"Please confirm your account by clicking this link: <a href=\"{confirmAccountUrl}\">{confirmAccountUrl}</a>");
 		}
 	}
 }

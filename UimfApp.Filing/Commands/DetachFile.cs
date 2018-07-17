@@ -5,15 +5,16 @@ namespace UimfApp.Filing.Commands
 	using Filer.Core;
 	using MediatR;
 	using Microsoft.EntityFrameworkCore;
+	using UimfApp.Infrastructure;
+	using UimfApp.Infrastructure.Forms;
+	using UimfApp.Infrastructure.User;
 	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.Core.Binding;
 	using UiMetadataFramework.MediatR;
-	using UimfApp.Infrastructure;
-	using UimfApp.Infrastructure.User;
 
 	[Form(Id = "detach-file")]
-	public class DetachFile : IForm<DetachFile.Request, DetachFile.Response>
+	public class DetachFile : Form<DetachFile.Request, DetachFile.Response>
 	{
 		private readonly IFileManager context;
 		private readonly EntityFileManagerCollection documentSecurityRules;
@@ -26,9 +27,25 @@ namespace UimfApp.Filing.Commands
 			this.userContext = userContext;
 		}
 
-		public Response Handle(Request message)
+		public static FormLink Button(int fileId, string contextType, string contextId, string metaTag)
 		{
-			var manager = this.documentSecurityRules.GetManager(message.ContextType);
+			return new FormLink
+			{
+				Form = typeof(DetachFile).GetFormId(),
+				Label = UiFormConstants.DeleteLabel,
+				InputFieldValues = new Dictionary<string, object>
+				{
+					{ nameof(Request.FileId), fileId },
+					{ nameof(Request.ContextType), contextType },
+					{ nameof(Request.ContextId), contextId },
+					{ nameof(Request.MetaTag), metaTag }
+				}
+			};
+		}
+
+		protected override Response Handle(Request message)
+		{
+			var manager = this.documentSecurityRules.GetInstance(message.ContextType);
 			var canDelete = manager.CanDeleteFiles(message.ContextId, message.MetaTag);
 
 			if (!canDelete)
@@ -46,22 +63,6 @@ namespace UimfApp.Filing.Commands
 			}
 
 			return new Response();
-		}
-
-		public static FormLink Button(int fileId, string contextType, string contextId, string metaTag)
-		{
-			return new FormLink
-			{
-				Form = typeof(DetachFile).GetFormId(),
-				Label = "Delete document",
-				InputFieldValues = new Dictionary<string, object>
-				{
-					{ nameof(Request.FileId), fileId },
-					{ nameof(Request.ContextType), contextType },
-					{ nameof(Request.ContextId), contextId },
-					{ nameof(Request.MetaTag), metaTag }
-				}
-			};
 		}
 
 		public class Request : IRequest<Response>

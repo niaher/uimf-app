@@ -1,9 +1,11 @@
-import * as umf from "uimf-core";
+import * as alertifyLib from "alertifyjs";
 import { IFunctionRunner } from "core-framework";
+import * as umf from "uimf-core";
+const alertify = alertifyLib.default;
 
 export class Growl implements IFunctionRunner {
-	run(metadata: umf.ClientFunctionMetadata): Promise<void> {
-		window.alert(metadata.customProperties.message);
+	public run(metadata: umf.ClientFunctionMetadata): Promise<void> {
+		alertify.notify(metadata.customProperties.message, metadata.customProperties.style, 5);
 		return Promise.resolve();
 	}
 }

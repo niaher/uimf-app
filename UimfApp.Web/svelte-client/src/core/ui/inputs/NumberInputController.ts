@@ -2,7 +2,7 @@ import * as umf from "core-framework";
 
 export class NumberInputController extends umf.InputController<number> {
 	serializeValue(value: number | string): string {
-		return value != null ? value.toString() : null
+		return NumberInputController.serialize(value);
 	}
 
 	init(value: string): Promise<NumberInputController> {
@@ -15,5 +15,9 @@ export class NumberInputController extends umf.InputController<number> {
 
 	getValue(): Promise<number> {
 		return Promise.resolve(this.value);
+	}
+
+	public static serialize(value: number | string): string {
+		return value != null ? value.toString() : null;
 	}
 }

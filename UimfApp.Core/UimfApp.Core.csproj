@@ -18,21 +18,22 @@
 
   <ItemGroup>
     <PackageReference Include="CPermissions" Version="1.1.0" />
+    <PackageReference Include="filer.core" Version="0.0.8-beta" />
     <PackageReference Include="Filer.EntityFrameworkCore" Version="0.0.8-beta2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.0.0" />
-    <PackageReference Include="nofy.entityframeworkcore" Version="0.1.0-beta" />
-    <PackageReference Include="UiMetadataFramework.Basic" Version="0.0.14-beta" />
-    <PackageReference Include="UiMetadataFramework.Core" Version="0.0.12-beta" />
-    <PackageReference Include="UiMetadataFramework.MediatR" Version="0.0.11-beta" />
+    <PackageReference Include="FluentValidation" Version="7.5.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+    <PackageReference Include="UiMetadataFramework.Basic" Version="0.0.16-beta" />
+    <PackageReference Include="UiMetadataFramework.Core" Version="0.0.15-beta" />
+    <PackageReference Include="UiMetadataFramework.MediatR" Version="0.0.12-beta" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\UimfApp.Filing\UimfApp.Filing.csproj" />
+    <ProjectReference Include="..\UimfApp.Help\UimfApp.Help.csproj" />
     <ProjectReference Include="..\UimfApp.Infrastructure\UimfApp.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DataAccess\" />
+    <ProjectReference Include="..\UimfApp.Notifications\UimfApp.Notifications.csproj" />
+    <ProjectReference Include="..\UimfApp.Users\UimfApp.Users.csproj" />
   </ItemGroup>
 
 </Project>

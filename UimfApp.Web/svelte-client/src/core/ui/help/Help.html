@@ -1,0 +1,133 @@
+{{#if data }}
+	{{#if data.placement == 'Hint' }}
+	<div class="help-content modal-help">
+		<i on:click="open()" class="far fa-question-circle" title="Click to open help for this form"></i>
+		<input id="modal-{{modalId}}" type="checkbox" bind:checked="open" class="hidden" />
+		<div class="modal">
+			<div class="card">
+				<label class="close" on:click="close()"></label>
+				<div ref:container>
+					{{{data.content}}}
+
+					{{ #if files && files.length >0 }}
+					<div class="help-files">
+						<span>For more information:</span>
+							<ul>
+								{{#each files as file}}
+								<li>
+									<a href="/#/form/help?FileId={{file.file}}">{{ file.name }}</a>
+								</li>
+								{{/each}}
+							</ul>
+
+					</div>
+					{{/if}}
+				</div>
+			</div>
+		</div>
+	</div>
+	{{elseif data.placement == 'Inline' }}
+	<div class="help-content inline-help">
+		{{{data.content}}}
+		{{#if files && files.length >0 }}
+		<div class="help-files">
+			<span>For more information</span>
+			<ul>
+				{{#each files as file}}
+				<li>
+					<a href="/#/form/help?FileId={{file.file}}">{{ file.name }}</a>
+				</li>
+				{{/each}}
+			</ul>
+		</div>
+		{{/if}}
+	</div>
+	{{/if}}
+{{/if}}
+
+<script>
+	function humanize(e) {
+		return e.replace(/\.[^/.]+$/, "")
+			.split(/(?=[A-Z])/)
+			.join(" ");
+	}
+
+	// https://stackoverflow.com/a/3369743/111438
+	// Close topmost modal when user presses escape key.
+	let currentlyOpenHelpModal = null;
+	document.addEventListener("keydown", evt => {
+		const theEvent = evt || window.event;
+		let isEscape = false;
+		if ("key" in theEvent) {
+			isEscape = (theEvent.key === "Escape" || theEvent.key === "Esc");
+		}
+		else {
+			isEscape = (theEvent.keyCode === 27);
+		}
+		if (isEscape && currentlyOpenHelpModal != null) {
+			currentlyOpenHelpModal.close();
+		}
+	});
+
+	export default {
+		oncreate() {
+			const files = this.get("data").files.map(i => ({ file: i, name: humanize(i) }));
+
+			this.set({
+				files,
+				modalId: this.constructor.name
+			});
+		},
+		data() {
+			return {
+				files: [],
+				open: false,
+				modalId: ""
+			};
+		},
+		methods: {
+			open() {
+				this.set({ open: true });
+				currentlyOpenHelpModal = this;
+			},
+			close() {
+				this.set({ open: false });
+				currentlyOpenHelpModal = null;
+			}
+		}
+	};
+</script>
+
+<style>
+	ul.help-files {
+		list-style: none;
+	}
+
+	.inline-help {
+		background: #ecf8fb;
+		padding: 10px;
+	}
+
+	.modal-help > i{
+		font-size: 15pt;
+    	color: #5b7b9b;
+	}
+
+	.modal-help{
+		display: block;
+		margin-left: -10px;
+		position: absolute;
+		right: 10px;
+		top: 30px;
+	}
+
+	.help-files {
+		border-top: 1px solid #d8d8d8;
+		padding: 10px;
+		margin: 10px;
+		background: #ecf8fb;
+	}
+	.help-files ul {
+    	list-style: circle;
+	}
+</style>

@@ -1,10 +1,9 @@
-import { InputController } from "./InputController";
-import { FormInstance } from "./FormInstance";
-import { FormEventArguments } from "./FormEventArguments";
 import { EventHandlerMetadata } from "uimf-core";
+import { FormEventArguments } from "./FormEventArguments";
+import { InputController } from "./InputController";
 
 export abstract class InputFieldEventHandler {
-	id: string;
+	public id: string;
 
-	abstract run(input: InputController<any>, eventHandlerMetadata: EventHandlerMetadata, args: FormEventArguments): Promise<InputController<any>>;
+	public abstract run(input: InputController<any>, eventHandlerMetadata: EventHandlerMetadata, args: FormEventArguments): Promise<InputController<any>>;
 }

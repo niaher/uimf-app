@@ -7,12 +7,11 @@ namespace UimfApp.Core
 
 	public class UserRoleChecker : IUserRoleChecker
 	{
-		/// <inheritdoc />
 		public IEnumerable<SystemRole> GetDynamicRoles(UserContextData userData)
 		{
 			if (userData != null)
 			{
-				yield return CoreRoles.ToolUser;
+				yield return CoreRoles.AuthenticatedUser;
 			}
 		}
 	}

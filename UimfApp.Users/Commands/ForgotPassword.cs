@@ -1,9 +1,8 @@
 namespace UimfApp.Users.Commands
 {
-	using System.ComponentModel.DataAnnotations;
+	using System.Threading;
 	using System.Threading.Tasks;
 	using System.Web;
-	using CPermissions;
 	using MediatR;
 	using Microsoft.AspNetCore.Identity;
 	using Microsoft.Extensions.Options;
@@ -12,14 +11,18 @@ namespace UimfApp.Users.Commands
 	using UimfApp.Infrastructure.Forms;
 	using UimfApp.Infrastructure.Forms.Outputs;
 	using UimfApp.Infrastructure.Messages;
-	using UimfApp.Infrastructure.Security;
 	using UimfApp.Users.Security;
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.Core.Binding;
 	using UiMetadataFramework.MediatR;
+	using UimfApp.Infrastructure.Forms.CustomProperties;
+	using UimfApp.Infrastructure.Forms.Inputs;
+	using UimfApp.Infrastructure.Security;
 
 	[MyForm(Id = "forgot-password", Label = "Forgot password", SubmitButtonLabel = "Reset my password", Menu = UserMenus.TopLevel)]
-	public class ForgotPassword : IAsyncForm<ForgotPassword.Request, ForgotPassword.Response>, ISecureHandler
+	[Secure(typeof(UserActions), nameof(UserActions.Login))]
+	[CssClass(UiFormConstants.CardLayout)]
+	public class ForgotPassword : AsyncForm<ForgotPassword.Request, ForgotPassword.Response>
 	{
 		private readonly AppConfig appConfig;
 		private readonly IEmailSender emailSender;
@@ -32,15 +35,13 @@ namespace UimfApp.Users.Commands
 			this.appConfig = appConfig.Value;
 		}
 
-		public async Task<Response> Handle(Request message)
+		public override async Task<Response> Handle(Request message, CancellationToken cancellationToken)
 		{
-			var user = new EmailAddressAttribute().IsValid(message.Email)
-				? await this.userManager.FindByEmailAsync(message.Email)
-				: await this.userManager.FindByNameAsync(message.Email);
+			var user = await this.userManager.FindByEmailAsync(message.Email?.Value);
 
 			if (user == null)
 			{
-				throw new BusinessException("Invalid username and/or password.");
+				throw new BusinessException("This email is not registered in the system.");
 			}
 
 			var token = await this.userManager.GeneratePasswordResetTokenAsync(user);
@@ -60,11 +61,6 @@ namespace UimfApp.Users.Commands
 			};
 		}
 
-		public UserAction GetPermission()
-		{
-			return UserActions.Login;
-		}
-
 		public class Response : FormResponse
 		{
 			public Alert Result { get; set; }
@@ -72,8 +68,8 @@ namespace UimfApp.Users.Commands
 
 		public class Request : IRequest<Response>
 		{
-			[OutputField(Label = "Your email address")]
-			public string Email { get; set; }
+			[InputField(Label = "Your email address", Required = true)]
+			public Email Email { get; set; }
 		}
 	}
 }

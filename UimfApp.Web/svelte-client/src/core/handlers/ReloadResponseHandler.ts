@@ -1,5 +1,5 @@
+import { FormInstance, IFormResponseHandler } from "core-framework";
 import * as umf from "uimf-core";
-import { IFormResponseHandler, FormInstance } from "core-framework";
 
 export class ReloadResponseHandler implements IFormResponseHandler {
 	public readonly name: string = "reload";
@@ -9,21 +9,21 @@ export class ReloadResponseHandler implements IFormResponseHandler {
 		this.getFormUrl = getFormUrl;
 	}
 
-	handle(response: ReloadResponse, form: FormInstance) {
-		this.getFormUrl(response.form, response.inputFieldValues).then(url => {
+	public handle(response: IReloadResponse, form: FormInstance): void {
+		this.getFormUrl(response.form, response.inputFieldValues).then((url) => {
 			window.location.href = url;
 		});
 	}
 }
 
-class ReloadResponse extends umf.FormResponse {
+interface IReloadResponse extends umf.FormResponse {
 	/**
 	 * Gets or sets name of the form to redirect to.
 	 */
-	public form: string;
+	form: string;
 
 	/**
 	 * Gets or sets values for the input fields of the form (i.e. - <see cref="FormMetadata.InputFields"/>).
 	 */
-	public inputFieldValues: any;
+	inputFieldValues: any;
 }

@@ -1,20 +1,23 @@
 namespace UimfApp.Users.Commands
 {
+	using System.Collections.Generic;
 	using System.Linq;
-	using CPermissions;
+	using System.Threading;
+	using System.Threading.Tasks;
 	using MediatR;
 	using Microsoft.AspNetCore.Identity;
-	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Forms;
-	using UimfApp.Infrastructure.Security;
 	using UimfApp.Users.Security;
 	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.Core.Binding;
+	using UimfApp.Infrastructure;
+	using UimfApp.Infrastructure.Security;
 	using UimfApp.Infrastructure.User;
 
 	[MyForm(Id = "account", Label = "My account", PostOnLoad = true, Menu = UserMenus.Account)]
-	public class MyAccount : IMyForm<MyAccount.Request, MyAccount.Response>, ISecureHandler
+	[Secure(typeof(UserActions), nameof(UserActions.ManageMyAccount))]
+	public class MyAccount : MyAsyncForm<MyAccount.Request, MyAccount.Response>
 	{
 		private readonly UserContext userContext;
 		private readonly UserManager<ApplicationUser> userManager;
@@ -25,22 +28,23 @@ namespace UimfApp.Users.Commands
 			this.userContext = userContext;
 		}
 
-		public Response Handle(Request message)
+		public override async Task<Response> Handle(Request message, CancellationToken cancellationToken)
 		{
-			var user = this.userManager.Users.SingleOrDefault(t => t.UserName == this.userContext.User.UserName);
-
+			var user = await this.userManager.Users.SingleOrExceptionAsync(t => t.UserName == this.userContext.User.UserName);
+			
 			return new Response
 			{
 				Username = user.UserName,
 				EmailConfirmed = user.EmailConfirmed,
 				Email = user.Email,
-				Buttons = new ActionList(ChangePassword.Button(), ChangeEmail.Button())
+				Buttons = new ActionList(GetActions().ToArray())
 			};
 		}
 
-		public UserAction GetPermission()
+		private static IEnumerable<FormLink> GetActions()
 		{
-			return UserActions.ManageMyAccount;
+			yield return ChangePassword.Button();
+			yield return ChangeEmail.Button();
 		}
 
 		public static FormLink Button()

@@ -12,6 +12,7 @@ namespace UimfApp.Infrastructure.Forms.Outputs
 		}
 
 		public string Anchor { get; }
+		public string CssClass { get; set; }
 		public string Url { get; }
 	}
 }

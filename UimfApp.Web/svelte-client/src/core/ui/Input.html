@@ -1,57 +1,116 @@
-{{#if !alwaysHideLabel && field.metadata.label !== ""}}
-<div class="form-group row">
-    <label for="{{id}}" class="col-sm-2 col-form-label">{{field.metadata.label}}</label>
-    <div ref:container class="{{class}} col-sm-10"></div>
-</div>
-{{else}}
-<div class="form-group row">
-    <div ref:container class="{{class}} col-sm-12"></div>
-</div>
+{{#if visible}}
+    {{#if !alwaysHideLabel && field.metadata.label !== "" }}
+    <div class="form-group {{class}}">
+        <label for="{{id}}" class="col-form-label">
+            {{#if field.metadata.customProperties != null && field.metadata.customProperties["documentation"] != null}}
+            <div class="help-tooltip">{{field.metadata.label}}:
+                <Tooltip data="{{field.metadata.customProperties.documentation[0]}}"></Tooltip>
+            </div>
+            {{else}}
+            {{field.metadata.label}}:
+            {{/if}}
+        </label>
+        <div ref:container class="input-container"></div>
+    </div>
+    {{else}}
+    <div class="form-group {{class}}">
+        <div ref:container class="input-container"></div>
+    </div>
+    {{/if}}
 {{/if}}
 
 <script>
-    import * as umf from "core-framework";
+	import Tooltip from "./help/Tooltip";
 
-    var inputId = 0;
+	let inputId = 0;
 
-    export default {
-        oncreate() {
-            let field = this.get("field");
-            let tabindex = this.get("tabindex");
-            let app = this.get("app");
-            
-            var input = app.controlRegister.getInput(field.metadata.type);
+	export default {
+		oncreate() {
+			const field = this.get("field");
+			const app = this.get("app");
 
-            // Set correct css class based on the field type.
-            var inputDisplayConfig = input.constants || {};
-            this.set({ 
-                class: inputDisplayConfig.block ? "block" : "inline",
-                alwaysHideLabel: inputDisplayConfig.alwaysHideLabel
-            });
+			const input = app.controlRegister.getInput(field.metadata.type);
 
-            var i = new input.component({
-                target: this.refs.container,
-                data: {
-                    field: field,
-                    tabindex: tabindex,
-                    id: this.get("id"),
-                    app: app,
-                    form: this.get("form")
-                }
-            });
-        },
-        data() {
-            inputId += 1;
-            return {
-                id: "i" + inputId
-            }
-        }
-    }
+			// Set correct css class based on the field type.
+			const inputDisplayConfig = field.constants || input.constants || {};
 
+			const cssClass = field.metadata.customProperties != null ? field.metadata.customProperties.cssClass : null;
+
+			// Set correct css class based on the field type.
+			if (inputDisplayConfig.block) {
+				this.set({ class: `block ${cssClass}` });
+			}
+			else {
+				this.set({ class: `inline ${cssClass}` });
+			}
+
+			this.set({
+				class: cssClass,
+				alwaysHideLabel: inputDisplayConfig.alwaysHideLabel
+			});
+
+			const inputs = this.get("form").get("inputs");
+			// If `inputs` is null, then it means our parent form has been closed
+			// and "destroyed". In such cases we should just return.
+			// TODO: find a better way to implement "parent form null check".
+			if (inputs != null) {
+				// Register input in the parent form.
+				inputs.push(this);
+			}
+
+			const isVisible = !field.metadata.eventHandlers.length ||
+				field.metadata.eventHandlers.find(t => t.id === "depend-on") == null;
+
+			this.show(isVisible);
+		},
+		data() {
+			inputId += 1;
+			return {
+				id: `i${inputId}`,
+				visible: false
+			};
+		},
+		methods: {
+			show(visible) {
+				const field = this.get("field");
+				const currentlyVisible = !!this.get("visible");
+
+				this.set({ visible: !!visible });
+
+				if (currentlyVisible === false && visible === true) {
+					const app = this.get("app");
+					const input = app.controlRegister.getInput(field.metadata.type);
+
+					// eslint-disable-next-line
+					new input.component({
+						target: this.refs.container,
+						data: {
+							field,
+							tabindex: this.get("tabindex"),
+							id: this.get("id"),
+							app,
+							form: this.get("form"),
+							wrapper: this
+						}
+					});
+				}
+
+				if (!visible) {
+					field.value = null;
+				}
+			}
+		},
+		components: {
+			Tooltip
+		}
+	};
 </script>
 
 <style>
     .inline {
         display: inline-block
     }
+	.col-form-label{
+		padding-left: 0
+	}
 </style>

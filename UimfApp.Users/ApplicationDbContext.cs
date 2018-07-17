@@ -15,6 +15,14 @@ namespace UimfApp.Users
 		{
 			base.OnModelCreating(builder);
 
+			builder.Entity<ApplicationUser>().ToTable("AspNetUsers");
+			builder.Entity<ApplicationRole>().ToTable("AspNetRoles");
+			builder.Entity<ApplicationUserClaim>().ToTable("AspNetUserClaims");
+			builder.Entity<ApplicationUserRole>().ToTable("AspNetUserRoles");
+			builder.Entity<ApplicationUserLogin>().ToTable("AspNetUserLogins");
+			builder.Entity<ApplicationRoleClaim>().ToTable("AspNetRoleClaims");
+			builder.Entity<ApplicationUserToken>().ToTable("AspNetUserTokens");
+
 			builder.Entity<ApplicationUser>()
 				.HasMany(e => e.Claims)
 				.WithOne()
@@ -28,7 +36,7 @@ namespace UimfApp.Users
 				.HasForeignKey(e => e.UserId)
 				.IsRequired()
 				.OnDelete(DeleteBehavior.Cascade);
-			
+
 			builder.Entity<ApplicationUser>()
 				.HasMany(e => e.Roles)
 				.WithOne()
@@ -38,6 +46,10 @@ namespace UimfApp.Users
 
 			builder.Entity<ApplicationUser>()
 				.Ignore(t => t.HasLoggedIn);
+
+			builder.Entity<ApplicationUser>()
+				.Property(t => t.Active)
+				.HasColumnName("Active");
 
 			builder.Entity<ApplicationUserRole>()
 				.HasOne(e => e.Role)

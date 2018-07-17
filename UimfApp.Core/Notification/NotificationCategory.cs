@@ -6,7 +6,7 @@ namespace UimfApp.Core.Notification
 	public class NotificationCategory
 	{
 		private static readonly List<NotificationCategory> List;
-		public static NotificationCategory SomeThing = new NotificationCategory(1, "SomeThing", "SomeThing");
+		public static NotificationCategory WorkItem = new NotificationCategory(4, nameof(WorkItem), nameof(WorkItem));
 
 		static NotificationCategory()
 		{
@@ -27,10 +27,5 @@ namespace UimfApp.Core.Notification
 		public int Id { get; }
 		public string Name { get; }
 		public string Tag { get; }
-
-		public static NotificationCategory Parse(int? category)
-		{
-			return List.SingleOrDefault(t => t.Id == category);
-		}
 	}
 }

@@ -13,7 +13,8 @@ export class DropdownInputController extends umf.InputController<DropdownValue> 
 
 	init(value: string): Promise<DropdownInputController> {
 		return new Promise((resolve, reject) => {
-			this.selected = value;
+			this.selected = value != null ? value.toString() : null;
+
 			this.value = this.parse(value);
 			resolve(this);
 		});
@@ -21,6 +22,10 @@ export class DropdownInputController extends umf.InputController<DropdownValue> 
 
 	getValue(): Promise<DropdownValue> {
 		return Promise.resolve(this.parse(this.selected));
+	}
+
+	initFromSelected() {
+		this.value = this.parse(this.selected);
 	}
 
 	private parse(value: string): DropdownValue {

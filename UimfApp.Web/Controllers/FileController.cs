@@ -6,40 +6,29 @@ namespace UimfApp.Web.Controllers
 	using System.Linq;
 	using System.Threading.Tasks;
 	using Filer.Core;
-	using UimfApp.Infrastructure;
-	using UimfApp.Users;
 	using Microsoft.AspNetCore.Identity;
 	using Microsoft.AspNetCore.Mvc;
 	using Microsoft.EntityFrameworkCore;
 	using Microsoft.Extensions.Primitives;
 	using Microsoft.Net.Http.Headers;
+	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.User;
+	using UimfApp.Users;
 
 	public class FileController : Controller
 	{
 		private readonly IFileManager fileManager;
+
 		private readonly UserContext userContext;
 		private readonly UserManager<ApplicationUser> userManager;
 
-		public FileController(IFileManager fileManager, UserContext userContext, UserManager<ApplicationUser> userManager)
+		public FileController(IFileManager fileManager,
+			UserContext userContext,
+			UserManager<ApplicationUser> userManager)
 		{
 			this.fileManager = fileManager;
 			this.userContext = userContext;
 			this.userManager = userManager;
-		}
-
-		/// <summary>
-		/// Reads stream into a byte array.
-		/// </summary>
-		/// <param name="input">Stream instance.</param>
-		/// <returns>Byte array.</returns>
-		private static byte[] ReadFully(Stream input)
-		{
-			using (var ms = new MemoryStream())
-			{
-				input.CopyTo(ms);
-				return ms.ToArray();
-			}
 		}
 
 		[HttpGet]
@@ -101,11 +90,7 @@ namespace UimfApp.Web.Controllers
 			}
 
 			var files = this.Request.Form.Files;
-
-			if (files.Count > 1)
-			{
-				throw new NotSupportedException("Uploading multiple files is not supported at the moment.");
-			}
+			var filesResult = new List<int>();
 
 			foreach (var file in files)
 			{
@@ -117,20 +102,34 @@ namespace UimfApp.Web.Controllers
 							file.FileName,
 							file.ContentType,
 							ReadFully(fileStream),
-							CompressionFormat.GZip,
+							CompressionFormat.None,
 							user.Id);
 
 						var entity = await this.fileManager.GetById(fileId);
 
-						return new JsonResult(new
-						{
-							FileId = entity.Id
-						});
+						filesResult.Add(entity.Id);
 					}
 				}
 			}
 
-			return null;
+			return new JsonResult(new
+			{
+				FileIds = filesResult.ToArray()
+			});
+		}
+
+		/// <summary>
+		/// Reads stream into a byte array.
+		/// </summary>
+		/// <param name="input">Stream instance.</param>
+		/// <returns>Byte array.</returns>
+		private static byte[] ReadFully(Stream input)
+		{
+			using (var ms = new MemoryStream())
+			{
+				input.CopyTo(ms);
+				return ms.ToArray();
+			}
 		}
 	}
 }

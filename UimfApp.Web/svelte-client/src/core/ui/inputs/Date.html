@@ -1,6 +1,34 @@
-<input type="datetime"
+<input type="text"
     id="{{id}}"
     bind:value="field.valueAsText"
     required="{{field.metadata.required}}"
     tabindex="{{tabindex}}"
-     class="form-control">
+    autocomplete="off"
+    class="form-control"
+    ref:container>
+
+<script>
+    import Pikaday from "pikaday";
+
+    export default {
+        oncreate() {
+            var field = this.get("field");
+            new Pikaday({
+                field: this.refs.container,
+                format: 'YYYY-MM-DD',
+                onSelect: async function (date) {
+                    await field.init(date.toISOString());
+                }
+            });
+
+            var formElement =  this.refs.container;
+                var self = this;
+                formElement.addEventListener("change", function (e) {
+                     if (formElement.value == "") {
+                        field.init(null);
+                     }
+                });
+        }
+    }
+    
+</script>

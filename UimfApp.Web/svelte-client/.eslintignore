@@ -1,0 +1,6 @@
+**/*.ts
+**/*.json
+build
+node_modules
+.vscode
+.rpt2_cache

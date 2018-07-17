@@ -29,9 +29,6 @@
 
 Form is a UI control which can render a form in a browser. `Form` uses `FormInstance` to facilitate communication with the server and to ensure *form lifecycle*. 
 
-### `form`
-Provides access to associated `FormInstance` object.
-
 ### `parent`
 Components are assembled into a hierarchy. `Form` components can be nested using `InlineForm` output field. The nested form can access its parent form via `Form.parent`.
 
@@ -43,7 +40,12 @@ Each input or output field can publish events up to its `Form` component and to 
 Form has several built in-events:
 
 * `form:loaded` - fired as soon as the form has been rendered and initialized (before the initial `post-on-load`).
+arguments.
 * `form:responseHandled` - fired after response from the server has been handled.
+
+### `inputs`
+
+Array of input components (i.e. - Svelte components like Textarea.html) which were instantiated for this form.
 
 ## Input.html
 
@@ -54,6 +56,7 @@ Each input component gets initialized with the these properties:
 * `id` - auto-generated unique identifier
 * `app` - `UmfApp` instance
 * `form` - parent `Form.html`
+* `wrapper` - instance of `Input.html` which wraps the actual input component.
 
 ## Output.html
 

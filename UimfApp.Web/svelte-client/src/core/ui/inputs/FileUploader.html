@@ -1,36 +1,167 @@
-<input type="file" id="{{id}}" tabindex="{{tabindex}}" on:change="addFiles(this.files)" multiple="multiple" />
-<label for="{{id}}" class="button">Select files...</label> 
-
 {{#if selectedFiles != null && selectedFiles.length > 0}}
-<ul>
-	{{#each selectedFiles as file}}
-	<li>{{file.name}}</li>
+<ul class="files-list">
+	{{#each selectedFiles as file, index}}
+	<li>{{file.name}}
+		<i class="fa fa-times second-color" on:click="removeFile(index)"></i>
+	</li>
 	{{/each}}
 </ul>
-{{else}} 
-	No files selected.
 {{/if}}
 
-<script>
-	export default {
-		methods: {
-			addFiles(files) {
-				var field = this.get("field");
-				field.selected = files;
+<div class="file-drop-area"	ref:dropzone>
+	{{#if uploaderConfig != null && uploaderConfig.allowMultipleFiles}}
+	<input type="file"
+		id="{{id}}"
+		tabindex="{{tabindex}}"
+		on:change="addFiles(this.files)"
+		multiple="multiple"
+		accept="{{uploaderConfig ? uploaderConfig.allowedFileExtensions : '*'}}"/>
+	{{else}}
+	<input type="file"
+		id="{{id}}"
+		tabindex="{{tabindex}}"
+		on:change="addFiles(this.files)"
+		accept="{{uploaderConfig ? uploaderConfig.allowedFileExtensions : '*'}}"/>
+	{{/if}}
+	<label for="{{id}}">drag or <strong class='second-color'>upload</strong> files</label>
+</div>
 
-				this.set({ selectedFiles: files });
+<script>
+	function objectToArray(obj) {
+		if (obj) {
+			return Array.from(Object.keys(obj), k => obj[k]);
+		}
+
+		return [];
+	}
+
+	function getExtension(filename) {
+		return `.${filename.split(".").pop()}`;
+	}
+
+	function canFileBeAdded(filelist, file, allowedFileExtensions, app) {
+		const isFileExtensionAllowed =
+			allowedFileExtensions.indexOf("*") > -1 ||
+			allowedFileExtensions.indexOf(getExtension(file.name)) > -1;
+
+		const fileWasAlreadyAdded = filelist.find(f => f.name === file.name);
+
+		if (isFileExtensionAllowed && !fileWasAlreadyAdded) {
+			return true;
+		}
+
+		if (!isFileExtensionAllowed) {
+			app.showError(`File ${file.name} extension not allowed. Only ` +
+				`these file extensions are allowed: ${allowedFileExtensions}.`);
+		}
+
+		return false;
+	}
+
+	function getAllowedFileExtensions(component) {
+		let	allowedExtension = "*";
+		if (component.get("uploaderConfig") && component.get("uploaderConfig").allowedFileExtensions) {
+			allowedExtension = component.get("uploaderConfig").allowedFileExtensions.split(",").map(item => item.trim());
+		}
+
+		return allowedExtension;
+	}
+
+	function addFiles(component, files) {
+		const app = component.get("app");
+		const filesToAdd = objectToArray(files);
+		let listedFiles = [];
+
+		if (component.get("selectedFiles")) {
+			listedFiles = component.get("selectedFiles");
+		}
+
+		const allowedFileExtensions = getAllowedFileExtensions(component);
+		const filesThatCanBeAdded = filesToAdd
+			.filter(file => canFileBeAdded(listedFiles, file, allowedFileExtensions, app));
+
+		if (filesThatCanBeAdded.length > 0) {
+			if (!component.get("uploaderConfig").allowMultipleFiles) {
+				component.set({ selectedFiles: filesThatCanBeAdded.slice(0, 1) });
+			}
+			else {
+				component.set({ selectedFiles: filesThatCanBeAdded.concat(listedFiles) });
 			}
 		}
 	}
 
+	export default {
+		methods: {
+			addFiles(files) {
+				addFiles(this, files);
+				this.get("field").selected = this.get("selectedFiles");
+			},
+			removeFile(index) {
+				this.get("selectedFiles").splice(index, 1).splice(index, 1);
+				this.set({
+					selectedFiles: this.get("selectedFiles")
+				});
+
+				this.get("field").selected = this.get("selectedFiles");
+			}
+		},
+		oncreate() {
+			const field = this.get("field");
+			const uploaderConfig = field.metadata.customProperties.fileUploaderConfig != null ?
+				field.metadata.customProperties.fileUploaderConfig : {
+					allowMultipleFiles: true,
+					allowedFileExtensions: "*"
+				};
+
+			this.set({ uploaderConfig });
+
+			this.refs.dropzone.addEventListener("dragenter", () => {
+				this.refs.dropzone.classList.add("hover");
+			});
+
+			const self = this;
+			["dragleave", "drop"].forEach(t => {
+				self.refs.dropzone.addEventListener(t, () => {
+					self.refs.dropzone.classList.remove("hover");
+				});
+			});
+
+			this.refs.dropzone.ondragover = e => {
+				e.preventDefault();
+			};
+
+			this.refs.dropzone.ondrop = e => {
+				e.preventDefault();
+				self.addFiles(e.dataTransfer.files);
+				return false;
+			};
+		}
+	};
 </script>
 
 <style>
-	/* input {
-		width: 100px;
-		height: 30px;
-		position: static;
-		clip-path: none;
-		margin: none;
-	} */
+	.file-drop-area {
+		text-align: center;
+		border: dashed 2px #9c9c9c;
+		min-height: 60px;
+		z-index: 99999;
+	}
+
+	.file-drop-area.hover {
+		background: #fffde6;
+	}
+
+	.file-drop-area label{
+		margin: auto;
+    	line-height: 60px;
+		display: block;
+	}
+
+	.files-list i {
+		margin-left: 10px;
+	}
+
+	.second-color {
+		color:#f3818c;
+	}
 </style>

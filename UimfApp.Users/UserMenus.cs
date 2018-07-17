@@ -8,6 +8,7 @@ namespace UimfApp.Users
 		public const string Main = "System";
 		public const string Account = "Account";
 		public const string TopLevel = "";
+		public const string Impersonation = "Impersonation";
 		public const string Reports = Main + "/Reports";
 
 		public IList<MenuMetadata> GetMenuMetadata()
@@ -17,7 +18,8 @@ namespace UimfApp.Users
 				new MenuMetadata(TopLevel, 100),
 				new MenuMetadata(Main, 90),
 				new MenuMetadata(Account, 100),
-				new MenuMetadata(Reports, 1)
+				new MenuMetadata(Reports, 1),
+				new MenuMetadata(Impersonation, 101)
 			};
 		}
 	}
