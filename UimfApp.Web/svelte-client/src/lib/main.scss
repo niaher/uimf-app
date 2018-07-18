@@ -62,6 +62,13 @@ html, * {
         right: 0;
 }
 
+button, [type="button"], 
+[type="submit"], [type="reset"], a.button, label.button, 
+.button, a[role="button"], label[role="button"], [role="button"] {
+    cursor: pointer;
+    background: rgba(220, 220, 220, 0.75);
+}
+
 @-webkit-keyframes load3 {
   0% {
     -webkit-transform: rotate(0deg);
@@ -133,6 +140,40 @@ input, textarea, select{
   margin:0 !important;
 }
 
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: none;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.modal .card {
+  margin: 0 auto;
+  max-height: 70vh;
+  overflow: auto;
+}
+
+.modal .card .close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.25rem;
+  padding: 0;
+}
+
+:checked + .modal {
+  display: -webkit-box;
+  -webkit-box-flex: 0;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex: 0 1 auto;
+  flex: 0 1 auto;
+  z-index: 1200;
+}
+
 .modal .card {
   max-width: 60%;
   padding: 10px 15px;
@@ -142,6 +183,142 @@ input, textarea, select{
        max-width: 90%;
 }
  }
+
+ /*
+  Definitions for cards and containers.
+*/
+.card {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-pack: justify;
+  -webkit-box-align: center;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  -webkit-align-self: center;
+  align-self: center;
+  position: relative;
+  width: 100%;
+  background: #fafafa;
+  border: 0.0625rem solid #acacac;
+  margin: 0.5rem;
+  overflow: hidden;
+}
+
+.card > .section {
+  box-sizing: border-box;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 0.0625rem solid #c9c9c9;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.card > .section.media {
+  height: 200px;
+  padding: 0;
+  -o-object-fit: cover;
+  object-fit: cover;
+}
+
+.card > .section:last-child {
+  border-bottom: 0;
+}
+
+@media screen and (min-width: 320px) {
+  .card {
+    max-width: 320px;
+  }
+}
+
+/*
+  Custom elements for cards and containers.
+*/
+@media screen and (min-width: 480px) {
+  .card.large {
+    max-width: 480px;
+  }
+}
+
+@media screen and (min-width: 240px) {
+  .card.small {
+    max-width: 240px;
+  }
+}
+
+.card.fluid {
+  max-width: 100%;
+  width: auto;
+}
+
+.card.warning {
+  background: #ffca28;
+  border: 0.0625rem solid #e8b825;
+}
+
+.card.warning > .section {
+  border-bottom: 0.0625rem solid #e8b825;
+}
+
+.card.warning > .section:last-child {
+  border-bottom: 0;
+}
+
+.card.error {
+  background: #b71c1c;
+  color: #fafafa;
+  border: 0.0625rem solid #a71a1a;
+}
+
+.card.error > .section {
+  border-bottom: 0.0625rem solid #a71a1a;
+}
+
+.card.error > .section:last-child {
+  border-bottom: 0;
+}
+
+.card > .section.dark {
+  background: #e0e0e0;
+}
+
+.card > .section.darker {
+  background: #bdbdbd;
+}
+
+.card > .section.double-padded {
+  padding: 0.75rem;
+}
+
+.close::before {
+    content: "×";
+    display: block;
+    text-align: center;
+}
+.close:focus, .close:hover {
+    color: #000;
+    text-decoration: none;
+    opacity: .75;
+}
+.close:hover, .close:focus {
+    background: rgb(230, 230, 230);
+}
+
+.close {
+    display: inline-block;
+    width: 2rem;
+    vertical-align: top;
+    cursor: pointer;
+    border-radius: 2rem;
+    transition: background 0.3s;
+    z-index: 9999999;
+    font-size:2rem !important;
+}
+
 .form-body{
   padding: 10px 5px;
   background-color: #f8f8f8;
@@ -531,7 +708,7 @@ select.input-sm,
 .input-group-sm>select.form-control,
 .input-group-sm>select.input-group-addon,
 .input-group-sm>.input-group-btn>select.btn {
-    height: 30px;
+    height: 27px;
 }
 
 .input-sm, .input-group-sm>.form-control,

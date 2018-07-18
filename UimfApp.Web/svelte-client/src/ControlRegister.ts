@@ -38,7 +38,6 @@ import HtmlString from "core-ui/outputs/HtmlString";
 import Image from "core-ui/outputs/Image";
 import InlineForm from "core-ui/outputs/InlineForm";
 import Link from "core-ui/outputs/Link";
-import Money from "core-ui/outputs/Money";
 import NumberOutput from "core-ui/outputs/Number";
 import ObjectList from "core-ui/outputs/ObjectList";
 import Paginator from "core-ui/outputs/Paginator";
@@ -47,7 +46,6 @@ import Tabstrip from "core-ui/outputs/Tabstrip";
 import TextOutput from "core-ui/outputs/Text";
 import TextValue from "core-ui/outputs/TextValue";
 import TextValueMultiline from "core-ui/outputs/TextValueMultiline";
-import Tree from "core-ui/outputs/Tree";
 
 import {
 	BindToOutput,
@@ -91,13 +89,11 @@ controlRegister.registerOutputFieldControl("text-value", TextValue);
 controlRegister.registerOutputFieldControl("text-value-multiline", TextValueMultiline, new umf.OutputControlConfiguration(false, true));
 controlRegister.registerOutputFieldControl("downloadable-file", DownloadableFile);
 controlRegister.registerOutputFieldControl("alert", Alert, new umf.OutputControlConfiguration(true, true));
-controlRegister.registerOutputFieldControl("money", Money, new umf.OutputControlConfiguration(false, false));
 controlRegister.registerOutputFieldControl("file-size", FileSize);
 controlRegister.registerOutputFieldControl("image", Image, new umf.OutputControlConfiguration(false, true));
 controlRegister.registerOutputFieldControl("link", Link);
 controlRegister.registerOutputFieldControl("object-list", ObjectList, new umf.OutputControlConfiguration(false, true));
 controlRegister.registerOutputFieldControl("html-string", HtmlString);
-controlRegister.registerOutputFieldControl("tree", Tree, new umf.OutputControlConfiguration(true, true));
 controlRegister.registerOutputFieldControl("documentation", Documentation, new umf.OutputControlConfiguration(true, true));
 
 // Form event handlers.

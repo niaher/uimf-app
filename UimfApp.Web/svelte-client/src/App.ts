@@ -128,6 +128,6 @@ function hideLoader(): void {
 	progress.setAttribute("style", "width:100%");
 
 	setTimeout(function(): void {
-		loader.setAttribute("class", "hidden");
+		loader.setAttribute("class", "d-none");
 	}, 500);
 }
