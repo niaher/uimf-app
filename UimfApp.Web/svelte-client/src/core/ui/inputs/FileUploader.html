@@ -107,8 +107,10 @@
 		},
 		oncreate() {
 			const field = this.get("field");
-			const uploaderConfig = field.metadata.customProperties.fileUploaderConfig != null ?
-				field.metadata.customProperties.fileUploaderConfig : {
+
+			const uploaderConfig =
+				field.metadata.getCustomProperty("fileUploaderConfig") ||
+				{
 					allowMultipleFiles: true,
 					allowedFileExtensions: "*"
 				};

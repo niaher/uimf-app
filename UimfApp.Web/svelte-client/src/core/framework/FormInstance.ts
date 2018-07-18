@@ -11,7 +11,7 @@ export class FormInstance {
 	public inputs: Array<InputController<any>> = [];
 
 	constructor(metadata: umf.FormMetadata, controlRegister: ControlRegister) {
-		this.metadata = metadata;
+		this.metadata = new umf.FormMetadata(metadata);
 		this.inputs = controlRegister.createInputControllers(this.metadata.inputFields);
 	}
 

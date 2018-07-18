@@ -49,16 +49,16 @@
     "tslib": "1.7.1",
     "tslint": "^5.10.0",
     "tslint-eslint-rules": "^5.3.1",
-    "typescript": "2.3.4",
-    "uimf-core": "0.0.7"
+    "typescript": "2.3.4"
   },
   "dependencies": {
     "@types/axios": "0.14.0",
-    "axios": "0.16.2",
     "alertifyjs": "^1.11.1",
     "awesomplete": "1.1.2",
+    "axios": "0.16.2",
     "choices.js": "^3.0.2",
     "humanize": "0.0.9",
-    "pikaday": "^1.7.0"
+    "pikaday": "^1.7.0",
+    "uimf-core": "0.0.8"
   }
 }
