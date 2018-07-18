@@ -10,6 +10,8 @@
 	using UimfApp.Core.DataAccess;
 	using UimfApp.Core.Domain;
 	using UimfApp.Core.Security;
+	using UimfApp.Filing;
+	using UimfApp.Filing.Commands;
 	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Forms;
 	using UimfApp.Infrastructure.Forms.CustomProperties;
@@ -25,11 +27,13 @@
 	{
 		private readonly CoreDbContext context;
 		private readonly UserSecurityContext userSecurityContext;
+		private readonly EntityFileManagerCollection entityFileManagerCollection;
 
-		public WorkItemOverview(CoreDbContext context, UserSecurityContext userSecurityContext)
+		public WorkItemOverview(CoreDbContext context, UserSecurityContext userSecurityContext, EntityFileManagerCollection entityFileManagerCollection)
 		{
 			this.context = context;
 			this.userSecurityContext = userSecurityContext;
+			this.entityFileManagerCollection = entityFileManagerCollection;
 		}
 
 		public static FormLink Button(int workItemId, string label = null)
@@ -63,7 +67,8 @@
 				DueOn = item.DueOn,
 				CreatedBy = item.CreatedByUser?.Name,
 				AssignedTo = item.AssignedToUser?.Name,
-				Actions = this.GetActions(item).AsActionList()
+				Actions = this.GetActions(item).AsActionList(),
+				Files = AttachedFilesWithUploader.InlineForm<WorkItem>(this.entityFileManagerCollection, item.Id)
 			};
 		}
 
@@ -119,6 +124,9 @@
 			[OutputField(OrderIndex = 15, Label = "Due")]
 			[HideIfNull]
 			public DateTime? DueOn { get; set; }
+
+			[OutputField(OrderIndex = 40, Label = "")]
+			public InlineForm Files { get; set; }
 		}
 	}
 }

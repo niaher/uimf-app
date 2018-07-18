@@ -14,6 +14,9 @@ namespace UimfApp.Filing.Commands
 	using UiMetadataFramework.Core.Binding;
 	using UiMetadataFramework.MediatR;
 
+	/// <summary>
+	/// Displays files associated with a specific object.
+	/// </summary>
 	[Form(Id = "attached-files", PostOnLoad = true, Label = "Files")]
 	public class AttachedFiles : AsyncForm<AttachedFiles.Request, AttachedFiles.Response>
 	{

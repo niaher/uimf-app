@@ -18,8 +18,11 @@ namespace UimfApp.Filing.Commands
 	using UiMetadataFramework.Core.Binding;
 	using UiMetadataFramework.MediatR;
 
+	/// <summary>
+	/// Displays files associated with a specific object and allows uploading new files.
+	/// </summary>
 	[MyForm(Id = "attached-files-with-uploader", PostOnLoad = true, Label = "Files", SubmitButtonLabel = "Upload")]
-	[CssClass(UiFormConstants.InputsVerticalMultipleColumn)]
+	[CssClass(UiFormConstants.InputsHorizontalOneColumn)]
 	public class AttachedFilesWithUploader : AsyncForm<AttachedFilesWithUploader.Request, AttachedFilesWithUploader.Response>
 	{
 		private readonly IFileManager context;
@@ -36,7 +39,18 @@ namespace UimfApp.Filing.Commands
 			this.userContext = userContext;
 		}
 
-		public static InlineForm InlineForm<TContext>(EntityFileManagerCollection entityFileManagers,
+		/// <summary>
+		/// Gets inline form for either <see cref="AttachedFilesWithUploader"/> or <see cref="AttachedFiles"/>,
+		/// depending on whether the user has permissions to upload files.
+		/// </summary>
+		/// <typeparam name="TContext">Context to which the files are attached.</typeparam>
+		/// <param name="entityFileManagers"></param>
+		/// <param name="contextId">Id of the entity to which the files are attached.</param>
+		/// <param name="isMultiple">Whether user should be allowed to upload multiple files at once.</param>
+		/// <param name="metadata">An arbitrary string indicating the type of file being attached. Can be used for security checks.</param>
+		/// <returns></returns>
+		public static InlineForm InlineForm<TContext>(
+			EntityFileManagerCollection entityFileManagers,
 			int contextId,
 			bool isMultiple = true,
 			string metadata = null)

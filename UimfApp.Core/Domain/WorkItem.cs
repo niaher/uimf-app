@@ -4,9 +4,12 @@
 namespace UimfApp.Core.Domain
 {
 	using System;
+	using UimfApp.Core.Filing;
+	using UimfApp.Filing;
 	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Domain;
 
+	[FileContainer(WorkItemFileManager.Key)]
 	public class WorkItem : DomainEntityWithKeyInt32
 	{
 		protected WorkItem()
