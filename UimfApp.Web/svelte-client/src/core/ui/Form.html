@@ -18,7 +18,7 @@
 		{{#each visibleInputFields as inputField}}
 		<FormInput field="{{inputField}}" app="{{app}}" tabindex="{{tabindex * 100 + inputField.metadata.orderIndex}}" form="{{self}}" />
 		{{/each}}
-		<div style="width:100%">
+		<div class="full-width">
 			<button type="submit" disabled="{{disabled}}" tabindex="-1" class="btn btn-info">{{{submitButtonLabel}}}</button>
 		</div>
 	</form>
@@ -237,25 +237,25 @@
 </script>
 
 <style>
-	.response {
-		margin-top: 15px;
-		padding-left: 10px;
-		padding-right: 10px;
-	}
+  .response {
+    margin-top: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 
-	.form-header {
-		text-align: center;
-		padding-top: 20px;
-		border-bottom: 1px solid #bbd2d6;
-		background-color: #fff;
-		position: relative;
-	}
+  .form-header {
+    text-align: center;
+    padding-top: 20px;
+    border-bottom: 1px solid #bbd2d6;
+    background-color: #fff;
+    position: relative;
+  }
 
-	.form-header h2 {
-		display: inline-block;
-	}
+  .form-header h2 {
+    display: inline-block;
+  }
 
-	.help-content {
-		text-align: left;
-	}
+  .help-content {
+    text-align: left;
+  }
 </style>
