@@ -21,7 +21,7 @@
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.Core.Binding;
 
-	[MyForm(Id = "work-items", Label = "Work items", PostOnLoad = true, Menu = CoreMenus.WorkItems)]
+	[MyForm(Id = "work-items", Label = "Work items", PostOnLoad = true, Menu = CoreMenus.WorkItems, SubmitButtonLabel = UiFormConstants.SearchLabel)]
 	[Secure(typeof(CoreActions), nameof(CoreActions.ManageWorkItems))]
 	[Documentation(DocumentationPlacement.Inline, DocumentationSourceType.String, "On this page you can see all work items.")]
 	public class WorkItems : MyAsyncForm<WorkItems.Request, WorkItems.Response>
