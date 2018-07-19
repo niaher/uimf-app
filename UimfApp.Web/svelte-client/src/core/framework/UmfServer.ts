@@ -43,7 +43,7 @@ export class UmfServer {
 		});
 	}
 
-	public getAllMetadata(): Promise<{ forms: FormMetadata[], menus: any[] }> {
+	public getAllMetadata(): Promise<{ forms: FormMetadata[], menu: any }> {
 		this.fire("request:started");
 		return axios.get(this.getMetadataUrl).then((response: axiosLib.AxiosResponse) => {
 			this.fire("request:completed");

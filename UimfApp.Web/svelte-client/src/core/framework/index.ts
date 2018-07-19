@@ -16,3 +16,6 @@ export * from "./FormEventArguments";
 export * from "./FormResponseEventArguments";
 export * from "./InputEventArguments";
 export * from "./IFunctionRunner";
+export * from "./MenuGroup";
+export * from "./MenuItem";
+export * from "./Menu";

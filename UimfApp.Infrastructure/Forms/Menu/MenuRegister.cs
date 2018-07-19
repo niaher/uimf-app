@@ -1,37 +1,34 @@
 namespace UimfApp.Infrastructure.Forms.Menu
 {
-	using System.Collections.Concurrent;
 	using System.Collections.Generic;
 	using System.Linq;
-	using System.Reflection;
+	using UiMetadataFramework.Core;
 
-	public class MenuRegister
+	public class MenuRegister : Register<MenuContainer>
 	{
-		private readonly DependencyInjectionContainer dependencyInjectionContainer;
-		private readonly ConcurrentDictionary<string, MenuMetadata> menus = new ConcurrentDictionary<string, MenuMetadata>();
-
-		public MenuRegister(DependencyInjectionContainer dependencyInjectionContainer)
+		public MenuRegister(DependencyInjectionContainer dependencyInjectionContainer) : base(dependencyInjectionContainer)
 		{
-			this.dependencyInjectionContainer = dependencyInjectionContainer;
 		}
 
-		public IList<MenuMetadata> RegisteredMenus => this.menus.Values.ToList();
-
-		public void RegisterAssembly(Assembly assembly)
+		public IMenuNode BuildMenu(IList<FormMetadata> forms)
 		{
-			var menuContainers = assembly.ExportedTypes
-				.Where(t => t.GetTypeInfo().IsClass && !t.GetTypeInfo().IsAbstract && !t.GetTypeInfo().IsGenericType)
-				.Where(t => t.GetTypeInfo().GetInterfaces().Any(i => i == typeof(IMenuContainer)))
+			var menuContainers = this.GetAllInstances().ToList();
+
+			var groups = menuContainers
+				.SelectMany(t => t.GetMenuGroups())
 				.ToList();
 
-			foreach (var menuContainer in menuContainers)
-			{
-				var c = (IMenuContainer)this.dependencyInjectionContainer.GetInstance(menuContainer);
-				foreach (var menu in c.GetMenuMetadata())
-				{
-					this.menus.TryAdd(menu.Name, menu);
-				}
-			}
+			var root = new MenuBuilder(groups);
+
+			// Add static menus based on [Form] attribute.
+			forms.ForEach(t => root.AddMenuItemIfFormHasMenuConfiguration(t));
+
+			// Add dynamic menus.
+			menuContainers
+				.SelectMany(t => t.GetDynamicMenuItems())
+				.ForEach(t => root.AddMenuItem(t));
+
+			return root.Build();
 		}
 	}
 }

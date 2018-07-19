@@ -47,6 +47,15 @@ namespace UimfApp.Core.Notification
 			this.notificationManagerCollection = notificationManagerCollection;
 		}
 
+		public static FormLink Button(string label)
+		{
+			return new FormLink
+			{
+				Label = label,
+				Form = typeof(MyNotifications).GetFormId()
+			};
+		}
+
 		protected override Response Handle(Request message)
 		{
 			var query = this.notificationsDbContext

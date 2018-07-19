@@ -1,73 +1,36 @@
-{{#if menus != null}}
+{{#if menu != null}}
 <ul class="menu">
-	{{#each menus as menu}}
+	{{#each menu.children as item}}
 	<li>
-		<MenuItem menu="{{menu}}">
+		<MenuItem item="{{item}}" menu="{{self}}">
 	</li>
 	{{/each}}
 </ul>
 {{/if}}
 
 <script>
-	import MenuItem from "components/MenuItem";
+	import MenuItem from "./MenuItem";
 
-	function nestedSort(array, comparison) {
-		array.sort(comparison);
+	// function nestedSort(array, comparison) {
+	// 	array.sort(comparison);
 
-		for (const item of array) {
-			if (item.items != null) {
-				nestedSort(item.items, comparison);
-			}
-		}
-	}
+	// 	for (const item of array) {
+	// 		if (item.items != null) {
+	// 			nestedSort(item.items, comparison);
+	// 		}
+	// 	}
+	// }
 
 	export default {
 		oncreate() {
-			const forms = this.get("forms"),
-				getMenu = this.get("getMenu"),
-				makeUrl = this.get("makeUrl"),
-				tree = [];
+			console.log(this.get().menu);
+			this.set({ self: this });
+			// const getMenuGroup = this.get("getMenuGroup");
+			// const makeUrl = this.get("makeUrl");
 
-			for (const form of forms) {
-				const formMenu = getMenu(form);
-				if (formMenu != null) {
-					let currentFolder = {
-						items: tree
-					};
-
-					// If it's a "folder" menu.
-					if (formMenu.name !== "") {
-						const path = formMenu.name.split("/");
-
-						for (const folder of path) {
-							let subfolder = currentFolder.items.find(t => t.id === folder);
-
-							if (subfolder == null) {
-								subfolder = {
-									id: folder,
-									orderIndex: formMenu.orderIndex,
-									items: []
-								};
-
-								currentFolder.items.push(subfolder);
-								currentFolder = subfolder;
-							}
-							else {
-								currentFolder = subfolder;
-							}
-						}
-					}
-					currentFolder.items.push({
-						label: form.label,
-						url: makeUrl(form.id),
-						// Make sure we respect both parent menu sorting order and then leaf-level menu sorting order.
-						orderIndex: (formMenu.orderIndex * 100000) + form.customProperties.menuOrderIndex
-					});
-				}
-			}
-			nestedSort(tree, (a, b) => a.orderIndex - b.orderIndex);
-
-			this.set({ menus: tree });
+			// Make sure we respect both parent menu sorting order and then leaf-level menu sorting order.
+			// orderIndex: (group.orderIndex * 100000) + formLink.orderIndex
+			// nestedSort(tree, (a, b) => a.orderIndex - b.orderIndex);
 		},
 		components: {
 			MenuItem

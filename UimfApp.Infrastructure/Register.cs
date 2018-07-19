@@ -2,6 +2,7 @@ namespace UimfApp.Infrastructure
 {
 	using System;
 	using System.Collections.Concurrent;
+	using System.Collections.Generic;
 	using System.Linq;
 	using System.Reflection;
 
@@ -24,6 +25,17 @@ namespace UimfApp.Infrastructure
 		protected Register(DependencyInjectionContainer dependencyInjectionContainer)
 		{
 			this.dependencyInjectionContainer = dependencyInjectionContainer;
+		}
+
+		/// <summary>
+		/// Return list of <typeparamref name="T"/> object, one for each registered type.
+		/// </summary>
+		public IEnumerable<T> GetAllInstances()
+		{
+			foreach (var key in this.registeredTypes.Values)
+			{
+				yield return this.GetInstance(key);
+			}
 		}
 
 		/// <summary>

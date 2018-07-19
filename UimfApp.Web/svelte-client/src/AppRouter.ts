@@ -42,13 +42,6 @@ export class AppRouter implements umf.IAppRouter {
 			resolve(data: any, parameters: any, cb: ResolveCallback): void {
 				cb(false, {
 					forms: app.forms,
-					getMenu: (form: FormMetadata) => {
-						if (form.customProperties != null) {
-							return app.getMenu(form.customProperties.menu);
-						}
-
-						return null;
-					},
 					makeUrl: (formId: string) => self.makeUrl(formId, null)
 				});
 			}

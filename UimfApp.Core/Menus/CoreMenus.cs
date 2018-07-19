@@ -1,22 +1,42 @@
 namespace UimfApp.Core.Menus
 {
 	using System.Collections.Generic;
+	using System.Linq;
+	using UimfApp.Core.DataAccess;
+	using UimfApp.Core.Notification;
+	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Forms.Menu;
 
-	public sealed class CoreMenus : IMenuContainer
+	[RegisterEntry("core")]
+	public sealed class CoreMenus : MenuContainer
 	{
 		public const string WorkItems = "Work items";
 		public const string System = "System";
 		public const string Notifications = "Notifications";
+		private readonly CoreDbContext context;
 
-		public IList<MenuMetadata> GetMenuMetadata()
+		public CoreMenus(CoreDbContext context)
 		{
-			return new List<MenuMetadata>
+			this.context = context;
+		}
+
+		public override IEnumerable<MenuGroup> GetMenuGroups()
+		{
+			return new List<MenuGroup>
 			{
-				new MenuMetadata(Notifications, -1),
-				new MenuMetadata(WorkItems, 15),
-				new MenuMetadata(System, 20)
+				new MenuGroup(Notifications, -1),
+				new MenuGroup(WorkItems, 15),
+				new MenuGroup(System, 20)
 			};
+		}
+
+		public override IEnumerable<MenuItem> GetDynamicMenuItems()
+		{
+			var notificationCount = this.context.WorkItems.Count();
+
+			yield return MyNotifications
+				.Button($"<i class='far fa-bell' title='Notifications'>{notificationCount}</i>")
+				.AsMenuItem(Notifications);
 		}
 	}
 }

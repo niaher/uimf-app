@@ -102,15 +102,9 @@ function buildMenu(theApp: UmfApp): void {
 		target: document.getElementById("topmenu"),
 		data: {
 			forms: theApp.forms,
+			menu: theApp.menu,
 			theApp,
-			getMenu: (form: umf.FormMetadata) => {
-				if (form.customProperties != null) {
-					return theApp.getMenu(form.customProperties.menu);
-				}
-
-				return null;
-			},
-			makeUrl: (formId: string) => theApp.makeUrl(formId, null)
+			makeUrl: (formId: string, inputFieldValues: any) => theApp.makeUrl(formId, inputFieldValues)
 		}
 	});
 }

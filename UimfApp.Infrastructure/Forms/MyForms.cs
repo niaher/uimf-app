@@ -6,11 +6,11 @@ namespace UimfApp.Infrastructure.Forms
 	using System.Threading;
 	using System.Threading.Tasks;
 	using MediatR;
-	using UiMetadataFramework.Core;
-	using UiMetadataFramework.MediatR;
 	using UimfApp.Infrastructure.Forms.Menu;
 	using UimfApp.Infrastructure.Security;
 	using UimfApp.Infrastructure.User;
+	using UiMetadataFramework.Core;
+	using UiMetadataFramework.MediatR;
 
 	/// <summary>
 	/// Gets all forms available to the current user.
@@ -76,7 +76,7 @@ namespace UimfApp.Infrastructure.Forms
 			return Task.FromResult(new Response
 			{
 				Forms = list,
-				Menus = this.menuRegister.RegisteredMenus
+				Menu = this.menuRegister.BuildMenu(list)
 			});
 		}
 
@@ -91,7 +91,7 @@ namespace UimfApp.Infrastructure.Forms
 		public class Response
 		{
 			public IList<FormMetadata> Forms { get; set; }
-			public IList<MenuMetadata> Menus { get; set; }
+			public IMenuNode Menu { get; set; }
 		}
 	}
 }

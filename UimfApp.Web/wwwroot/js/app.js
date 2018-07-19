@@ -1821,6 +1821,103 @@ var UmfServer = (function () {
     return UmfServer;
 }());
 
+var UmfApp$$1 = (function () {
+    function UmfApp$$1(server, controlRegister) {
+        var _this = this;
+        this.formsById = {};
+        this.eventHandlers = [];
+        this.formResponseHandlers = {};
+        this.server = server;
+        this.controlRegister = controlRegister;
+        var _loop_1 = function (e) {
+            this_1.server.on(e, function (params) {
+                _this.fire(e, params);
+            });
+        };
+        var this_1 = this;
+        for (var _i = 0, _a = ["request:started", "request:completed"]; _i < _a.length; _i++) {
+            var e = _a[_i];
+            _loop_1(e);
+        }
+    }
+    UmfApp$$1.prototype.on = function (event, handler) {
+        this.eventHandlers[event] = this.eventHandlers[event] || [];
+        this.eventHandlers[event].push(handler);
+    };
+    UmfApp$$1.prototype.fire = function (event, params) {
+        var handlersForEvent = this.eventHandlers[event];
+        if (handlersForEvent != null && handlersForEvent.length > 0) {
+            for (var _i = 0, handlersForEvent_1 = handlersForEvent; _i < handlersForEvent_1.length; _i++) {
+                var handler = handlersForEvent_1[_i];
+                handler(params);
+            }
+        }
+    };
+    UmfApp$$1.prototype.useRouter = function (router) {
+        this.go = function (form, values) {
+            return router.go(form, values);
+        };
+        this.makeUrl = function (form, values) {
+            return router.makeUrl(form, values);
+        };
+    };
+    UmfApp$$1.prototype.registerResponseHandler = function (handler) {
+        this.formResponseHandlers[handler.name] = handler;
+    };
+    UmfApp$$1.prototype.load = function () {
+        var _this = this;
+        return this.server.getAllMetadata()
+            .then(function (response) {
+            _this.forms = response.forms;
+            _this.menu = response.menu;
+            _this.formsById = {};
+            for (var _i = 0, _a = _this.forms; _i < _a.length; _i++) {
+                var form = _a[_i];
+                _this.formsById[form.id] = new FormMetadata(form);
+            }
+        });
+    };
+    UmfApp$$1.prototype.getForm = function (id) {
+        return this.formsById[id];
+    };
+    UmfApp$$1.prototype.getFormInstance = function (formId, throwError) {
+        if (throwError === void 0) { throwError = false; }
+        var metadata = this.getForm(formId);
+        if (metadata == null) {
+            if (throwError) {
+                throw Error("Form " + formId + " not found.");
+            }
+            return null;
+        }
+        return new FormInstance$$1(metadata, this.controlRegister);
+    };
+    UmfApp$$1.prototype.handleResponse = function (response, form, args) {
+        var responseMetadata = response.metadata || new FormResponseMetadata();
+        var handler = this.formResponseHandlers[responseMetadata.handler || "default"];
+        if (handler == null) {
+            throw new Error("Cannot find FormResponseHandler \"" + responseMetadata.handler + "\".");
+        }
+        return handler.handle(response, form, args);
+    };
+    UmfApp$$1.prototype.runFunctions = function (functionMetadata, eventArgs) {
+        if (functionMetadata == null) {
+            return Promise.resolve();
+        }
+        var promises = [];
+        for (var _i = 0, functionMetadata_1 = functionMetadata; _i < functionMetadata_1.length; _i++) {
+            var f = functionMetadata_1[_i];
+            var handler = this.controlRegister.functions[f.id];
+            if (handler == null) {
+                throw new Error("Could not find function '" + f.id + "'.");
+            }
+            var promise = handler.run(f, eventArgs);
+            promises.push(promise);
+        }
+        return Promise.all(promises);
+    };
+    return UmfApp$$1;
+}());
+
 var FormInstance$$1 = (function () {
     function FormInstance$$1(metadata, controlRegister) {
         this.outputs = [];
@@ -2111,112 +2208,6 @@ var FormInstance$$1 = (function () {
         return normalizedResponse;
     };
     return FormInstance$$1;
-}());
-
-var UmfApp = (function () {
-    function UmfApp(server, controlRegister) {
-        var _this = this;
-        this.formsById = {};
-        this.menusByName = {};
-        this.eventHandlers = [];
-        this.formResponseHandlers = {};
-        this.server = server;
-        this.controlRegister = controlRegister;
-        var _loop_1 = function (e) {
-            this_1.server.on(e, function (params) {
-                _this.fire(e, params);
-            });
-        };
-        var this_1 = this;
-        for (var _i = 0, _a = ["request:started", "request:completed"]; _i < _a.length; _i++) {
-            var e = _a[_i];
-            _loop_1(e);
-        }
-    }
-    UmfApp.prototype.on = function (event, handler) {
-        this.eventHandlers[event] = this.eventHandlers[event] || [];
-        this.eventHandlers[event].push(handler);
-    };
-    UmfApp.prototype.fire = function (event, params) {
-        var handlersForEvent = this.eventHandlers[event];
-        if (handlersForEvent != null && handlersForEvent.length > 0) {
-            for (var _i = 0, handlersForEvent_1 = handlersForEvent; _i < handlersForEvent_1.length; _i++) {
-                var handler = handlersForEvent_1[_i];
-                handler(params);
-            }
-        }
-    };
-    UmfApp.prototype.useRouter = function (router) {
-        this.go = function (form, values) {
-            return router.go(form, values);
-        };
-        this.makeUrl = function (form, values) {
-            return router.makeUrl(form, values);
-        };
-    };
-    UmfApp.prototype.registerResponseHandler = function (handler) {
-        this.formResponseHandlers[handler.name] = handler;
-    };
-    UmfApp.prototype.load = function () {
-        var _this = this;
-        return this.server.getAllMetadata()
-            .then(function (response) {
-            _this.forms = response.forms;
-            _this.menus = response.menus;
-            _this.formsById = {};
-            _this.menusByName = {};
-            for (var _i = 0, _a = _this.forms; _i < _a.length; _i++) {
-                var form = _a[_i];
-                _this.formsById[form.id] = new FormMetadata(form);
-            }
-            for (var _b = 0, _c = _this.menus; _b < _c.length; _b++) {
-                var menu = _c[_b];
-                _this.menusByName[menu.name] = menu;
-            }
-        });
-    };
-    UmfApp.prototype.getForm = function (id) {
-        return this.formsById[id];
-    };
-    UmfApp.prototype.getMenu = function (name) {
-        return this.menusByName[name];
-    };
-    UmfApp.prototype.getFormInstance = function (formId, throwError) {
-        if (throwError === void 0) { throwError = false; }
-        var metadata = this.getForm(formId);
-        if (metadata == null) {
-            if (throwError) {
-                throw Error("Form " + formId + " not found.");
-            }
-            return null;
-        }
-        return new FormInstance$$1(metadata, this.controlRegister);
-    };
-    UmfApp.prototype.handleResponse = function (response, form, args) {
-        var responseMetadata = response.metadata || new FormResponseMetadata();
-        var handler = this.formResponseHandlers[responseMetadata.handler || "default"];
-        if (handler == null) {
-            throw new Error("Cannot find FormResponseHandler \"" + responseMetadata.handler + "\".");
-        }
-        return handler.handle(response, form, args);
-    };
-    UmfApp.prototype.runFunctions = function (functionMetadata, eventArgs) {
-        if (functionMetadata == null) {
-            return Promise.resolve();
-        }
-        var promises = [];
-        for (var _i = 0, functionMetadata_1 = functionMetadata; _i < functionMetadata_1.length; _i++) {
-            var f = functionMetadata_1[_i];
-            var handler = this.controlRegister.functions[f.id];
-            if (handler == null) {
-                throw new Error("Could not find function '" + f.id + "'.");
-            }
-            var promise = handler.run(f, eventArgs);
-            promises.push(promise);
-        }
-        return Promise.all(promises);
-    };
-    return UmfApp;
 }());
 
 var InputController = (function () {
@@ -6261,24 +6252,127 @@ var proto = {
 	_differs: _differs
 };
 
-/* src\components\MenuItem.html generated by Svelte v1.64.1 */
-let id = 0;
-function data() {
-	id += 1;
+/* src\core\ui\outputs\MyFormLink.html generated by Svelte v1.64.1 */
+function create_main_fragment$2(component, state) {
+	var if_block_anchor;
+
+	var if_block = (state.field.data != null) && create_if_block$2(component, state);
+
 	return {
-		id
+		c: function create() {
+			if (if_block) if_block.c();
+			if_block_anchor = createComment();
+		},
+
+		m: function mount(target, anchor) {
+			if (if_block) if_block.m(target, anchor);
+			insertNode(if_block_anchor, target, anchor);
+		},
+
+		p: function update(changed, state) {
+			if (state.field.data != null) {
+				if (if_block) {
+					if_block.p(changed, state);
+				} else {
+					if_block = create_if_block$2(component, state);
+					if_block.c();
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				}
+			} else if (if_block) {
+				if_block.u();
+				if_block.d();
+				if_block = null;
+			}
+		},
+
+		u: function unmount() {
+			if (if_block) if_block.u();
+			detachNode(if_block_anchor);
+		},
+
+		d: function destroy$$1() {
+			if (if_block) if_block.d();
+		}
 	};
 }
 
-function create_main_fragment$1(component, state) {
+// (2:1) {{#if field.data.form != null}}
+function create_if_block_1(component, state) {
+	var a, text_value = state.field.data.label, text, a_href_value;
+
+	return {
+		c: function create() {
+			a = createElement("a");
+			text = createText(text_value);
+			this.h();
+		},
+
+		h: function hydrate() {
+			a.href = a_href_value = state.app.makeUrl(state.field.data.form, state.field.data.inputFieldValues);
+		},
+
+		m: function mount(target, anchor) {
+			insertNode(a, target, anchor);
+			appendNode(text, a);
+		},
+
+		p: function update(changed, state) {
+			if ((changed.field) && text_value !== (text_value = state.field.data.label)) {
+				text.data = text_value;
+			}
+
+			if ((changed.app || changed.field) && a_href_value !== (a_href_value = state.app.makeUrl(state.field.data.form, state.field.data.inputFieldValues))) {
+				a.href = a_href_value;
+			}
+		},
+
+		u: function unmount() {
+			detachNode(a);
+		},
+
+		d: noop$1
+	};
+}
+
+// (4:1) {{else}}
+function create_if_block_2(component, state) {
+	var span, text_value = state.field.data.label, text;
+
+	return {
+		c: function create() {
+			span = createElement("span");
+			text = createText(text_value);
+		},
+
+		m: function mount(target, anchor) {
+			insertNode(span, target, anchor);
+			appendNode(text, span);
+		},
+
+		p: function update(changed, state) {
+			if ((changed.field) && text_value !== (text_value = state.field.data.label)) {
+				text.data = text_value;
+			}
+		},
+
+		u: function unmount() {
+			detachNode(span);
+		},
+
+		d: noop$1
+	};
+}
+
+// (1:0) {{#if field.data != null}}
+function create_if_block$2(component, state) {
 	var if_block_anchor;
 
-	function select_block_type_1(state) {
-		if (state.menu.url != null) return create_if_block$1;
-		return create_if_block_1;
+	function select_block_type(state) {
+		if (state.field.data.form != null) return create_if_block_1;
+		return create_if_block_2;
 	}
 
-	var current_block_type = select_block_type_1(state);
+	var current_block_type = select_block_type(state);
 	var if_block = current_block_type(component, state);
 
 	return {
@@ -6293,7 +6387,7 @@ function create_main_fragment$1(component, state) {
 		},
 
 		p: function update(changed, state) {
-			if (current_block_type === (current_block_type = select_block_type_1(state)) && if_block) {
+			if (current_block_type === (current_block_type = select_block_type(state)) && if_block) {
 				if_block.p(changed, state);
 			} else {
 				if_block.u();
@@ -6315,331 +6409,99 @@ function create_main_fragment$1(component, state) {
 	};
 }
 
-// (5:1) {{#if menu.items.length > 1}}
-function create_if_block_2(component, state) {
-	var label, text_value = state.menu.id, text, label_for_value;
+function SvelteComponent$2(options) {
+	init(this, options);
+	this._state = assign({}, options.data);
+
+	this._fragment = create_main_fragment$2(this, this._state);
+
+	if (options.target) {
+		this._fragment.c();
+		this._mount(options.target, options.anchor);
+	}
+}
+
+assign(SvelteComponent$2.prototype, proto);
+
+/* src\components\MenuItem.html generated by Svelte v1.64.1 */
+let id = 0;
+function data() {
+	id += 1;
+	return {
+		id
+	};
+}
+
+function oncreate$1() {
+	this.set({ });
+	console.log(this.get());
+}
+
+function create_main_fragment$1(component, state) {
+	var if_block_anchor;
+
+	var if_block = (state.item.children.length === 0) && create_if_block$1(component, state);
 
 	return {
 		c: function create() {
-			label = createElement("label");
-			text = createText(text_value);
-			this.h();
-		},
-
-		h: function hydrate() {
-			label.htmlFor = label_for_value = "menu" + state.id;
-			label.className = "toggle-sub";
-			setAttribute(label, "onclick", "");
+			if (if_block) if_block.c();
+			if_block_anchor = createComment();
 		},
 
 		m: function mount(target, anchor) {
-			insertNode(label, target, anchor);
-			appendNode(text, label);
+			if (if_block) if_block.m(target, anchor);
+			insertNode(if_block_anchor, target, anchor);
 		},
 
 		p: function update(changed, state) {
-			if ((changed.menu) && text_value !== (text_value = state.menu.id)) {
-				text.data = text_value;
-			}
-
-			if ((changed.id) && label_for_value !== (label_for_value = "menu" + state.id)) {
-				label.htmlFor = label_for_value;
+			if (state.item.children.length === 0) {
+				if (!if_block) {
+					if_block = create_if_block$1(component, state);
+					if_block.c();
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				}
+			} else if (if_block) {
+				if_block.u();
+				if_block.d();
+				if_block = null;
 			}
 		},
 
 		u: function unmount() {
-			detachNode(label);
+			if (if_block) if_block.u();
+			detachNode(if_block_anchor);
 		},
 
-		d: noop$1
+		d: function destroy$$1() {
+			if (if_block) if_block.d();
+		}
 	};
 }
 
-// (7:1) {{else}}
-function create_if_block_3(component, state) {
-	var a, raw_value = state.menu.items[0].label, a_href_value;
+// (1:0) {{#if item.children.length === 0}}
+function create_if_block$1(component, state) {
 
-	return {
-		c: function create() {
-			a = createElement("a");
-			this.h();
-		},
-
-		h: function hydrate() {
-			a.href = a_href_value = state.menu.items[0].url;
-		},
-
-		m: function mount(target, anchor) {
-			insertNode(a, target, anchor);
-			a.innerHTML = raw_value;
-		},
-
-		p: function update(changed, state) {
-			if ((changed.menu) && raw_value !== (raw_value = state.menu.items[0].label)) {
-				a.innerHTML = raw_value;
-			}
-
-			if ((changed.menu) && a_href_value !== (a_href_value = state.menu.items[0].url)) {
-				a.href = a_href_value;
-			}
-		},
-
-		u: function unmount() {
-			a.innerHTML = '';
-
-			detachNode(a);
-		},
-
-		d: noop$1
-	};
-}
-
-// (14:1) {{#each menu.items as submenu}}
-function create_each_block$1(component, state) {
-	var submenu = state.submenu, each_value = state.each_value, submenu_index = state.submenu_index;
-	var li;
-
-	var sveltecomponent_initial_data = { menu: submenu };
-	var sveltecomponent = new SvelteComponent$1({
+	var myformlink_initial_data = { field: "{field: { data: item }}" };
+	var myformlink = new SvelteComponent$2({
 		root: component.root,
-		data: sveltecomponent_initial_data
+		data: myformlink_initial_data
 	});
 
 	return {
 		c: function create() {
-			li = createElement("li");
-			sveltecomponent._fragment.c();
+			myformlink._fragment.c();
 		},
 
 		m: function mount(target, anchor) {
-			insertNode(li, target, anchor);
-			sveltecomponent._mount(li, null);
-		},
-
-		p: function update(changed, state) {
-			submenu = state.submenu;
-			each_value = state.each_value;
-			submenu_index = state.submenu_index;
-			var sveltecomponent_changes = {};
-			if (changed.menu) sveltecomponent_changes.menu = submenu;
-			sveltecomponent._set(sveltecomponent_changes);
+			myformlink._mount(target, anchor);
 		},
 
 		u: function unmount() {
-			detachNode(li);
+			myformlink._unmount();
 		},
 
 		d: function destroy$$1() {
-			sveltecomponent.destroy(false);
-		}
-	};
-}
-
-// (12:64) {{#if menu.items.length > 1}}
-function create_if_block_4(component, state) {
-	var ul;
-
-	var each_value = state.menu.items;
-
-	var each_blocks = [];
-
-	for (var i = 0; i < each_value.length; i += 1) {
-		each_blocks[i] = create_each_block$1(component, assign(assign({}, state), {
-			each_value: each_value,
-			submenu: each_value[i],
-			submenu_index: i
-		}));
-	}
-
-	return {
-		c: function create() {
-			ul = createElement("ul");
-
-			for (var i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].c();
-			}
-			this.h();
-		},
-
-		h: function hydrate() {
-			ul.className = "sub-nav";
-		},
-
-		m: function mount(target, anchor) {
-			insertNode(ul, target, anchor);
-
-			for (var i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].m(ul, null);
-			}
-		},
-
-		p: function update(changed, state) {
-			var each_value = state.menu.items;
-
-			if (changed.menu) {
-				for (var i = 0; i < each_value.length; i += 1) {
-					var each_context = assign(assign({}, state), {
-						each_value: each_value,
-						submenu: each_value[i],
-						submenu_index: i
-					});
-
-					if (each_blocks[i]) {
-						each_blocks[i].p(changed, each_context);
-					} else {
-						each_blocks[i] = create_each_block$1(component, each_context);
-						each_blocks[i].c();
-						each_blocks[i].m(ul, null);
-					}
-				}
-
-				for (; i < each_blocks.length; i += 1) {
-					each_blocks[i].u();
-					each_blocks[i].d();
-				}
-				each_blocks.length = each_value.length;
-			}
-		},
-
-		u: function unmount() {
-			detachNode(ul);
-
-			for (var i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].u();
-			}
-		},
-
-		d: function destroy$$1() {
-			destroyEach(each_blocks);
-		}
-	};
-}
-
-// (1:0) {{#if menu.url != null}}
-function create_if_block$1(component, state) {
-	var a, raw_value = state.menu.label, a_href_value;
-
-	return {
-		c: function create() {
-			a = createElement("a");
-			this.h();
-		},
-
-		h: function hydrate() {
-			a.href = a_href_value = state.menu.url;
-		},
-
-		m: function mount(target, anchor) {
-			insertNode(a, target, anchor);
-			a.innerHTML = raw_value;
-		},
-
-		p: function update(changed, state) {
-			if ((changed.menu) && raw_value !== (raw_value = state.menu.label)) {
-				a.innerHTML = raw_value;
-			}
-
-			if ((changed.menu) && a_href_value !== (a_href_value = state.menu.url)) {
-				a.href = a_href_value;
-			}
-		},
-
-		u: function unmount() {
-			a.innerHTML = '';
-
-			detachNode(a);
-		},
-
-		d: noop$1
-	};
-}
-
-// (3:0) {{else}}
-function create_if_block_1(component, state) {
-	var div, text_1, input, input_id_value, text_2, if_block_1_anchor;
-
-	function select_block_type(state) {
-		if (state.menu.items.length > 1) return create_if_block_2;
-		return create_if_block_3;
-	}
-
-	var current_block_type = select_block_type(state);
-	var if_block = current_block_type(component, state);
-
-	var if_block_1 = (state.menu.items.length > 1) && create_if_block_4(component, state);
-
-	return {
-		c: function create() {
-			div = createElement("div");
-			if_block.c();
-			text_1 = createText("\r\n\r\n");
-			input = createElement("input");
-			text_2 = createText(" ");
-			if (if_block_1) if_block_1.c();
-			if_block_1_anchor = createComment();
-			this.h();
-		},
-
-		h: function hydrate() {
-			div.className = "menu top-menu-div";
-			setAttribute(input, "type", "checkbox");
-			input.id = input_id_value = "menu" + state.id;
-			input.className = "sub-nav-check";
-		},
-
-		m: function mount(target, anchor) {
-			insertNode(div, target, anchor);
-			if_block.m(div, null);
-			insertNode(text_1, target, anchor);
-			insertNode(input, target, anchor);
-			insertNode(text_2, target, anchor);
-			if (if_block_1) if_block_1.m(target, anchor);
-			insertNode(if_block_1_anchor, target, anchor);
-		},
-
-		p: function update(changed, state) {
-			if (current_block_type === (current_block_type = select_block_type(state)) && if_block) {
-				if_block.p(changed, state);
-			} else {
-				if_block.u();
-				if_block.d();
-				if_block = current_block_type(component, state);
-				if_block.c();
-				if_block.m(div, null);
-			}
-
-			if ((changed.id) && input_id_value !== (input_id_value = "menu" + state.id)) {
-				input.id = input_id_value;
-			}
-
-			if (state.menu.items.length > 1) {
-				if (if_block_1) {
-					if_block_1.p(changed, state);
-				} else {
-					if_block_1 = create_if_block_4(component, state);
-					if_block_1.c();
-					if_block_1.m(if_block_1_anchor.parentNode, if_block_1_anchor);
-				}
-			} else if (if_block_1) {
-				if_block_1.u();
-				if_block_1.d();
-				if_block_1 = null;
-			}
-		},
-
-		u: function unmount() {
-			detachNode(div);
-			if_block.u();
-			detachNode(text_1);
-			detachNode(input);
-			detachNode(text_2);
-			if (if_block_1) if_block_1.u();
-			detachNode(if_block_1_anchor);
-		},
-
-		d: function destroy$$1() {
-			if_block.d();
-			if (if_block_1) if_block_1.d();
+			myformlink.destroy(false);
 		}
 	};
 }
@@ -6648,6 +6510,13 @@ function SvelteComponent$1(options) {
 	init(this, options);
 	this._state = assign(data(), options.data);
 
+	var self = this;
+	var _oncreate = function() {
+		var changed = { item: 1 };
+		oncreate$1.call(self);
+		self.fire("update", { changed: changed, current: self._state });
+	};
+
 	if (!options.root) {
 		this._oncreate = [];
 		this._beforecreate = [];
@@ -6655,6 +6524,8 @@ function SvelteComponent$1(options) {
 	}
 
 	this._fragment = create_main_fragment$1(this, this._state);
+
+	this.root._oncreate.push(_oncreate);
 
 	if (options.target) {
 		this._fragment.c();
@@ -6671,68 +6542,31 @@ function SvelteComponent$1(options) {
 assign(SvelteComponent$1.prototype, proto);
 
 /* src\components\Menu.html generated by Svelte v1.64.1 */
-function nestedSort(array, comparison) {
-	array.sort(comparison);
+// function nestedSort(array, comparison) {
+// 	array.sort(comparison);
 
-	for (const item of array) {
-		if (item.items != null) {
-			nestedSort(item.items, comparison);
-		}
-	}
-}
+// 	for (const item of array) {
+// 		if (item.items != null) {
+// 			nestedSort(item.items, comparison);
+// 		}
+// 	}
+// }
 
 function oncreate() {
-	const forms = this.get("forms"),
-		getMenu = this.get("getMenu"),
-		makeUrl = this.get("makeUrl"),
-		tree = [];
+	console.log(this.get().menu);
+	this.set({ self: this });
+	// const getMenuGroup = this.get("getMenuGroup");
+	// const makeUrl = this.get("makeUrl");
 
-	for (const form of forms) {
-		const formMenu = getMenu(form);
-		if (formMenu != null) {
-			let currentFolder = {
-				items: tree
-			};
-
-			// If it's a "folder" menu.
-			if (formMenu.name !== "") {
-				const path = formMenu.name.split("/");
-
-				for (const folder of path) {
-					let subfolder = currentFolder.items.find(t => t.id === folder);
-
-					if (subfolder == null) {
-						subfolder = {
-							id: folder,
-							orderIndex: formMenu.orderIndex,
-							items: []
-						};
-
-						currentFolder.items.push(subfolder);
-						currentFolder = subfolder;
-					}
-					else {
-						currentFolder = subfolder;
-					}
-				}
-			}
-			currentFolder.items.push({
-				label: form.label,
-				url: makeUrl(form.id),
-				// Make sure we respect both parent menu sorting order and then leaf-level menu sorting order.
-				orderIndex: (formMenu.orderIndex * 100000) + form.customProperties.menuOrderIndex
-			});
-		}
-	}
-	nestedSort(tree, (a, b) => a.orderIndex - b.orderIndex);
-
-	this.set({ menus: tree });
+	// Make sure we respect both parent menu sorting order and then leaf-level menu sorting order.
+	// orderIndex: (group.orderIndex * 100000) + formLink.orderIndex
+	// nestedSort(tree, (a, b) => a.orderIndex - b.orderIndex);
 }
 
 function create_main_fragment(component, state) {
 	var if_block_anchor;
 
-	var if_block = (state.menus != null) && create_if_block(component, state);
+	var if_block = (state.menu != null) && create_if_block(component, state);
 
 	return {
 		c: function create() {
@@ -6746,7 +6580,7 @@ function create_main_fragment(component, state) {
 		},
 
 		p: function update(changed, state) {
-			if (state.menus != null) {
+			if (state.menu != null) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
@@ -6772,12 +6606,12 @@ function create_main_fragment(component, state) {
 	};
 }
 
-// (3:1) {{#each menus as menu}}
+// (3:1) {{#each menu.children as item}}
 function create_each_block(component, state) {
-	var menu = state.menu, each_value = state.each_value, menu_index = state.menu_index;
+	var item = state.item, each_value = state.each_value, item_index = state.item_index;
 	var li;
 
-	var menuitem_initial_data = { menu: menu };
+	var menuitem_initial_data = { item: item, menu: state.self };
 	var menuitem = new SvelteComponent$1({
 		root: component.root,
 		slots: { default: createFragment() },
@@ -6796,11 +6630,12 @@ function create_each_block(component, state) {
 		},
 
 		p: function update(changed, state) {
-			menu = state.menu;
+			item = state.item;
 			each_value = state.each_value;
-			menu_index = state.menu_index;
+			item_index = state.item_index;
 			var menuitem_changes = {};
-			if (changed.menus) menuitem_changes.menu = menu;
+			if (changed.menu) menuitem_changes.item = item;
+			if (changed.self) menuitem_changes.menu = state.self;
 			menuitem._set(menuitem_changes);
 		},
 
@@ -6814,19 +6649,19 @@ function create_each_block(component, state) {
 	};
 }
 
-// (1:0) {{#if menus != null}}
+// (1:0) {{#if menu != null}}
 function create_if_block(component, state) {
 	var ul;
 
-	var each_value = state.menus;
+	var each_value = state.menu.children;
 
 	var each_blocks = [];
 
 	for (var i = 0; i < each_value.length; i += 1) {
 		each_blocks[i] = create_each_block(component, assign(assign({}, state), {
 			each_value: each_value,
-			menu: each_value[i],
-			menu_index: i
+			item: each_value[i],
+			item_index: i
 		}));
 	}
 
@@ -6853,14 +6688,14 @@ function create_if_block(component, state) {
 		},
 
 		p: function update(changed, state) {
-			var each_value = state.menus;
+			var each_value = state.menu.children;
 
-			if (changed.menus) {
+			if (changed.menu || changed.self) {
 				for (var i = 0; i < each_value.length; i += 1) {
 					var each_context = assign(assign({}, state), {
 						each_value: each_value,
-						menu: each_value[i],
-						menu_index: i
+						item: each_value[i],
+						item_index: i
 					});
 
 					if (each_blocks[i]) {
@@ -6900,7 +6735,7 @@ function SvelteComponent(options) {
 
 	var self = this;
 	var _oncreate = function() {
-		var changed = { menus: 1 };
+		var changed = { menu: 1, self: 1 };
 		oncreate.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
@@ -9014,17 +8849,17 @@ function instantiateWithMethods(Component, options, methods) {
 }
 
 /* src\components\Home.html generated by Svelte v1.64.1 */
-function oncreate$1() {
+function oncreate$2() {
 	this.set({
 		canViewHelpFiles: window.app.getForm("help") != null
 	});
 }
 
-function create_main_fragment$2(component, state) {
+function create_main_fragment$3(component, state) {
 	var if_block_anchor;
 
 	function select_block_type(state) {
-		if (state.canViewHelpFiles === true) return create_if_block$2;
+		if (state.canViewHelpFiles === true) return create_if_block$3;
 		return create_if_block_1$1;
 	}
 
@@ -9064,7 +8899,7 @@ function create_main_fragment$2(component, state) {
 }
 
 // (1:0) {{#if canViewHelpFiles === true}}
-function create_if_block$2(component, state) {
+function create_if_block$3(component, state) {
 	var p;
 
 	return {
@@ -9117,14 +8952,14 @@ function create_if_block_1$1(component, state) {
 	};
 }
 
-function SvelteComponent$2(options) {
+function SvelteComponent$3(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
 	var self = this;
 	var _oncreate = function() {
 		var changed = { canViewHelpFiles: 1 };
-		oncreate$1.call(self);
+		oncreate$2.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -9132,7 +8967,7 @@ function SvelteComponent$2(options) {
 		this._oncreate = [];
 	}
 
-	this._fragment = create_main_fragment$2(this, this._state);
+	this._fragment = create_main_fragment$3(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -9144,13 +8979,13 @@ function SvelteComponent$2(options) {
 	}
 }
 
-assign(SvelteComponent$2.prototype, proto);
+assign(SvelteComponent$3.prototype, proto);
 
 /* src\core\ui\help\Tooltip.html generated by Svelte v1.64.1 */
-function create_main_fragment$5(component, state) {
+function create_main_fragment$6(component, state) {
 	var if_block_anchor;
 
-	var if_block = (state.data) && create_if_block$5(component, state);
+	var if_block = (state.data) && create_if_block$6(component, state);
 
 	return {
 		c: function create() {
@@ -9168,7 +9003,7 @@ function create_main_fragment$5(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$5(component, state);
+					if_block = create_if_block$6(component, state);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -9191,7 +9026,7 @@ function create_main_fragment$5(component, state) {
 }
 
 // (1:0) {{#if data }}
-function create_if_block$5(component, state) {
+function create_if_block$6(component, state) {
 	var span, raw_value = state.data.content;
 
 	return {
@@ -9225,11 +9060,11 @@ function create_if_block$5(component, state) {
 	};
 }
 
-function SvelteComponent$5(options) {
+function SvelteComponent$6(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
-	this._fragment = create_main_fragment$5(this, this._state);
+	this._fragment = create_main_fragment$6(this, this._state);
 
 	if (options.target) {
 		this._fragment.c();
@@ -9237,9 +9072,9 @@ function SvelteComponent$5(options) {
 	}
 }
 
-assign(SvelteComponent$5.prototype, proto);
+assign(SvelteComponent$6.prototype, proto);
 
-/* src\core\ui\input.html generated by Svelte v1.64.1 */
+/* src\core\ui\Input.html generated by Svelte v1.64.1 */
 let inputId = 0;
 
 function data$2() {
@@ -9281,7 +9116,7 @@ var methods$1 = {
 	}
 };
 
-function oncreate$2() {
+function oncreate$3() {
 	const field = this.get("field");
 	const app = this.get("app");
 
@@ -9327,10 +9162,10 @@ function add_css$1() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$4(component, state) {
+function create_main_fragment$5(component, state) {
 	var if_block_anchor;
 
-	var if_block = (state.visible) && create_if_block$4(component, state);
+	var if_block = (state.visible) && create_if_block$5(component, state);
 
 	return {
 		c: function create() {
@@ -9348,7 +9183,7 @@ function create_main_fragment$4(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$4(component, state);
+					if_block = create_if_block$5(component, state);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -9375,7 +9210,7 @@ function create_if_block_2$2(component, state) {
 	var div, text_value = state.field.metadata.label, text, text_1;
 
 	var tooltip_initial_data = { data: state.field.metadata.customProperties.documentation[0] };
-	var tooltip = new SvelteComponent$5({
+	var tooltip = new SvelteComponent$6({
 		root: component.root,
 		data: tooltip_initial_data
 	});
@@ -9421,7 +9256,7 @@ function create_if_block_2$2(component, state) {
 }
 
 // (9:12) {{else}}
-function create_if_block_3$2(component, state) {
+function create_if_block_3$1(component, state) {
 	var text_value = state.field.metadata.label, text, text_1;
 
 	return {
@@ -9456,7 +9291,7 @@ function create_if_block_1$3(component, state) {
 
 	function select_block_type(state) {
 		if (state.field.metadata.customProperties != null && state.field.metadata.customProperties["documentation"] != null) return create_if_block_2$2;
-		return create_if_block_3$2;
+		return create_if_block_3$1;
 	}
 
 	var current_block_type = select_block_type(state);
@@ -9521,7 +9356,7 @@ function create_if_block_1$3(component, state) {
 }
 
 // (15:4) {{else}}
-function create_if_block_4$2(component, state) {
+function create_if_block_4$1(component, state) {
 	var div, div_1, div_class_value;
 
 	return {
@@ -9559,12 +9394,12 @@ function create_if_block_4$2(component, state) {
 }
 
 // (1:0) {{#if visible}}
-function create_if_block$4(component, state) {
+function create_if_block$5(component, state) {
 	var if_block_anchor;
 
 	function select_block_type_1(state) {
 		if (!state.alwaysHideLabel && state.field.metadata.label !== "") return create_if_block_1$3;
-		return create_if_block_4$2;
+		return create_if_block_4$1;
 	}
 
 	var current_block_type = select_block_type_1(state);
@@ -9604,7 +9439,7 @@ function create_if_block$4(component, state) {
 	};
 }
 
-function SvelteComponent$4(options) {
+function SvelteComponent$5(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = assign(data$2(), options.data);
@@ -9614,7 +9449,7 @@ function SvelteComponent$4(options) {
 	var self = this;
 	var _oncreate = function() {
 		var changed = { visible: 1, alwaysHideLabel: 1, field: 1, class: 1, id: 1 };
-		oncreate$2.call(self);
+		oncreate$3.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -9624,7 +9459,7 @@ function SvelteComponent$4(options) {
 		this._aftercreate = [];
 	}
 
-	this._fragment = create_main_fragment$4(this, this._state);
+	this._fragment = create_main_fragment$5(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -9640,17 +9475,17 @@ function SvelteComponent$4(options) {
 	}
 }
 
-assign(SvelteComponent$4.prototype, proto);
-assign(SvelteComponent$4.prototype, methods$1);
+assign(SvelteComponent$5.prototype, proto);
+assign(SvelteComponent$5.prototype, methods$1);
 
-/* src\core\ui\output.html generated by Svelte v1.64.1 */
+/* src\core\ui\Output.html generated by Svelte v1.64.1 */
 function data$3() {
 	return {
 		showLabel: true
 	};
 }
 
-function oncreate$3() {
+function oncreate$4() {
 	const field = this.get("field");
 	const app = this.get("app");
 	const parent = this.get("parent");
@@ -9693,12 +9528,12 @@ function add_css$2() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$6(component, state) {
+function create_main_fragment$7(component, state) {
 	var if_block_anchor;
 
 	function select_block_type_1(state) {
-		if (state.showLabel === true && !state.alwaysHideLabel && state.field.metadata.label !== "") return create_if_block$6;
-		return create_if_block_3$3;
+		if (state.showLabel === true && !state.alwaysHideLabel && state.field.metadata.label !== "") return create_if_block$7;
+		return create_if_block_3$2;
 	}
 
 	var current_block_type = select_block_type_1(state);
@@ -9743,7 +9578,7 @@ function create_if_block_1$4(component, state) {
 	var label, text_value = state.field.metadata.label, text, text_1;
 
 	var tooltip_initial_data = { data: state.field.metadata.customProperties.documentation[0] };
-	var tooltip = new SvelteComponent$5({
+	var tooltip = new SvelteComponent$6({
 		root: component.root,
 		data: tooltip_initial_data
 	});
@@ -9825,7 +9660,7 @@ function create_if_block_2$3(component, state) {
 }
 
 // (1:0) {{#if showLabel === true && !alwaysHideLabel && field.metadata.label !== ""}}
-function create_if_block$6(component, state) {
+function create_if_block$7(component, state) {
 	var div, text, div_1, div_1_class_value;
 
 	function select_block_type(state) {
@@ -9887,7 +9722,7 @@ function create_if_block$6(component, state) {
 }
 
 // (14:0) {{else}}
-function create_if_block_3$3(component, state) {
+function create_if_block_3$2(component, state) {
 	var div, div_class_value;
 
 	return {
@@ -9921,7 +9756,7 @@ function create_if_block_3$3(component, state) {
 	};
 }
 
-function SvelteComponent$6(options) {
+function SvelteComponent$7(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = assign(data$3(), options.data);
@@ -9931,7 +9766,7 @@ function SvelteComponent$6(options) {
 	var self = this;
 	var _oncreate = function() {
 		var changed = { showLabel: 1, alwaysHideLabel: 1, field: 1, class: 1 };
-		oncreate$3.call(self);
+		oncreate$4.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -9941,7 +9776,7 @@ function SvelteComponent$6(options) {
 		this._aftercreate = [];
 	}
 
-	this._fragment = create_main_fragment$6(this, this._state);
+	this._fragment = create_main_fragment$7(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -9957,7 +9792,7 @@ function SvelteComponent$6(options) {
 	}
 }
 
-assign(SvelteComponent$6.prototype, proto);
+assign(SvelteComponent$7.prototype, proto);
 
 /* src\core\ui\help\Help.html generated by Svelte v1.64.1 */
 function humanize(e) {
@@ -10002,7 +9837,7 @@ var methods$2 = {
 	}
 };
 
-function oncreate$4() {
+function oncreate$5() {
 	const files = this.get("data").files.map(i => ({ file: i, name: humanize(i) }));
 
 	this.set({
@@ -10018,10 +9853,10 @@ function add_css$3() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$7(component, state) {
+function create_main_fragment$8(component, state) {
 	var if_block_anchor;
 
-	var if_block = (state.data) && create_if_block$7(component, state);
+	var if_block = (state.data) && create_if_block$8(component, state);
 
 	return {
 		c: function create() {
@@ -10039,7 +9874,7 @@ function create_main_fragment$7(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$7(component, state);
+					if_block = create_if_block$8(component, state);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -10062,7 +9897,7 @@ function create_main_fragment$7(component, state) {
 }
 
 // (16:8) {{#each files as file}}
-function create_each_block$3(component, state) {
+function create_each_block$2(component, state) {
 	var file = state.file, each_value = state.each_value, file_index = state.file_index;
 	var li, a, text_value = file.name, text, a_href_value;
 
@@ -10114,7 +9949,7 @@ function create_if_block_2$4(component, state) {
 	var each_blocks = [];
 
 	for (var i = 0; i < each_value.length; i += 1) {
-		each_blocks[i] = create_each_block$3(component, assign(assign({}, state), {
+		each_blocks[i] = create_each_block$2(component, assign(assign({}, state), {
 			each_value: each_value,
 			file: each_value[i],
 			file_index: i
@@ -10164,7 +9999,7 @@ function create_if_block_2$4(component, state) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, each_context);
 					} else {
-						each_blocks[i] = create_each_block$3(component, each_context);
+						each_blocks[i] = create_each_block$2(component, each_context);
 						each_blocks[i].c();
 						each_blocks[i].m(ul, null);
 					}
@@ -10237,7 +10072,7 @@ function create_each_block_1$1(component, state) {
 }
 
 // (32:2) {{#if files && files.length >0 }}
-function create_if_block_4$3(component, state) {
+function create_if_block_4$2(component, state) {
 	var div, span, text_1, ul;
 
 	var each_value_1 = state.files;
@@ -10439,10 +10274,10 @@ function create_if_block_1$5(component, state) {
 }
 
 // (29:39) 
-function create_if_block_3$4(component, state) {
+function create_if_block_3$3(component, state) {
 	var div, raw_value = state.data.content, raw_after, text;
 
-	var if_block = (state.files && state.files.length >0) && create_if_block_4$3(component, state);
+	var if_block = (state.files && state.files.length >0) && create_if_block_4$2(component, state);
 
 	return {
 		c: function create() {
@@ -10475,7 +10310,7 @@ function create_if_block_3$4(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block_4$3(component, state);
+					if_block = create_if_block_4$2(component, state);
 					if_block.c();
 					if_block.m(div, null);
 				}
@@ -10500,12 +10335,12 @@ function create_if_block_3$4(component, state) {
 }
 
 // (1:0) {{#if data }}
-function create_if_block$7(component, state) {
+function create_if_block$8(component, state) {
 	var if_block_anchor;
 
 	function select_block_type(state) {
 		if (state.data.placement == 'Hint') return create_if_block_1$5;
-		if (state.data.placement == 'Inline') return create_if_block_3$4;
+		if (state.data.placement == 'Inline') return create_if_block_3$3;
 		return null;
 	}
 
@@ -10548,7 +10383,7 @@ function create_if_block$7(component, state) {
 	};
 }
 
-function SvelteComponent$7(options) {
+function SvelteComponent$8(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = assign(data$4(), options.data);
@@ -10558,7 +10393,7 @@ function SvelteComponent$7(options) {
 	var self = this;
 	var _oncreate = function() {
 		var changed = { data: 1, modalId: 1, open: 1, files: 1 };
-		oncreate$4.call(self);
+		oncreate$5.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -10566,7 +10401,7 @@ function SvelteComponent$7(options) {
 		this._oncreate = [];
 	}
 
-	this._fragment = create_main_fragment$7(this, this._state);
+	this._fragment = create_main_fragment$8(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -10578,8 +10413,8 @@ function SvelteComponent$7(options) {
 	}
 }
 
-assign(SvelteComponent$7.prototype, proto);
-assign(SvelteComponent$7.prototype, methods$2);
+assign(SvelteComponent$8.prototype, proto);
+assign(SvelteComponent$8.prototype, methods$2);
 
 /* src\core\ui\Form.html generated by Svelte v1.64.1 */
 let tabindex = 1;
@@ -10777,10 +10612,10 @@ function add_css() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$3(component, state) {
+function create_main_fragment$4(component, state) {
 	var if_block_anchor;
 
-	var if_block = (state.initialized) && create_if_block$3(component, state);
+	var if_block = (state.initialized) && create_if_block$4(component, state);
 
 	return {
 		c: function create() {
@@ -10798,7 +10633,7 @@ function create_main_fragment$3(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$3(component, state);
+					if_block = create_if_block$4(component, state);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -10821,11 +10656,11 @@ function create_main_fragment$3(component, state) {
 }
 
 // (8:3) {{#each documentation as document }}
-function create_each_block$2(component, state) {
+function create_each_block$1(component, state) {
 	var document_1 = state.document, each_value = state.each_value, document_index = state.document_index;
 
 	var help_initial_data = { data: document_1 };
-	var help = new SvelteComponent$7({
+	var help = new SvelteComponent$8({
 		root: component.root,
 		data: help_initial_data
 	});
@@ -10867,7 +10702,7 @@ function create_if_block_2$1(component, state) {
 	var each_blocks = [];
 
 	for (var i = 0; i < each_value.length; i += 1) {
-		each_blocks[i] = create_each_block$2(component, assign(assign({}, state), {
+		each_blocks[i] = create_each_block$1(component, assign(assign({}, state), {
 			each_value: each_value,
 			document: each_value[i],
 			document_index: i
@@ -10905,7 +10740,7 @@ function create_if_block_2$1(component, state) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, each_context);
 					} else {
-						each_blocks[i] = create_each_block$2(component, each_context);
+						each_blocks[i] = create_each_block$1(component, each_context);
 						each_blocks[i].c();
 						each_blocks[i].m(each_anchor.parentNode, each_anchor);
 					}
@@ -11002,7 +10837,7 @@ function create_each_block_1(component, state) {
 	 	tabindex: state.tabindex * 100 + inputField.metadata.orderIndex,
 	 	form: state.self
 	 };
-	var forminput = new SvelteComponent$4({
+	var forminput = new SvelteComponent$5({
 		root: component.root,
 		data: forminput_initial_data
 	});
@@ -11039,7 +10874,7 @@ function create_each_block_1(component, state) {
 }
 
 // (15:1) {{#if initialized && visibleInputFields.length > 0}}
-function create_if_block_3$1(component, state) {
+function create_if_block_3(component, state) {
 	var div, form, text, div_1, button;
 
 	var each_value_1 = state.visibleInputFields;
@@ -11209,7 +11044,7 @@ function create_if_block_5(component, state) {
 	 	form: state.form,
 	 	parent: state.self
 	 };
-	var formoutput = new SvelteComponent$6({
+	var formoutput = new SvelteComponent$7({
 		root: component.root,
 		data: formoutput_initial_data
 	});
@@ -11246,7 +11081,7 @@ function create_if_block_5(component, state) {
 }
 
 // (28:1) {{#if outputFieldValues != null}}
-function create_if_block_4$1(component, state) {
+function create_if_block_4(component, state) {
 	var div;
 
 	var each_value_2 = state.outputFieldValues;
@@ -11326,14 +11161,14 @@ function create_if_block_4$1(component, state) {
 }
 
 // (1:0) {{#if initialized}}
-function create_if_block$3(component, state) {
+function create_if_block$4(component, state) {
 	var div, text, text_1, div_class_value;
 
 	var if_block = ((state.responseMetadata.title != null && state.responseMetadata.title != "") || (state.metadata.label != null && state.metadata.label != "")) && create_if_block_1$2(component, state);
 
-	var if_block_1 = (state.initialized && state.visibleInputFields.length > 0) && create_if_block_3$1(component, state);
+	var if_block_1 = (state.initialized && state.visibleInputFields.length > 0) && create_if_block_3(component, state);
 
-	var if_block_2 = (state.outputFieldValues != null) && create_if_block_4$1(component, state);
+	var if_block_2 = (state.outputFieldValues != null) && create_if_block_4(component, state);
 
 	return {
 		c: function create() {
@@ -11378,7 +11213,7 @@ function create_if_block$3(component, state) {
 				if (if_block_1) {
 					if_block_1.p(changed, state);
 				} else {
-					if_block_1 = create_if_block_3$1(component, state);
+					if_block_1 = create_if_block_3(component, state);
 					if_block_1.c();
 					if_block_1.m(div, text_1);
 				}
@@ -11392,7 +11227,7 @@ function create_if_block$3(component, state) {
 				if (if_block_2) {
 					if_block_2.p(changed, state);
 				} else {
-					if_block_2 = create_if_block_4$1(component, state);
+					if_block_2 = create_if_block_4(component, state);
 					if_block_2.c();
 					if_block_2.m(div, null);
 				}
@@ -11422,7 +11257,7 @@ function create_if_block$3(component, state) {
 	};
 }
 
-function SvelteComponent$3(options) {
+function SvelteComponent$4(options) {
 	init(this, options);
 	this._state = assign(data$1(), options.data);
 
@@ -11436,7 +11271,7 @@ function SvelteComponent$3(options) {
 		this._aftercreate = [];
 	}
 
-	this._fragment = create_main_fragment$3(this, this._state);
+	this._fragment = create_main_fragment$4(this, this._state);
 
 	if (options.target) {
 		this._fragment.c();
@@ -11450,8 +11285,8 @@ function SvelteComponent$3(options) {
 	}
 }
 
-assign(SvelteComponent$3.prototype, proto);
-assign(SvelteComponent$3.prototype, methods);
+assign(SvelteComponent$4.prototype, proto);
+assign(SvelteComponent$4.prototype, methods);
 
 var AppRouter = (function () {
     function AppRouter(element, app) {
@@ -11462,11 +11297,11 @@ var AppRouter = (function () {
         this.stateRouter.addState({
             name: "home",
             route: "/home",
-            template: SvelteComponent$2,
+            template: SvelteComponent$3,
             resolve: function (data, parameters, cb) {
                 cb(false, {
                     app: app,
-                    parent: SvelteComponent$3
+                    parent: SvelteComponent$4
                 });
             }
         });
@@ -11478,12 +11313,6 @@ var AppRouter = (function () {
             resolve: function (data, parameters, cb) {
                 cb(false, {
                     forms: app.forms,
-                    getMenu: function (form) {
-                        if (form.customProperties != null) {
-                            return app.getMenu(form.customProperties.menu);
-                        }
-                        return null;
-                    },
                     makeUrl: function (formId) { return self.makeUrl(formId, null); }
                 });
             }
@@ -11492,7 +11321,7 @@ var AppRouter = (function () {
             name: "form",
             data: {},
             route: "/form/:_id",
-            template: SvelteComponent$3,
+            template: SvelteComponent$4,
             // Force route reload when value of _d parameter changes. This is
             // needed because by default the router will not reload route even if
             // any of the parameters change, unless they are specified in "querystringParameters".
@@ -11868,12 +11697,13 @@ var MultiSelectInputController = (function (_super) {
         return Promise.resolve(valueToSubmit);
     };
     MultiSelectInputController.prototype.parse = function (value) {
-        return value == null || value == ""
+        return value == null || value === ""
             ? new MultiSelectValue()
             : new MultiSelectValue(value.split(","));
     };
     return MultiSelectInputController;
 }(InputController));
+// tslint:disable-next-line:max-classes-per-file
 var MultiSelectValue = (function () {
     function MultiSelectValue(items) {
         this.items = [];
@@ -11925,8 +11755,8 @@ var NumberRangeInputController = (function (_super) {
     NumberRangeInputController.prototype.getValue = function () {
         return Promise.resolve(this.value);
     };
-    NumberRangeInputController.prototype.serializeValue = function (number) {
-        var parsed = this.parse(number);
+    NumberRangeInputController.prototype.serializeValue = function (num) {
+        var parsed = this.parse(num);
         return parsed != null ? parsed.serialize() : "";
     };
     NumberRangeInputController.prototype.parse = function (value) {
@@ -11939,6 +11769,7 @@ var NumberRangeInputController = (function (_super) {
     };
     return NumberRangeInputController;
 }(InputController));
+// tslint:disable-next-line:max-classes-per-file
 var NumberRange = (function () {
     function NumberRange(min, max) {
         if (min === void 0) { min = null; }
@@ -11948,7 +11779,8 @@ var NumberRange = (function () {
     }
     NumberRange.parse = function (range) {
         var split = range.split("|");
-        var minValue = parseFloat(split[0]), maxValue = parseFloat(split[1]);
+        var minValue = parseFloat(split[0]);
+        var maxValue = parseFloat(split[1]);
         return new NumberRange(minValue, maxValue);
     };
     NumberRange.prototype.serialize = function () {
@@ -12133,11 +11965,11 @@ function add_css$4() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$8(component, state) {
+function create_main_fragment$9(component, state) {
 	var if_block_anchor;
 
 	function select_block_type(state) {
-		if (state.field.metadata.required) return create_if_block$8;
+		if (state.field.metadata.required) return create_if_block$9;
 		return create_if_block_1$6;
 	}
 
@@ -12179,7 +12011,7 @@ function create_main_fragment$8(component, state) {
 }
 
 // (1:0) {{#if field.metadata.required}}
-function create_if_block$8(component, state) {
+function create_if_block$9(component, state) {
 	var input;
 
 	function input_change_handler() {
@@ -12295,7 +12127,7 @@ function create_if_block_1$6(component, state) {
 	};
 }
 
-function SvelteComponent$8(options) {
+function SvelteComponent$9(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
@@ -12306,7 +12138,7 @@ function SvelteComponent$8(options) {
 		this._beforecreate = [];
 	}
 
-	this._fragment = create_main_fragment$8(this, this._state);
+	this._fragment = create_main_fragment$9(this, this._state);
 
 	if (options.target) {
 		this._fragment.c();
@@ -12316,7 +12148,7 @@ function SvelteComponent$8(options) {
 	}
 }
 
-assign(SvelteComponent$8.prototype, proto);
+assign(SvelteComponent$9.prototype, proto);
 
 var hookCallback;
 
@@ -18012,7 +17844,7 @@ var pikaday = createCommonjsModule(function (module, exports) {
 });
 
 /* src\core\ui\inputs\Date.html generated by Svelte v1.64.1 */
-function oncreate$5() {
+function oncreate$6() {
     var field = this.get("field");
     new pikaday({
         field: this.refs.container,
@@ -18031,7 +17863,7 @@ function oncreate$5() {
         });
 }
 
-function create_main_fragment$9(component, state) {
+function create_main_fragment$10(component, state) {
 	var input, input_updating = false, input_required_value;
 
 	function input_input_handler() {
@@ -18091,7 +17923,7 @@ function create_main_fragment$9(component, state) {
 	};
 }
 
-function SvelteComponent$9(options) {
+function SvelteComponent$10(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = assign({}, options.data);
@@ -18099,7 +17931,7 @@ function SvelteComponent$9(options) {
 	var self = this;
 	var _oncreate = function() {
 		var changed = { id: 1, field: 1, tabindex: 1 };
-		oncreate$5.call(self);
+		oncreate$6.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -18107,7 +17939,7 @@ function SvelteComponent$9(options) {
 		this._oncreate = [];
 	}
 
-	this._fragment = create_main_fragment$9(this, this._state);
+	this._fragment = create_main_fragment$10(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -18119,10 +17951,10 @@ function SvelteComponent$9(options) {
 	}
 }
 
-assign(SvelteComponent$9.prototype, proto);
+assign(SvelteComponent$10.prototype, proto);
 
 /* src\core\ui\inputs\DateRange.html generated by Svelte v1.64.1 */
-function oncreate$6() {
+function oncreate$7() {
     var field = this.get("field");
 
     new pikaday({
@@ -18163,7 +17995,7 @@ function add_css$5() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$10(component, state) {
+function create_main_fragment$11(component, state) {
 	var div, span, text_1, input, input_updating = false, input_required_value, text_2, span_1, text_4, input_1, input_1_updating = false, input_1_required_value;
 
 	function input_input_handler() {
@@ -18266,7 +18098,7 @@ function create_main_fragment$10(component, state) {
 	};
 }
 
-function SvelteComponent$10(options) {
+function SvelteComponent$11(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = assign({}, options.data);
@@ -18276,7 +18108,7 @@ function SvelteComponent$10(options) {
 	var self = this;
 	var _oncreate = function() {
 		var changed = { field: 1, tabindex: 1 };
-		oncreate$6.call(self);
+		oncreate$7.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -18284,7 +18116,7 @@ function SvelteComponent$10(options) {
 		this._oncreate = [];
 	}
 
-	this._fragment = create_main_fragment$10(this, this._state);
+	this._fragment = create_main_fragment$11(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -18296,7 +18128,7 @@ function SvelteComponent$10(options) {
 	}
 }
 
-assign(SvelteComponent$10.prototype, proto);
+assign(SvelteComponent$11.prototype, proto);
 
 /* src\core\ui\inputs\Dropdown.html generated by Svelte v1.64.1 */
 function mapToTypeaheadItems(items) {
@@ -18337,7 +18169,7 @@ var methods$3 = {
 	}
 };
 
-function oncreate$7() {
+function oncreate$8() {
 	const field = this.get("field");
 	const { source, items } = field.metadata.customProperties;
 
@@ -18357,10 +18189,10 @@ function oncreate$7() {
 	}
 }
 
-function create_main_fragment$11(component, state) {
+function create_main_fragment$12(component, state) {
 	var if_block_anchor;
 
-	var if_block = (state.options != null) && create_if_block$9(component, state);
+	var if_block = (state.options != null) && create_if_block$10(component, state);
 
 	return {
 		c: function create() {
@@ -18378,7 +18210,7 @@ function create_main_fragment$11(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$9(component, state);
+					if_block = create_if_block$10(component, state);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -18401,7 +18233,7 @@ function create_main_fragment$11(component, state) {
 }
 
 // (10:1) {{#each options as option}}
-function create_each_block$4(component, state) {
+function create_each_block$3(component, state) {
 	var option = state.option, each_value = state.each_value, option_index = state.option_index;
 	var option_1, text_value = option.label, text, option_1_value_value;
 
@@ -18446,7 +18278,7 @@ function create_each_block$4(component, state) {
 }
 
 // (1:0) {{#if options != null }}
-function create_if_block$9(component, state) {
+function create_if_block$10(component, state) {
 	var select, option, select_updating = false, select_required_value;
 
 	var each_value = state.options;
@@ -18454,7 +18286,7 @@ function create_if_block$9(component, state) {
 	var each_blocks = [];
 
 	for (var i = 0; i < each_value.length; i += 1) {
-		each_blocks[i] = create_each_block$4(component, assign(assign({}, state), {
+		each_blocks[i] = create_each_block$3(component, assign(assign({}, state), {
 			each_value: each_value,
 			option: each_value[i],
 			option_index: i
@@ -18521,7 +18353,7 @@ function create_if_block$9(component, state) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, each_context);
 					} else {
-						each_blocks[i] = create_each_block$4(component, each_context);
+						each_blocks[i] = create_each_block$3(component, each_context);
 						each_blocks[i].c();
 						each_blocks[i].m(select, null);
 					}
@@ -18565,14 +18397,14 @@ function create_if_block$9(component, state) {
 	};
 }
 
-function SvelteComponent$11(options) {
+function SvelteComponent$12(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
 	var self = this;
 	var _oncreate = function() {
 		var changed = { options: 1, id: 1, field: 1, tabindex: 1 };
-		oncreate$7.call(self);
+		oncreate$8.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -18581,7 +18413,7 @@ function SvelteComponent$11(options) {
 		this._beforecreate = [];
 	}
 
-	this._fragment = create_main_fragment$11(this, this._state);
+	this._fragment = create_main_fragment$12(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -18594,11 +18426,11 @@ function SvelteComponent$11(options) {
 	}
 }
 
-assign(SvelteComponent$11.prototype, proto);
-assign(SvelteComponent$11.prototype, methods$3);
+assign(SvelteComponent$12.prototype, proto);
+assign(SvelteComponent$12.prototype, methods$3);
 
 /* src\core\ui\inputs\Email.html generated by Svelte v1.64.1 */
-function oncreate$8() {
+function oncreate$9() {
     var field = this.get("field");
     var formElement = this.refs.container;
     formElement.addEventListener("change", function (e) {
@@ -18606,7 +18438,7 @@ function oncreate$8() {
     });
 }
 
-function create_main_fragment$12(component, state) {
+function create_main_fragment$13(component, state) {
 	var input, input_updating = false, input_required_value;
 
 	function input_input_handler() {
@@ -18665,7 +18497,7 @@ function create_main_fragment$12(component, state) {
 	};
 }
 
-function SvelteComponent$12(options) {
+function SvelteComponent$13(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = assign({}, options.data);
@@ -18673,7 +18505,7 @@ function SvelteComponent$12(options) {
 	var self = this;
 	var _oncreate = function() {
 		var changed = { id: 1, field: 1, tabindex: 1 };
-		oncreate$8.call(self);
+		oncreate$9.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -18681,7 +18513,7 @@ function SvelteComponent$12(options) {
 		this._oncreate = [];
 	}
 
-	this._fragment = create_main_fragment$12(this, this._state);
+	this._fragment = create_main_fragment$13(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -18693,7 +18525,7 @@ function SvelteComponent$12(options) {
 	}
 }
 
-assign(SvelteComponent$12.prototype, proto);
+assign(SvelteComponent$13.prototype, proto);
 
 /* src\core\ui\inputs\FileUploader.html generated by Svelte v1.64.1 */
 function objectToArray(obj) {
@@ -18774,7 +18606,7 @@ var methods$4 = {
 	}
 };
 
-function oncreate$9() {
+function oncreate$10() {
 	const field = this.get("field");
 
 	const uploaderConfig =
@@ -18815,10 +18647,10 @@ function add_css$6() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$13(component_1, state) {
+function create_main_fragment$14(component_1, state) {
 	var text, div, text_1, label;
 
-	var if_block = (state.selectedFiles != null && state.selectedFiles.length > 0) && create_if_block$10(component_1, state);
+	var if_block = (state.selectedFiles != null && state.selectedFiles.length > 0) && create_if_block$11(component_1, state);
 
 	function select_block_type(state) {
 		if (state.uploaderConfig != null && state.uploaderConfig.allowMultipleFiles) return create_if_block_1$7;
@@ -18860,7 +18692,7 @@ function create_main_fragment$13(component_1, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$10(component_1, state);
+					if_block = create_if_block$11(component_1, state);
 					if_block.c();
 					if_block.m(text.parentNode, text);
 				}
@@ -18901,7 +18733,7 @@ function create_main_fragment$13(component_1, state) {
 }
 
 // (3:1) {{#each selectedFiles as file, index}}
-function create_each_block$5(component_1, state) {
+function create_each_block$4(component_1, state) {
 	var file_1 = state.file, each_value = state.each_value, index = state.index;
 	var li, text_value = file_1.name, text, text_1, i;
 
@@ -18955,7 +18787,7 @@ function create_each_block$5(component_1, state) {
 }
 
 // (1:0) {{#if selectedFiles != null && selectedFiles.length > 0}}
-function create_if_block$10(component_1, state) {
+function create_if_block$11(component_1, state) {
 	var ul;
 
 	var each_value = state.selectedFiles;
@@ -18963,7 +18795,7 @@ function create_if_block$10(component_1, state) {
 	var each_blocks = [];
 
 	for (var i = 0; i < each_value.length; i += 1) {
-		each_blocks[i] = create_each_block$5(component_1, assign(assign({}, state), {
+		each_blocks[i] = create_each_block$4(component_1, assign(assign({}, state), {
 			each_value: each_value,
 			file: each_value[i],
 			index: i
@@ -19006,7 +18838,7 @@ function create_if_block$10(component_1, state) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, each_context);
 					} else {
-						each_blocks[i] = create_each_block$5(component_1, each_context);
+						each_blocks[i] = create_each_block$4(component_1, each_context);
 						each_blocks[i].c();
 						each_blocks[i].m(ul, null);
 					}
@@ -19141,7 +18973,7 @@ function click_handler(event) {
 	component_1.removeFile(index);
 }
 
-function SvelteComponent$13(options) {
+function SvelteComponent$14(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = assign({}, options.data);
@@ -19151,7 +18983,7 @@ function SvelteComponent$13(options) {
 	var self = this;
 	var _oncreate = function() {
 		var changed = { selectedFiles: 1, uploaderConfig: 1, id: 1, tabindex: 1 };
-		oncreate$9.call(self);
+		oncreate$10.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -19159,7 +18991,7 @@ function SvelteComponent$13(options) {
 		this._oncreate = [];
 	}
 
-	this._fragment = create_main_fragment$13(this, this._state);
+	this._fragment = create_main_fragment$14(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -19171,8 +19003,8 @@ function SvelteComponent$13(options) {
 	}
 }
 
-assign(SvelteComponent$13.prototype, proto);
-assign(SvelteComponent$13.prototype, methods$4);
+assign(SvelteComponent$14.prototype, proto);
+assign(SvelteComponent$14.prototype, methods$4);
 
 var choices = createCommonjsModule(function (module, exports) {
 /*! choices.js v3.0.4 | (c) 2018 Josh Johnson | https://github.com/jshjohnson/Choices#readme */ 
@@ -25441,7 +25273,7 @@ var methods$5 = {
 	}
 };
 
-function oncreate$10() {
+function oncreate$11() {
 	var field = this.get("field");
 	var source = field.metadata.customProperties.source;
 	var parameters = field.metadata.customProperties.parameters;
@@ -25509,7 +25341,7 @@ function oncreate$10() {
 	});
 }
 
-function create_main_fragment$14(component, state) {
+function create_main_fragment$15(component, state) {
 	var select;
 
 	function change_handler(event) {
@@ -25556,7 +25388,7 @@ function create_main_fragment$14(component, state) {
 	};
 }
 
-function SvelteComponent$14(options) {
+function SvelteComponent$15(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = assign({}, options.data);
@@ -25564,7 +25396,7 @@ function SvelteComponent$14(options) {
 	var self = this;
 	var _oncreate = function() {
 		var changed = { id: 1, tabindex: 1 };
-		oncreate$10.call(self);
+		oncreate$11.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -25572,7 +25404,7 @@ function SvelteComponent$14(options) {
 		this._oncreate = [];
 	}
 
-	this._fragment = create_main_fragment$14(this, this._state);
+	this._fragment = create_main_fragment$15(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -25584,11 +25416,11 @@ function SvelteComponent$14(options) {
 	}
 }
 
-assign(SvelteComponent$14.prototype, proto);
-assign(SvelteComponent$14.prototype, methods$5);
+assign(SvelteComponent$15.prototype, proto);
+assign(SvelteComponent$15.prototype, methods$5);
 
 /* src\core\ui\inputs\Number.html generated by Svelte v1.64.1 */
-function oncreate$11() {
+function oncreate$12() {
 	var field = this.get("field");
 	var numberConfig = field.metadata.customProperties != null &&
 		field.metadata.customProperties["numberConfig"] != null
@@ -25603,10 +25435,10 @@ function oncreate$11() {
 	});
 }
 
-function create_main_fragment$15(component, state) {
+function create_main_fragment$16(component, state) {
 	var if_block_anchor;
 
-	var if_block = (state.numberConfig != null) && create_if_block$11(component, state);
+	var if_block = (state.numberConfig != null) && create_if_block$12(component, state);
 
 	return {
 		c: function create() {
@@ -25624,7 +25456,7 @@ function create_main_fragment$15(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$11(component, state);
+					if_block = create_if_block$12(component, state);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -25647,7 +25479,7 @@ function create_main_fragment$15(component, state) {
 }
 
 // (1:0) {{#if numberConfig != null}}
-function create_if_block$11(component, state) {
+function create_if_block$12(component, state) {
 	var input, input_updating = false, input_required_value, input_step_value, input_min_value, input_max_value;
 
 	function input_input_handler() {
@@ -25719,14 +25551,14 @@ function create_if_block$11(component, state) {
 	};
 }
 
-function SvelteComponent$15(options) {
+function SvelteComponent$16(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
 	var self = this;
 	var _oncreate = function() {
 		var changed = { numberConfig: 1, id: 1, field: 1, tabindex: 1 };
-		oncreate$11.call(self);
+		oncreate$12.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -25734,7 +25566,7 @@ function SvelteComponent$15(options) {
 		this._oncreate = [];
 	}
 
-	this._fragment = create_main_fragment$15(this, this._state);
+	this._fragment = create_main_fragment$16(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -25746,10 +25578,10 @@ function SvelteComponent$15(options) {
 	}
 }
 
-assign(SvelteComponent$15.prototype, proto);
+assign(SvelteComponent$16.prototype, proto);
 
 /* src\core\ui\inputs\NumberRange.html generated by Svelte v1.64.1 */
-function oncreate$12() {
+function oncreate$13() {
 	const field = this.get("field");
 
 	if (field == null) {
@@ -25774,10 +25606,10 @@ function add_css$7() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$16(component, state) {
+function create_main_fragment$17(component, state) {
 	var if_block_anchor;
 
-	var if_block = (state.numberConfig != null) && create_if_block$12(component, state);
+	var if_block = (state.numberConfig != null) && create_if_block$13(component, state);
 
 	return {
 		c: function create() {
@@ -25795,7 +25627,7 @@ function create_main_fragment$16(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$12(component, state);
+					if_block = create_if_block$13(component, state);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -25818,7 +25650,7 @@ function create_main_fragment$16(component, state) {
 }
 
 // (1:0) {{#if numberConfig != null}}
-function create_if_block$12(component, state) {
+function create_if_block$13(component, state) {
 	var div, span, text_1, input, input_updating = false, input_required_value, input_step_value, input_min_value, input_max_value, text_2, span_1, text_4, input_1, input_1_updating = false, input_1_required_value, input_1_step_value, input_1_min_value, input_1_max_value;
 
 	function input_input_handler() {
@@ -25947,7 +25779,7 @@ function create_if_block$12(component, state) {
 	};
 }
 
-function SvelteComponent$16(options) {
+function SvelteComponent$17(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
@@ -25956,7 +25788,7 @@ function SvelteComponent$16(options) {
 	var self = this;
 	var _oncreate = function() {
 		var changed = { numberConfig: 1, field: 1, tabindex: 1 };
-		oncreate$12.call(self);
+		oncreate$13.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -25964,7 +25796,7 @@ function SvelteComponent$16(options) {
 		this._oncreate = [];
 	}
 
-	this._fragment = create_main_fragment$16(this, this._state);
+	this._fragment = create_main_fragment$17(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -25976,7 +25808,7 @@ function SvelteComponent$16(options) {
 	}
 }
 
-assign(SvelteComponent$16.prototype, proto);
+assign(SvelteComponent$17.prototype, proto);
 
 /* src\core\ui\inputs\Password.html generated by Svelte v1.64.1 */
 var methods$6 = {
@@ -25990,7 +25822,7 @@ var methods$6 = {
 	}
 };
 
-function oncreate$13() {
+function oncreate$14() {
 	const field = this.get("field");
 	const config = (field.metadata.customProperties || {}).passwordInputConfig;
 
@@ -26009,10 +25841,10 @@ function add_css$8() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$17(component, state) {
+function create_main_fragment$18(component, state) {
 	var if_block_anchor;
 
-	var if_block = (state.passwordConfig != null) && create_if_block$13(component, state);
+	var if_block = (state.passwordConfig != null) && create_if_block$14(component, state);
 
 	return {
 		c: function create() {
@@ -26030,7 +25862,7 @@ function create_main_fragment$17(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$13(component, state);
+					if_block = create_if_block$14(component, state);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -26187,7 +26019,7 @@ function create_if_block_2$6(component, state) {
 }
 
 // (19:4) {{#if passwordConfig.requireConfirmation}}
-function create_if_block_3$5(component, state) {
+function create_if_block_3$4(component, state) {
 	var div, input, input_required_value, input_tabindex_value;
 
 	function change_handler(event) {
@@ -26237,7 +26069,7 @@ function create_if_block_3$5(component, state) {
 }
 
 // (1:0) {{#if passwordConfig != null}}
-function create_if_block$13(component, state) {
+function create_if_block$14(component, state) {
 	var text, if_block_1_anchor;
 
 	function select_block_type(state) {
@@ -26248,7 +26080,7 @@ function create_if_block$13(component, state) {
 	var current_block_type = select_block_type(state);
 	var if_block = current_block_type(component, state);
 
-	var if_block_1 = (state.passwordConfig.requireConfirmation) && create_if_block_3$5(component, state);
+	var if_block_1 = (state.passwordConfig.requireConfirmation) && create_if_block_3$4(component, state);
 
 	return {
 		c: function create() {
@@ -26280,7 +26112,7 @@ function create_if_block$13(component, state) {
 				if (if_block_1) {
 					if_block_1.p(changed, state);
 				} else {
-					if_block_1 = create_if_block_3$5(component, state);
+					if_block_1 = create_if_block_3$4(component, state);
 					if_block_1.c();
 					if_block_1.m(if_block_1_anchor.parentNode, if_block_1_anchor);
 				}
@@ -26305,7 +26137,7 @@ function create_if_block$13(component, state) {
 	};
 }
 
-function SvelteComponent$17(options) {
+function SvelteComponent$18(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
@@ -26314,7 +26146,7 @@ function SvelteComponent$17(options) {
 	var self = this;
 	var _oncreate = function() {
 		var changed = { passwordConfig: 1, id: 1, field: 1, tabindex: 1 };
-		oncreate$13.call(self);
+		oncreate$14.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -26322,7 +26154,7 @@ function SvelteComponent$17(options) {
 		this._oncreate = [];
 	}
 
-	this._fragment = create_main_fragment$17(this, this._state);
+	this._fragment = create_main_fragment$18(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -26334,11 +26166,11 @@ function SvelteComponent$17(options) {
 	}
 }
 
-assign(SvelteComponent$17.prototype, proto);
-assign(SvelteComponent$17.prototype, methods$6);
+assign(SvelteComponent$18.prototype, proto);
+assign(SvelteComponent$18.prototype, methods$6);
 
 /* src\core\ui\inputs\Text.html generated by Svelte v1.64.1 */
-function create_main_fragment$18(component, state) {
+function create_main_fragment$19(component, state) {
 	var input, input_updating = false, input_required_value;
 
 	function input_input_handler() {
@@ -26395,11 +26227,11 @@ function create_main_fragment$18(component, state) {
 	};
 }
 
-function SvelteComponent$18(options) {
+function SvelteComponent$19(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
-	this._fragment = create_main_fragment$18(this, this._state);
+	this._fragment = create_main_fragment$19(this, this._state);
 
 	if (options.target) {
 		this._fragment.c();
@@ -26407,7 +26239,7 @@ function SvelteComponent$18(options) {
 	}
 }
 
-assign(SvelteComponent$18.prototype, proto);
+assign(SvelteComponent$19.prototype, proto);
 
 /* src\core\ui\inputs\Textarea.html generated by Svelte v1.64.1 */
 function add_css$9() {
@@ -26417,7 +26249,7 @@ function add_css$9() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$19(component, state) {
+function create_main_fragment$20(component, state) {
 	var textarea, textarea_updating = false, textarea_required_value;
 
 	function textarea_input_handler() {
@@ -26474,13 +26306,13 @@ function create_main_fragment$19(component, state) {
 	};
 }
 
-function SvelteComponent$19(options) {
+function SvelteComponent$20(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
 	if (!document.getElementById("svelte-1aezpf0-style")) add_css$9();
 
-	this._fragment = create_main_fragment$19(this, this._state);
+	this._fragment = create_main_fragment$20(this, this._state);
 
 	if (options.target) {
 		this._fragment.c();
@@ -26488,7 +26320,7 @@ function SvelteComponent$19(options) {
 	}
 }
 
-assign(SvelteComponent$19.prototype, proto);
+assign(SvelteComponent$20.prototype, proto);
 
 /**
  * Represents an event triggered by an action-list.
@@ -26564,7 +26396,7 @@ var methods$7 = {
 		else {
 			this.set({ open: true });
 
-			var f = new SvelteComponent$3({
+			var f = new SvelteComponent$4({
 				target: this.refs.container,
 				data: {
 					metadata: formInstance.metadata,
@@ -26626,10 +26458,10 @@ function add_css$10() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$20(component, state) {
+function create_main_fragment$21(component, state) {
 	var if_block_anchor;
 
-	var if_block = (state.field.data != null && state.field.data.actions != null && state.field.data.actions.length > 0) && create_if_block$14(component, state);
+	var if_block = (state.field.data != null && state.field.data.actions != null && state.field.data.actions.length > 0) && create_if_block$15(component, state);
 
 	return {
 		c: function create() {
@@ -26647,7 +26479,7 @@ function create_main_fragment$20(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$14(component, state);
+					if_block = create_if_block$15(component, state);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -26670,7 +26502,7 @@ function create_main_fragment$20(component, state) {
 }
 
 // (3:1) {{#each field.data.actions as action}}
-function create_each_block$6(component, state) {
+function create_each_block$5(component, state) {
 	var action = state.action, each_value = state.each_value, action_index = state.action_index;
 	var li;
 
@@ -26822,7 +26654,7 @@ function create_if_block_2$7(component, state) {
 }
 
 // (1:0) {{#if field.data != null && field.data.actions != null && field.data.actions.length > 0}}
-function create_if_block$14(component, state) {
+function create_if_block$15(component, state) {
 	var ul, text, input, input_id_value, text_1, div, div_1, label, text_2, div_2;
 
 	var each_value = state.field.data.actions;
@@ -26830,7 +26662,7 @@ function create_if_block$14(component, state) {
 	var each_blocks = [];
 
 	for (var i = 0; i < each_value.length; i += 1) {
-		each_blocks[i] = create_each_block$6(component, assign(assign({}, state), {
+		each_blocks[i] = create_each_block$5(component, assign(assign({}, state), {
 			each_value: each_value,
 			action: each_value[i],
 			action_index: i
@@ -26911,7 +26743,7 @@ function create_if_block$14(component, state) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, each_context);
 					} else {
-						each_blocks[i] = create_each_block$6(component, each_context);
+						each_blocks[i] = create_each_block$5(component, each_context);
 						each_blocks[i].c();
 						each_blocks[i].m(ul, null);
 					}
@@ -26960,14 +26792,14 @@ function click_handler$1(event) {
 	component.run(action, state.app);
 }
 
-function SvelteComponent$20(options) {
+function SvelteComponent$21(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = assign(data$5(), options.data);
 
 	if (!document.getElementById("svelte-1kdm3za-style")) add_css$10();
 
-	this._fragment = create_main_fragment$20(this, this._state);
+	this._fragment = create_main_fragment$21(this, this._state);
 
 	if (options.target) {
 		this._fragment.c();
@@ -26975,8 +26807,8 @@ function SvelteComponent$20(options) {
 	}
 }
 
-assign(SvelteComponent$20.prototype, proto);
-assign(SvelteComponent$20.prototype, methods$7);
+assign(SvelteComponent$21.prototype, proto);
+assign(SvelteComponent$21.prototype, methods$7);
 
 /* src\core\ui\outputs\Alert.html generated by Svelte v1.64.1 */
 function add_css$11() {
@@ -26986,10 +26818,10 @@ function add_css$11() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$21(component, state) {
+function create_main_fragment$22(component, state) {
 	var if_block_anchor;
 
-	var if_block = (state.field.data != null) && create_if_block$15(component, state);
+	var if_block = (state.field.data != null) && create_if_block$16(component, state);
 
 	return {
 		c: function create() {
@@ -27007,7 +26839,7 @@ function create_main_fragment$21(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$15(component, state);
+					if_block = create_if_block$16(component, state);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -27099,7 +26931,7 @@ function create_if_block_2$8(component, state) {
 }
 
 // (1:0) {{#if field.data != null}}
-function create_if_block$15(component, state) {
+function create_if_block$16(component, state) {
 	var div, text, div_class_value;
 
 	var if_block = (state.field.data.heading != null) && create_if_block_1$10(component, state);
@@ -27173,13 +27005,13 @@ function create_if_block$15(component, state) {
 	};
 }
 
-function SvelteComponent$21(options) {
+function SvelteComponent$22(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
 	if (!document.getElementById("svelte-16fvliq-style")) add_css$11();
 
-	this._fragment = create_main_fragment$21(this, this._state);
+	this._fragment = create_main_fragment$22(this, this._state);
 
 	if (options.target) {
 		this._fragment.c();
@@ -27187,7 +27019,7 @@ function SvelteComponent$21(options) {
 	}
 }
 
-assign(SvelteComponent$21.prototype, proto);
+assign(SvelteComponent$22.prototype, proto);
 
 /* src\core\ui\outputs\Datetime.html generated by Svelte v1.64.1 */
 function format$1(field) {
@@ -27205,7 +27037,7 @@ function format$1(field) {
 
 }
 
-function create_main_fragment$22(component, state) {
+function create_main_fragment$23(component, state) {
 	var text_value = format$1(state.field), text;
 
 	return {
@@ -27231,11 +27063,11 @@ function create_main_fragment$22(component, state) {
 	};
 }
 
-function SvelteComponent$22(options) {
+function SvelteComponent$23(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
-	this._fragment = create_main_fragment$22(this, this._state);
+	this._fragment = create_main_fragment$23(this, this._state);
 
 	if (options.target) {
 		this._fragment.c();
@@ -27243,10 +27075,10 @@ function SvelteComponent$22(options) {
 	}
 }
 
-assign(SvelteComponent$22.prototype, proto);
+assign(SvelteComponent$23.prototype, proto);
 
 /* src\core\ui\outputs\Documentation.html generated by Svelte v1.64.1 */
-function oncreate$14() {
+function oncreate$15() {
 	const content = this.refs.container;
 	const output = this.refs.toc;
 
@@ -27314,10 +27146,10 @@ function add_css$12() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$23(component, state) {
+function create_main_fragment$24(component, state) {
 	var div, div_1, text_1, div_2;
 
-	var if_block = (state.field.data != null && state.field.data.value != null) && create_if_block$16(component, state);
+	var if_block = (state.field.data != null && state.field.data.value != null) && create_if_block$17(component, state);
 
 	return {
 		c: function create() {
@@ -27350,7 +27182,7 @@ function create_main_fragment$23(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$16(component, state);
+					if_block = create_if_block$17(component, state);
 					if_block.c();
 					if_block.m(div_1, null);
 				}
@@ -27375,7 +27207,7 @@ function create_main_fragment$23(component, state) {
 }
 
 // (3:2) {{#if field.data != null && field.data.value != null}}
-function create_if_block$16(component, state) {
+function create_if_block$17(component, state) {
 	var raw_value = state.field.data.value, raw_before, raw_after;
 
 	return {
@@ -27408,7 +27240,7 @@ function create_if_block$16(component, state) {
 	};
 }
 
-function SvelteComponent$23(options) {
+function SvelteComponent$24(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = assign({}, options.data);
@@ -27418,7 +27250,7 @@ function SvelteComponent$23(options) {
 	var self = this;
 	var _oncreate = function() {
 		var changed = { field: 1 };
-		oncreate$14.call(self);
+		oncreate$15.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -27426,7 +27258,7 @@ function SvelteComponent$23(options) {
 		this._oncreate = [];
 	}
 
-	this._fragment = create_main_fragment$23(this, this._state);
+	this._fragment = create_main_fragment$24(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -27438,10 +27270,10 @@ function SvelteComponent$23(options) {
 	}
 }
 
-assign(SvelteComponent$23.prototype, proto);
+assign(SvelteComponent$24.prototype, proto);
 
 /* src\core\ui\outputs\DownloadableFile.html generated by Svelte v1.64.1 */
-function create_main_fragment$24(component, state) {
+function create_main_fragment$25(component, state) {
 	var a, text_value = state.field.data.name, text, a_href_value;
 
 	return {
@@ -27478,11 +27310,11 @@ function create_main_fragment$24(component, state) {
 	};
 }
 
-function SvelteComponent$24(options) {
+function SvelteComponent$25(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
-	this._fragment = create_main_fragment$24(this, this._state);
+	this._fragment = create_main_fragment$25(this, this._state);
 
 	if (options.target) {
 		this._fragment.c();
@@ -27490,7 +27322,7 @@ function SvelteComponent$24(options) {
 	}
 }
 
-assign(SvelteComponent$24.prototype, proto);
+assign(SvelteComponent$25.prototype, proto);
 
 /* src\core\ui\outputs\FileSize.html generated by Svelte v1.64.1 */
 function filesize(bytes) {
@@ -27514,7 +27346,7 @@ function filesize(bytes) {
 	return bytes.toFixed(1) + ' ' + units[u];
 }
 
-function create_main_fragment$25(component, state) {
+function create_main_fragment$26(component, state) {
 	var text_value = filesize(state.field.data.bytes), text;
 
 	return {
@@ -27540,11 +27372,11 @@ function create_main_fragment$25(component, state) {
 	};
 }
 
-function SvelteComponent$25(options) {
+function SvelteComponent$26(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
-	this._fragment = create_main_fragment$25(this, this._state);
+	this._fragment = create_main_fragment$26(this, this._state);
 
 	if (options.target) {
 		this._fragment.c();
@@ -27552,13 +27384,13 @@ function SvelteComponent$25(options) {
 	}
 }
 
-assign(SvelteComponent$25.prototype, proto);
+assign(SvelteComponent$26.prototype, proto);
 
 /* src\core\ui\outputs\FormLink.html generated by Svelte v1.64.1 */
-function create_main_fragment$26(component, state) {
+function create_main_fragment$27(component, state) {
 	var if_block_anchor;
 
-	var if_block = (state.field.data != null) && create_if_block$17(component, state);
+	var if_block = (state.field.data != null) && create_if_block$18(component, state);
 
 	return {
 		c: function create() {
@@ -27576,7 +27408,7 @@ function create_main_fragment$26(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$17(component, state);
+					if_block = create_if_block$18(component, state);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -27666,7 +27498,7 @@ function create_if_block_2$9(component, state) {
 }
 
 // (1:0) {{#if field.data != null}}
-function create_if_block$17(component, state) {
+function create_if_block$18(component, state) {
 	var if_block_anchor;
 
 	function select_block_type(state) {
@@ -27711,11 +27543,11 @@ function create_if_block$17(component, state) {
 	};
 }
 
-function SvelteComponent$26(options) {
+function SvelteComponent$27(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
-	this._fragment = create_main_fragment$26(this, this._state);
+	this._fragment = create_main_fragment$27(this, this._state);
 
 	if (options.target) {
 		this._fragment.c();
@@ -27723,13 +27555,13 @@ function SvelteComponent$26(options) {
 	}
 }
 
-assign(SvelteComponent$26.prototype, proto);
+assign(SvelteComponent$27.prototype, proto);
 
 /* src\core\ui\outputs\HtmlString.html generated by Svelte v1.64.1 */
-function create_main_fragment$27(component, state) {
+function create_main_fragment$28(component, state) {
 	var if_block_anchor;
 
-	var if_block = (state.field.data != null && state.field.data.value != null) && create_if_block$18(component, state);
+	var if_block = (state.field.data != null && state.field.data.value != null) && create_if_block$19(component, state);
 
 	return {
 		c: function create() {
@@ -27747,7 +27579,7 @@ function create_main_fragment$27(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$18(component, state);
+					if_block = create_if_block$19(component, state);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -27770,7 +27602,7 @@ function create_main_fragment$27(component, state) {
 }
 
 // (1:0) {{#if field.data != null && field.data.value != null}}
-function create_if_block$18(component, state) {
+function create_if_block$19(component, state) {
 	var raw_value = state.field.data.value, raw_before, raw_after;
 
 	return {
@@ -27803,97 +27635,6 @@ function create_if_block$18(component, state) {
 	};
 }
 
-function SvelteComponent$27(options) {
-	init(this, options);
-	this._state = assign({}, options.data);
-
-	this._fragment = create_main_fragment$27(this, this._state);
-
-	if (options.target) {
-		this._fragment.c();
-		this._mount(options.target, options.anchor);
-	}
-}
-
-assign(SvelteComponent$27.prototype, proto);
-
-/* src\core\ui\outputs\Image.html generated by Svelte v1.64.1 */
-function create_main_fragment$28(component, state) {
-	var if_block_anchor;
-
-	var if_block = (state.field.data != null) && create_if_block$19(component, state);
-
-	return {
-		c: function create() {
-			if (if_block) if_block.c();
-			if_block_anchor = createComment();
-		},
-
-		m: function mount(target, anchor) {
-			if (if_block) if_block.m(target, anchor);
-			insertNode(if_block_anchor, target, anchor);
-		},
-
-		p: function update(changed, state) {
-			if (state.field.data != null) {
-				if (if_block) {
-					if_block.p(changed, state);
-				} else {
-					if_block = create_if_block$19(component, state);
-					if_block.c();
-					if_block.m(if_block_anchor.parentNode, if_block_anchor);
-				}
-			} else if (if_block) {
-				if_block.u();
-				if_block.d();
-				if_block = null;
-			}
-		},
-
-		u: function unmount() {
-			if (if_block) if_block.u();
-			detachNode(if_block_anchor);
-		},
-
-		d: function destroy$$1() {
-			if (if_block) if_block.d();
-		}
-	};
-}
-
-// (1:0) {{#if field.data != null}}
-function create_if_block$19(component, state) {
-	var img, img_src_value;
-
-	return {
-		c: function create() {
-			img = createElement("img");
-			this.h();
-		},
-
-		h: function hydrate() {
-			img.src = img_src_value = state.field.data.url;
-			img.alt = "";
-		},
-
-		m: function mount(target, anchor) {
-			insertNode(img, target, anchor);
-		},
-
-		p: function update(changed, state) {
-			if ((changed.field) && img_src_value !== (img_src_value = state.field.data.url)) {
-				img.src = img_src_value;
-			}
-		},
-
-		u: function unmount() {
-			detachNode(img);
-		},
-
-		d: noop$1
-	};
-}
-
 function SvelteComponent$28(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
@@ -27908,115 +27649,8 @@ function SvelteComponent$28(options) {
 
 assign(SvelteComponent$28.prototype, proto);
 
-/* src\core\ui\outputs\InlineForm.html generated by Svelte v1.64.1 */
-function oncreate$15() {
-	const app = this.get("app");
-	const field = this.get("field");
-	const parentFormComponent = this.get("parent");
-
-	const formInstance = app.getFormInstance(field.data.form, true);
-
-	formInstance.initializeInputFields(field.data.inputFieldValues).then(() => {
-		const f = new SvelteComponent$3({
-			target: this.refs.container,
-			data: {
-				metadata: formInstance.metadata,
-				form: formInstance,
-				app,
-				useUrl: false,
-				parent: parentFormComponent
-			}
-		});
-
-		f.init();
-
-		this.set({ current: f });
-	});
-
-	this.get("parent").on("destroy", () => this.destroy());
-}
-
-function ondestroy$1() {
-	const form = this.get("current");
-
-	if (form != null) {
-		form.destroy();
-	}
-}
-
-function add_css$13() {
-	var style = createElement("style");
-	style.id = 'svelte-rap1ht-style';
-	style.textContent = ".svelte-rap1ht.inline-form,.svelte-rap1ht .inline-form{border-width:1px 1px 1px;border-style:solid;border-color:#bbd2d6;margin:30px 0;border-radius:5px}.svelte-rap1ht.inline-form .form-header,.svelte-rap1ht .inline-form .form-header{border-bottom:none;padding-top:0;padding-bottom:0;background:#eee}.svelte-rap1ht.inline-form .response,.svelte-rap1ht .inline-form .response{margin-top:0;padding:10px 15px}.svelte-rap1ht.inline-form h2,.svelte-rap1ht .inline-form h2{margin:0;font-size:15px;padding:10px 15px 15px}.svelte-rap1ht.inline-form .response .form-header,.svelte-rap1ht .inline-form .response .form-header{padding-top:10px;border-bottom:1px solid #bbd2d6;background-color:#fff}.svelte-rap1ht.inline-form .response h2,.svelte-rap1ht .inline-form .response h2{font-size:2rem}";
-	appendNode(style, document.head);
-}
-
+/* src\core\ui\outputs\Image.html generated by Svelte v1.64.1 */
 function create_main_fragment$29(component, state) {
-	var div;
-
-	return {
-		c: function create() {
-			div = createElement("div");
-			this.h();
-		},
-
-		h: function hydrate() {
-			div.className = "inline-form svelte-rap1ht";
-		},
-
-		m: function mount(target, anchor) {
-			insertNode(div, target, anchor);
-			component.refs.container = div;
-		},
-
-		p: noop$1,
-
-		u: function unmount() {
-			detachNode(div);
-		},
-
-		d: function destroy$$1() {
-			if (component.refs.container === div) component.refs.container = null;
-		}
-	};
-}
-
-function SvelteComponent$29(options) {
-	init(this, options);
-	this.refs = {};
-	this._state = assign({}, options.data);
-
-	this._handlers.destroy = [ondestroy$1];
-
-	if (!document.getElementById("svelte-rap1ht-style")) add_css$13();
-
-	var self = this;
-	var _oncreate = function() {
-		var changed = {  };
-		oncreate$15.call(self);
-		self.fire("update", { changed: changed, current: self._state });
-	};
-
-	if (!options.root) {
-		this._oncreate = [];
-	}
-
-	this._fragment = create_main_fragment$29(this, this._state);
-
-	this.root._oncreate.push(_oncreate);
-
-	if (options.target) {
-		this._fragment.c();
-		this._mount(options.target, options.anchor);
-
-		callAll(this._oncreate);
-	}
-}
-
-assign(SvelteComponent$29.prototype, proto);
-
-/* src\core\ui\outputs\Link.html generated by Svelte v1.64.1 */
-function create_main_fragment$30(component, state) {
 	var if_block_anchor;
 
 	var if_block = (state.field.data != null) && create_if_block$20(component, state);
@@ -28061,52 +27695,42 @@ function create_main_fragment$30(component, state) {
 
 // (1:0) {{#if field.data != null}}
 function create_if_block$20(component, state) {
-	var a, text_value = state.field.data.anchor, text, a_href_value, a_class_value;
+	var img, img_src_value;
 
 	return {
 		c: function create() {
-			a = createElement("a");
-			text = createText(text_value);
+			img = createElement("img");
 			this.h();
 		},
 
 		h: function hydrate() {
-			a.href = a_href_value = state.field.data.url;
-			a.className = a_class_value = state.field.data.cssClass;
+			img.src = img_src_value = state.field.data.url;
+			img.alt = "";
 		},
 
 		m: function mount(target, anchor) {
-			insertNode(a, target, anchor);
-			appendNode(text, a);
+			insertNode(img, target, anchor);
 		},
 
 		p: function update(changed, state) {
-			if ((changed.field) && text_value !== (text_value = state.field.data.anchor)) {
-				text.data = text_value;
-			}
-
-			if ((changed.field) && a_href_value !== (a_href_value = state.field.data.url)) {
-				a.href = a_href_value;
-			}
-
-			if ((changed.field) && a_class_value !== (a_class_value = state.field.data.cssClass)) {
-				a.className = a_class_value;
+			if ((changed.field) && img_src_value !== (img_src_value = state.field.data.url)) {
+				img.src = img_src_value;
 			}
 		},
 
 		u: function unmount() {
-			detachNode(a);
+			detachNode(img);
 		},
 
 		d: noop$1
 	};
 }
 
-function SvelteComponent$30(options) {
+function SvelteComponent$29(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
-	this._fragment = create_main_fragment$30(this, this._state);
+	this._fragment = create_main_fragment$29(this, this._state);
 
 	if (options.target) {
 		this._fragment.c();
@@ -28114,21 +27738,116 @@ function SvelteComponent$30(options) {
 	}
 }
 
-assign(SvelteComponent$30.prototype, proto);
+assign(SvelteComponent$29.prototype, proto);
 
-/* src\core\ui\outputs\Number.html generated by Svelte v1.64.1 */
-function formatted(field) {
-	if (field.data == null) {
-		return "";
-	}
+/* src\core\ui\outputs\InlineForm.html generated by Svelte v1.64.1 */
+function oncreate$16() {
+	const app = this.get("app");
+	const field = this.get("field");
+	const parentFormComponent = this.get("parent");
 
-	var x = field.data;
-	var parts = x.toString().split(".");
-	parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-	
-	return parts.join(".");
+	const formInstance = app.getFormInstance(field.data.form, true);
+
+	formInstance.initializeInputFields(field.data.inputFieldValues).then(() => {
+		const f = new SvelteComponent$4({
+			target: this.refs.container,
+			data: {
+				metadata: formInstance.metadata,
+				form: formInstance,
+				app,
+				useUrl: false,
+				parent: parentFormComponent
+			}
+		});
+
+		f.init();
+
+		this.set({ current: f });
+	});
+
+	this.get("parent").on("destroy", () => this.destroy());
 }
 
+function ondestroy$1() {
+	const form = this.get("current");
+
+	if (form != null) {
+		form.destroy();
+	}
+}
+
+function add_css$13() {
+	var style = createElement("style");
+	style.id = 'svelte-rap1ht-style';
+	style.textContent = ".svelte-rap1ht.inline-form,.svelte-rap1ht .inline-form{border-width:1px 1px 1px;border-style:solid;border-color:#bbd2d6;margin:30px 0;border-radius:5px}.svelte-rap1ht.inline-form .form-header,.svelte-rap1ht .inline-form .form-header{border-bottom:none;padding-top:0;padding-bottom:0;background:#eee}.svelte-rap1ht.inline-form .response,.svelte-rap1ht .inline-form .response{margin-top:0;padding:10px 15px}.svelte-rap1ht.inline-form h2,.svelte-rap1ht .inline-form h2{margin:0;font-size:15px;padding:10px 15px 15px}.svelte-rap1ht.inline-form .response .form-header,.svelte-rap1ht .inline-form .response .form-header{padding-top:10px;border-bottom:1px solid #bbd2d6;background-color:#fff}.svelte-rap1ht.inline-form .response h2,.svelte-rap1ht .inline-form .response h2{font-size:2rem}";
+	appendNode(style, document.head);
+}
+
+function create_main_fragment$30(component, state) {
+	var div;
+
+	return {
+		c: function create() {
+			div = createElement("div");
+			this.h();
+		},
+
+		h: function hydrate() {
+			div.className = "inline-form svelte-rap1ht";
+		},
+
+		m: function mount(target, anchor) {
+			insertNode(div, target, anchor);
+			component.refs.container = div;
+		},
+
+		p: noop$1,
+
+		u: function unmount() {
+			detachNode(div);
+		},
+
+		d: function destroy$$1() {
+			if (component.refs.container === div) component.refs.container = null;
+		}
+	};
+}
+
+function SvelteComponent$30(options) {
+	init(this, options);
+	this.refs = {};
+	this._state = assign({}, options.data);
+
+	this._handlers.destroy = [ondestroy$1];
+
+	if (!document.getElementById("svelte-rap1ht-style")) add_css$13();
+
+	var self = this;
+	var _oncreate = function() {
+		var changed = {  };
+		oncreate$16.call(self);
+		self.fire("update", { changed: changed, current: self._state });
+	};
+
+	if (!options.root) {
+		this._oncreate = [];
+	}
+
+	this._fragment = create_main_fragment$30(this, this._state);
+
+	this.root._oncreate.push(_oncreate);
+
+	if (options.target) {
+		this._fragment.c();
+		this._mount(options.target, options.anchor);
+
+		callAll(this._oncreate);
+	}
+}
+
+assign(SvelteComponent$30.prototype, proto);
+
+/* src\core\ui\outputs\Link.html generated by Svelte v1.64.1 */
 function create_main_fragment$31(component, state) {
 	var if_block_anchor;
 
@@ -28174,6 +27893,119 @@ function create_main_fragment$31(component, state) {
 
 // (1:0) {{#if field.data != null}}
 function create_if_block$21(component, state) {
+	var a, text_value = state.field.data.anchor, text, a_href_value, a_class_value;
+
+	return {
+		c: function create() {
+			a = createElement("a");
+			text = createText(text_value);
+			this.h();
+		},
+
+		h: function hydrate() {
+			a.href = a_href_value = state.field.data.url;
+			a.className = a_class_value = state.field.data.cssClass;
+		},
+
+		m: function mount(target, anchor) {
+			insertNode(a, target, anchor);
+			appendNode(text, a);
+		},
+
+		p: function update(changed, state) {
+			if ((changed.field) && text_value !== (text_value = state.field.data.anchor)) {
+				text.data = text_value;
+			}
+
+			if ((changed.field) && a_href_value !== (a_href_value = state.field.data.url)) {
+				a.href = a_href_value;
+			}
+
+			if ((changed.field) && a_class_value !== (a_class_value = state.field.data.cssClass)) {
+				a.className = a_class_value;
+			}
+		},
+
+		u: function unmount() {
+			detachNode(a);
+		},
+
+		d: noop$1
+	};
+}
+
+function SvelteComponent$31(options) {
+	init(this, options);
+	this._state = assign({}, options.data);
+
+	this._fragment = create_main_fragment$31(this, this._state);
+
+	if (options.target) {
+		this._fragment.c();
+		this._mount(options.target, options.anchor);
+	}
+}
+
+assign(SvelteComponent$31.prototype, proto);
+
+/* src\core\ui\outputs\Number.html generated by Svelte v1.64.1 */
+function formatted(field) {
+	if (field.data == null) {
+		return "";
+	}
+
+	var x = field.data;
+	var parts = x.toString().split(".");
+	parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	
+	return parts.join(".");
+}
+
+function create_main_fragment$32(component, state) {
+	var if_block_anchor;
+
+	var if_block = (state.field.data != null) && create_if_block$22(component, state);
+
+	return {
+		c: function create() {
+			if (if_block) if_block.c();
+			if_block_anchor = createComment();
+		},
+
+		m: function mount(target, anchor) {
+			if (if_block) if_block.m(target, anchor);
+			insertNode(if_block_anchor, target, anchor);
+		},
+
+		p: function update(changed, state) {
+			if (state.field.data != null) {
+				if (if_block) {
+					if_block.p(changed, state);
+				} else {
+					if_block = create_if_block$22(component, state);
+					if_block.c();
+					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+				}
+			} else if (if_block) {
+				if_block.u();
+				if_block.d();
+				if_block = null;
+			}
+		},
+
+		u: function unmount() {
+			if (if_block) if_block.u();
+			detachNode(if_block_anchor);
+		},
+
+		d: function destroy$$1() {
+			if (if_block) if_block.d();
+		}
+	};
+}
+
+// (1:0) {{#if field.data != null}}
+function create_if_block$22(component, state) {
 	var text;
 
 	return {
@@ -28199,12 +28031,12 @@ function create_if_block$21(component, state) {
 	};
 }
 
-function SvelteComponent$31(options) {
+function SvelteComponent$32(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 	this._recompute({ field: 1 }, this._state);
 
-	this._fragment = create_main_fragment$31(this, this._state);
+	this._fragment = create_main_fragment$32(this, this._state);
 
 	if (options.target) {
 		this._fragment.c();
@@ -28212,16 +28044,16 @@ function SvelteComponent$31(options) {
 	}
 }
 
-assign(SvelteComponent$31.prototype, proto);
+assign(SvelteComponent$32.prototype, proto);
 
-SvelteComponent$31.prototype._recompute = function _recompute(changed, state) {
+SvelteComponent$32.prototype._recompute = function _recompute(changed, state) {
 	if (changed.field) {
 		if (this._differs(state.formatted, (state.formatted = formatted(state.field)))) changed.formatted = true;
 	}
 };
 
 /* src\core\ui\outputs\ObjectList.html generated by Svelte v1.64.1 */
-function oncreate$16() {
+function oncreate$17() {
 	var field = this.get("field");
 	if (field.data == null || field.data.metadata == null) {
 		return;
@@ -28253,10 +28085,10 @@ function add_css$14() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$32(component, state) {
+function create_main_fragment$33(component, state) {
 	var if_block_anchor;
 
-	var if_block = (state.field.data != null && state.items != null) && create_if_block$22(component, state);
+	var if_block = (state.field.data != null && state.items != null) && create_if_block$23(component, state);
 
 	return {
 		c: function create() {
@@ -28274,7 +28106,7 @@ function create_main_fragment$32(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$22(component, state);
+					if_block = create_if_block$23(component, state);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -28297,7 +28129,7 @@ function create_main_fragment$32(component, state) {
 }
 
 // (2:0) {{#each items as itemFields}}
-function create_each_block$7(component, state) {
+function create_each_block$6(component, state) {
 	var itemFields = state.itemFields, each_value = state.each_value, itemFields_index = state.itemFields_index;
 	var div, div_class_value;
 
@@ -28445,7 +28277,7 @@ function create_if_block_1$12(component, state) {
 	 	form: state.form,
 	 	parent: state.parent
 	 };
-	var formoutput = new SvelteComponent$6({
+	var formoutput = new SvelteComponent$7({
 		root: component.root,
 		data: formoutput_initial_data
 	});
@@ -28485,7 +28317,7 @@ function create_if_block_1$12(component, state) {
 }
 
 // (1:0) {{#if field.data != null && items != null}}
-function create_if_block$22(component, state) {
+function create_if_block$23(component, state) {
 	var each_anchor;
 
 	var each_value = state.items;
@@ -28493,7 +28325,7 @@ function create_if_block$22(component, state) {
 	var each_blocks = [];
 
 	for (var i = 0; i < each_value.length; i += 1) {
-		each_blocks[i] = create_each_block$7(component, assign(assign({}, state), {
+		each_blocks[i] = create_each_block$6(component, assign(assign({}, state), {
 			each_value: each_value,
 			itemFields: each_value[i],
 			itemFields_index: i
@@ -28531,7 +28363,7 @@ function create_if_block$22(component, state) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, each_context);
 					} else {
-						each_blocks[i] = create_each_block$7(component, each_context);
+						each_blocks[i] = create_each_block$6(component, each_context);
 						each_blocks[i].c();
 						each_blocks[i].m(each_anchor.parentNode, each_anchor);
 					}
@@ -28559,7 +28391,7 @@ function create_if_block$22(component, state) {
 	};
 }
 
-function SvelteComponent$32(options) {
+function SvelteComponent$33(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
@@ -28568,7 +28400,7 @@ function SvelteComponent$32(options) {
 	var self = this;
 	var _oncreate = function() {
 		var changed = { field: 1, items: 1, cssClass: 1, app: 1, form: 1, parent: 1 };
-		oncreate$16.call(self);
+		oncreate$17.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -28578,7 +28410,7 @@ function SvelteComponent$32(options) {
 		this._aftercreate = [];
 	}
 
-	this._fragment = create_main_fragment$32(this, this._state);
+	this._fragment = create_main_fragment$33(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -28594,7 +28426,7 @@ function SvelteComponent$32(options) {
 	}
 }
 
-assign(SvelteComponent$32.prototype, proto);
+assign(SvelteComponent$33.prototype, proto);
 
 /* src\core\ui\outputs\Table.html generated by Svelte v1.64.1 */
 function buildFilter$2(currentFormInstance, parameters) {
@@ -28666,7 +28498,7 @@ var methods$9 = {
 		filter.Items = { items: selectedItemIds };
 		formInstance.setInputFields(filter);
 
-		var f = new SvelteComponent$3({
+		var f = new SvelteComponent$4({
 			target: this.refs.bulkActionContainer,
 			data: {
 				metadata: formInstance.metadata,
@@ -28753,7 +28585,7 @@ var methods$9 = {
 		},
 };
 
-function oncreate$18() {
+function oncreate$19() {
 	var data = this.get("field").data;
 
 	if (data == null) {
@@ -28815,11 +28647,11 @@ function add_css$15() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$34(component, state) {
+function create_main_fragment$35(component, state) {
 	var if_block_anchor;
 
 	function select_block_type_4(state) {
-		if (state.visible && state.field.data != null && state.field.data.length > 0) return create_if_block$24;
+		if (state.visible && state.field.data != null && state.field.data.length > 0) return create_if_block$25;
 		return create_if_block_15;
 	}
 
@@ -28861,13 +28693,13 @@ function create_main_fragment$34(component, state) {
 }
 
 // (7:5) {{#each bulkActions as action}}
-function create_each_block$9(component, state) {
+function create_each_block$8(component, state) {
 	var action = state.action, each_value = state.each_value, action_index = state.action_index;
 	var if_block_anchor;
 
 	function select_block_type(state) {
 		if (state.selectedItemsCount > 0) return create_if_block_2$11;
-		return create_if_block_3$6;
+		return create_if_block_3$5;
 	}
 
 	var current_block_type = select_block_type(state);
@@ -28975,7 +28807,7 @@ function create_if_block_2$11(component, state) {
 }
 
 // (10:6) {{else}}
-function create_if_block_3$6(component, state) {
+function create_if_block_3$5(component, state) {
 	var action = state.action, each_value = state.each_value, action_index = state.action_index;
 	var button, text_value = action.label, text;
 
@@ -29022,7 +28854,7 @@ function create_if_block_1$14(component, state) {
 	var each_blocks = [];
 
 	for (var i = 0; i < each_value.length; i += 1) {
-		each_blocks[i] = create_each_block$9(component, assign(assign({}, state), {
+		each_blocks[i] = create_each_block$8(component, assign(assign({}, state), {
 			each_value: each_value,
 			action: each_value[i],
 			action_index: i
@@ -29068,7 +28900,7 @@ function create_if_block_1$14(component, state) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, each_context);
 					} else {
-						each_blocks[i] = create_each_block$9(component, each_context);
+						each_blocks[i] = create_each_block$8(component, each_context);
 						each_blocks[i].c();
 						each_blocks[i].m(td, null);
 					}
@@ -29101,7 +28933,7 @@ function create_if_block_1$14(component, state) {
 }
 
 // (18:4) {{#if bulkActions.length > 0}}
-function create_if_block_4$4(component, state) {
+function create_if_block_4$3(component, state) {
 	var th, input;
 
 	function change_handler(event) {
@@ -29302,7 +29134,7 @@ function create_if_block_9(component, state) {
 	var div, text_value = column.label, text, text_1;
 
 	var tooltip_initial_data = { data: column.customProperties.documentation[0] };
-	var tooltip = new SvelteComponent$5({
+	var tooltip = new SvelteComponent$6({
 		root: component.root,
 		data: tooltip_initial_data
 	});
@@ -29705,7 +29537,7 @@ function create_if_block_13(component, state) {
 	 	parent: state.parent,
 	 	showLabel: "false"
 	 };
-	var formoutput = new SvelteComponent$6({
+	var formoutput = new SvelteComponent$7({
 		root: component.root,
 		data: formoutput_initial_data
 	});
@@ -29886,12 +29718,12 @@ function create_if_block_14(component, state) {
 }
 
 // (1:0) {{#if visible && field.data != null && field.data.length > 0}}
-function create_if_block$24(component, state) {
+function create_if_block$25(component, state) {
 	var table, thead, text, tr, text_1, text_4, tbody, text_7, if_block_3_anchor;
 
 	var if_block = (state.bulkActions.length > 0) && create_if_block_1$14(component, state);
 
-	var if_block_1 = (state.bulkActions.length > 0) && create_if_block_4$4(component, state);
+	var if_block_1 = (state.bulkActions.length > 0) && create_if_block_4$3(component, state);
 
 	var each_value_1 = state.columnsOrdered;
 
@@ -29975,7 +29807,7 @@ function create_if_block$24(component, state) {
 
 			if (state.bulkActions.length > 0) {
 				if (!if_block_1) {
-					if_block_1 = create_if_block_4$4(component, state);
+					if_block_1 = create_if_block_4$3(component, state);
 					if_block_1.c();
 					if_block_1.m(tr, text_1);
 				}
@@ -30123,7 +29955,7 @@ function change_handler(event) {
 	component.selectItem(this, row);
 }
 
-function SvelteComponent$34(options) {
+function SvelteComponent$35(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = assign({}, options.data);
@@ -30134,7 +29966,7 @@ function SvelteComponent$34(options) {
 	var self = this;
 	var _oncreate = function() {
 		var changed = { field: 1, visible: 1, bulkActions: 1, columnsOrdered: 1, selectedItemsCount: 1, map: 1, getRowCssClass: 1, getField: 1, app: 1, form: 1, parent: 1, isBulkActionModalOpen: 1 };
-		oncreate$18.call(self);
+		oncreate$19.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -30144,7 +29976,7 @@ function SvelteComponent$34(options) {
 		this._aftercreate = [];
 	}
 
-	this._fragment = create_main_fragment$34(this, this._state);
+	this._fragment = create_main_fragment$35(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -30160,10 +29992,10 @@ function SvelteComponent$34(options) {
 	}
 }
 
-assign(SvelteComponent$34.prototype, proto);
-assign(SvelteComponent$34.prototype, methods$9);
+assign(SvelteComponent$35.prototype, proto);
+assign(SvelteComponent$35.prototype, methods$9);
 
-SvelteComponent$34.prototype._recompute = function _recompute(changed, state) {
+SvelteComponent$35.prototype._recompute = function _recompute(changed, state) {
 	if (changed.field) {
 		if (this._differs(state.columnsOrdered, (state.columnsOrdered = columnsOrdered(state.field)))) changed.columnsOrdered = true;
 	}
@@ -30295,7 +30127,7 @@ var methods$8 = {
 	}
 };
 
-function oncreate$17() {
+function oncreate$18() {
 	const field = this.get("field");
 	const form = this.get("form");
 
@@ -30315,7 +30147,7 @@ function oncreate$17() {
 	tableField.metadata = field.metadata;
 
 	// eslint-disable-next-line no-new
-	new SvelteComponent$34({
+	new SvelteComponent$35({
 		target: this.refs.container,
 		data: {
 			field: tableField,
@@ -30326,10 +30158,10 @@ function oncreate$17() {
 	});
 }
 
-function create_main_fragment$33(component, state) {
+function create_main_fragment$34(component, state) {
 	var text, div;
 
-	var if_block = (state.field.data != null && state.pages.length > 0) && create_if_block$23(component, state);
+	var if_block = (state.field.data != null && state.pages.length > 0) && create_if_block$24(component, state);
 
 	return {
 		c: function create() {
@@ -30350,7 +30182,7 @@ function create_main_fragment$33(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$23(component, state);
+					if_block = create_if_block$24(component, state);
 					if_block.c();
 					if_block.m(text.parentNode, text);
 				}
@@ -30375,7 +30207,7 @@ function create_main_fragment$33(component, state) {
 }
 
 // (11:2) {{#each pages as page}}
-function create_each_block$8(component, state) {
+function create_each_block$7(component, state) {
 	var page = state.page, each_value = state.each_value, page_index = state.page_index;
 	var if_block_anchor;
 
@@ -30533,7 +30365,7 @@ function create_if_block_2$10(component, state) {
 }
 
 // (1:0) {{#if field.data != null && pages.length > 0}}
-function create_if_block$23(component, state) {
+function create_if_block$24(component, state) {
 	var div, select, option, text, option_1, text_1, option_2, text_2, option_3, text_3, select_updating = false, text_4, ul, text_6, div_1, text_7, text_8_value = state.field.data.results.length, text_8, text_9, text_10_value = state.field.data.totalCount, text_10, text_11;
 
 	function select_change_handler() {
@@ -30553,7 +30385,7 @@ function create_if_block$23(component, state) {
 	var each_blocks = [];
 
 	for (var i = 0; i < each_value.length; i += 1) {
-		each_blocks[i] = create_each_block$8(component, assign(assign({}, state), {
+		each_blocks[i] = create_each_block$7(component, assign(assign({}, state), {
 			each_value: each_value,
 			page: each_value[i],
 			page_index: i
@@ -30652,7 +30484,7 @@ function create_if_block$23(component, state) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, each_context);
 					} else {
-						each_blocks[i] = create_each_block$8(component, each_context);
+						each_blocks[i] = create_each_block$7(component, each_context);
 						each_blocks[i].c();
 						each_blocks[i].m(ul, null);
 					}
@@ -30700,7 +30532,7 @@ function click_handler$2(event) {
 	component.goToPage(page);
 }
 
-function SvelteComponent$33(options) {
+function SvelteComponent$34(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = assign(data$6(), options.data);
@@ -30709,7 +30541,7 @@ function SvelteComponent$33(options) {
 	var self = this;
 	var _oncreate = function() {
 		var changed = { field: 1, form: 1, parent: 1, pages: 1, app: 1 };
-		oncreate$17.call(self);
+		oncreate$18.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -30718,7 +30550,7 @@ function SvelteComponent$33(options) {
 		this._beforecreate = [];
 	}
 
-	this._fragment = create_main_fragment$33(this, this._state);
+	this._fragment = create_main_fragment$34(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -30731,10 +30563,10 @@ function SvelteComponent$33(options) {
 	}
 }
 
-assign(SvelteComponent$33.prototype, proto);
-assign(SvelteComponent$33.prototype, methods$8);
+assign(SvelteComponent$34.prototype, proto);
+assign(SvelteComponent$34.prototype, methods$8);
 
-SvelteComponent$33.prototype._recompute = function _recompute(changed, state) {
+SvelteComponent$34.prototype._recompute = function _recompute(changed, state) {
 	if (changed.field || changed.form || changed.parent) {
 		if (this._differs(state.pages, (state.pages = pages(state.field, state.form, state.parent)))) changed.pages = true;
 	}
@@ -30810,7 +30642,7 @@ var methods$10 = {
 		filter.Items = { items: selectedItemIds };
 		formInstance.setInputFields(filter);
 
-		var f = new SvelteComponent$3({
+		var f = new SvelteComponent$4({
 			target: this.refs.bulkActionContainer,
 			data: {
 				metadata: formInstance.metadata,
@@ -30897,7 +30729,7 @@ var methods$10 = {
 		},
 };
 
-function oncreate$19() {
+function oncreate$20() {
 	var data = this.get("field").data;
 
 	if (data == null) {
@@ -30959,11 +30791,11 @@ function add_css$16() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$35(component, state) {
+function create_main_fragment$36(component, state) {
 	var if_block_anchor;
 
 	function select_block_type_4(state) {
-		if (state.visible && state.field.data != null && state.field.data.length > 0) return create_if_block$25;
+		if (state.visible && state.field.data != null && state.field.data.length > 0) return create_if_block$26;
 		return create_if_block_15$1;
 	}
 
@@ -31005,13 +30837,13 @@ function create_main_fragment$35(component, state) {
 }
 
 // (7:5) {{#each bulkActions as action}}
-function create_each_block$10(component, state) {
+function create_each_block$9(component, state) {
 	var action = state.action, each_value = state.each_value, action_index = state.action_index;
 	var if_block_anchor;
 
 	function select_block_type(state) {
 		if (state.selectedItemsCount > 0) return create_if_block_2$12;
-		return create_if_block_3$7;
+		return create_if_block_3$6;
 	}
 
 	var current_block_type = select_block_type(state);
@@ -31119,7 +30951,7 @@ function create_if_block_2$12(component, state) {
 }
 
 // (10:6) {{else}}
-function create_if_block_3$7(component, state) {
+function create_if_block_3$6(component, state) {
 	var action = state.action, each_value = state.each_value, action_index = state.action_index;
 	var button, text_value = action.label, text;
 
@@ -31166,7 +30998,7 @@ function create_if_block_1$15(component, state) {
 	var each_blocks = [];
 
 	for (var i = 0; i < each_value.length; i += 1) {
-		each_blocks[i] = create_each_block$10(component, assign(assign({}, state), {
+		each_blocks[i] = create_each_block$9(component, assign(assign({}, state), {
 			each_value: each_value,
 			action: each_value[i],
 			action_index: i
@@ -31212,7 +31044,7 @@ function create_if_block_1$15(component, state) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, each_context);
 					} else {
-						each_blocks[i] = create_each_block$10(component, each_context);
+						each_blocks[i] = create_each_block$9(component, each_context);
 						each_blocks[i].c();
 						each_blocks[i].m(td, null);
 					}
@@ -31245,7 +31077,7 @@ function create_if_block_1$15(component, state) {
 }
 
 // (18:4) {{#if bulkActions.length > 0}}
-function create_if_block_4$5(component, state) {
+function create_if_block_4$4(component, state) {
 	var th, input;
 
 	function change_handler(event) {
@@ -31446,7 +31278,7 @@ function create_if_block_9$1(component, state) {
 	var div, text_value = column.label, text, text_1;
 
 	var tooltip_initial_data = { data: column.customProperties.documentation[0] };
-	var tooltip = new SvelteComponent$5({
+	var tooltip = new SvelteComponent$6({
 		root: component.root,
 		data: tooltip_initial_data
 	});
@@ -31849,7 +31681,7 @@ function create_if_block_13$1(component, state) {
 	 	parent: state.parent,
 	 	showLabel: "false"
 	 };
-	var formoutput = new SvelteComponent$6({
+	var formoutput = new SvelteComponent$7({
 		root: component.root,
 		data: formoutput_initial_data
 	});
@@ -32030,12 +31862,12 @@ function create_if_block_14$1(component, state) {
 }
 
 // (1:0) {{#if visible && field.data != null && field.data.length > 0}}
-function create_if_block$25(component, state) {
+function create_if_block$26(component, state) {
 	var table, thead, text, tr, text_1, text_4, tbody, text_7, if_block_3_anchor;
 
 	var if_block = (state.bulkActions.length > 0) && create_if_block_1$15(component, state);
 
-	var if_block_1 = (state.bulkActions.length > 0) && create_if_block_4$5(component, state);
+	var if_block_1 = (state.bulkActions.length > 0) && create_if_block_4$4(component, state);
 
 	var each_value_1 = state.columnsOrdered;
 
@@ -32119,7 +31951,7 @@ function create_if_block$25(component, state) {
 
 			if (state.bulkActions.length > 0) {
 				if (!if_block_1) {
-					if_block_1 = create_if_block_4$5(component, state);
+					if_block_1 = create_if_block_4$4(component, state);
 					if_block_1.c();
 					if_block_1.m(tr, text_1);
 				}
@@ -32267,7 +32099,7 @@ function change_handler$1(event) {
 	component.selectItem(this, row);
 }
 
-function SvelteComponent$35(options) {
+function SvelteComponent$36(options) {
 	init(this, options);
 	this.refs = {};
 	this._state = assign({}, options.data);
@@ -32278,7 +32110,7 @@ function SvelteComponent$35(options) {
 	var self = this;
 	var _oncreate = function() {
 		var changed = { field: 1, visible: 1, bulkActions: 1, columnsOrdered: 1, selectedItemsCount: 1, map: 1, getRowCssClass: 1, getField: 1, app: 1, form: 1, parent: 1, isBulkActionModalOpen: 1 };
-		oncreate$19.call(self);
+		oncreate$20.call(self);
 		self.fire("update", { changed: changed, current: self._state });
 	};
 
@@ -32288,7 +32120,7 @@ function SvelteComponent$35(options) {
 		this._aftercreate = [];
 	}
 
-	this._fragment = create_main_fragment$35(this, this._state);
+	this._fragment = create_main_fragment$36(this, this._state);
 
 	this.root._oncreate.push(_oncreate);
 
@@ -32304,10 +32136,10 @@ function SvelteComponent$35(options) {
 	}
 }
 
-assign(SvelteComponent$35.prototype, proto);
-assign(SvelteComponent$35.prototype, methods$10);
+assign(SvelteComponent$36.prototype, proto);
+assign(SvelteComponent$36.prototype, methods$10);
 
-SvelteComponent$35.prototype._recompute = function _recompute(changed, state) {
+SvelteComponent$36.prototype._recompute = function _recompute(changed, state) {
 	if (changed.field) {
 		if (this._differs(state.columnsOrdered, (state.columnsOrdered = columnsOrdered$1(state.field)))) changed.columnsOrdered = true;
 	}
@@ -32320,7 +32152,7 @@ function getCssClass(tab, tabstrip) {
 		: "";
 }
 
-function create_main_fragment$36(component, state) {
+function create_main_fragment$37(component, state) {
 	var div;
 
 	var each_value = state.field.data.tabs;
@@ -32328,7 +32160,7 @@ function create_main_fragment$36(component, state) {
 	var each_blocks = [];
 
 	for (var i = 0; i < each_value.length; i += 1) {
-		each_blocks[i] = create_each_block$11(component, assign(assign({}, state), {
+		each_blocks[i] = create_each_block$10(component, assign(assign({}, state), {
 			each_value: each_value,
 			tab: each_value[i],
 			tab_index: i
@@ -32371,7 +32203,7 @@ function create_main_fragment$36(component, state) {
 					if (each_blocks[i]) {
 						each_blocks[i].p(changed, each_context);
 					} else {
-						each_blocks[i] = create_each_block$11(component, each_context);
+						each_blocks[i] = create_each_block$10(component, each_context);
 						each_blocks[i].c();
 						each_blocks[i].m(div, null);
 					}
@@ -32400,7 +32232,7 @@ function create_main_fragment$36(component, state) {
 }
 
 // (2:1) {{#each field.data.tabs as tab}}
-function create_each_block$11(component, state) {
+function create_each_block$10(component, state) {
 	var tab = state.tab, each_value = state.each_value, tab_index = state.tab_index;
 	var div, a, text_value = tab.label, text, a_href_value, a_class_value;
 
@@ -32448,11 +32280,11 @@ function create_each_block$11(component, state) {
 	};
 }
 
-function SvelteComponent$36(options) {
+function SvelteComponent$37(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
-	this._fragment = create_main_fragment$36(this, this._state);
+	this._fragment = create_main_fragment$37(this, this._state);
 
 	if (options.target) {
 		this._fragment.c();
@@ -32460,7 +32292,7 @@ function SvelteComponent$36(options) {
 	}
 }
 
-assign(SvelteComponent$36.prototype, proto);
+assign(SvelteComponent$37.prototype, proto);
 
 /* src\core\ui\outputs\Text.html generated by Svelte v1.64.1 */
 function cssClass(field, form) {
@@ -32486,10 +32318,10 @@ function BooleanChecker(field) {
 	return field.data;
 }
 
-function create_main_fragment$37(component, state) {
+function create_main_fragment$38(component, state) {
 	var if_block_anchor;
 
-	var if_block = (state.field.data != null) && create_if_block$26(component, state);
+	var if_block = (state.field.data != null) && create_if_block$27(component, state);
 
 	return {
 		c: function create() {
@@ -32507,7 +32339,7 @@ function create_main_fragment$37(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$26(component, state);
+					if_block = create_if_block$27(component, state);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -32530,7 +32362,7 @@ function create_main_fragment$37(component, state) {
 }
 
 // (1:0) {{#if field.data != null }}
-function create_if_block$26(component, state) {
+function create_if_block$27(component, state) {
 	var span, text;
 
 	return {
@@ -32567,12 +32399,12 @@ function create_if_block$26(component, state) {
 	};
 }
 
-function SvelteComponent$37(options) {
+function SvelteComponent$38(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 	this._recompute({ field: 1, form: 1 }, this._state);
 
-	this._fragment = create_main_fragment$37(this, this._state);
+	this._fragment = create_main_fragment$38(this, this._state);
 
 	if (options.target) {
 		this._fragment.c();
@@ -32580,9 +32412,9 @@ function SvelteComponent$37(options) {
 	}
 }
 
-assign(SvelteComponent$37.prototype, proto);
+assign(SvelteComponent$38.prototype, proto);
 
-SvelteComponent$37.prototype._recompute = function _recompute(changed, state) {
+SvelteComponent$38.prototype._recompute = function _recompute(changed, state) {
 	if (changed.field || changed.form) {
 		if (this._differs(state.cssClass, (state.cssClass = cssClass(state.field, state.form)))) changed.cssClass = true;
 	}
@@ -32593,7 +32425,7 @@ SvelteComponent$37.prototype._recompute = function _recompute(changed, state) {
 };
 
 /* src\core\ui\outputs\TextValue.html generated by Svelte v1.64.1 */
-function create_main_fragment$38(component, state) {
+function create_main_fragment$39(component, state) {
 	var text_value = state.field.data.value, text;
 
 	return {
@@ -32619,11 +32451,11 @@ function create_main_fragment$38(component, state) {
 	};
 }
 
-function SvelteComponent$38(options) {
+function SvelteComponent$39(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
-	this._fragment = create_main_fragment$38(this, this._state);
+	this._fragment = create_main_fragment$39(this, this._state);
 
 	if (options.target) {
 		this._fragment.c();
@@ -32631,7 +32463,7 @@ function SvelteComponent$38(options) {
 	}
 }
 
-assign(SvelteComponent$38.prototype, proto);
+assign(SvelteComponent$39.prototype, proto);
 
 /* src\core\ui\outputs\TextValueMultiline.html generated by Svelte v1.64.1 */
 function add_css$17() {
@@ -32641,10 +32473,10 @@ function add_css$17() {
 	appendNode(style, document.head);
 }
 
-function create_main_fragment$39(component, state) {
+function create_main_fragment$40(component, state) {
 	var if_block_anchor;
 
-	var if_block = ((state.field.data || {}).value != null) && create_if_block$27(component, state);
+	var if_block = ((state.field.data || {}).value != null) && create_if_block$28(component, state);
 
 	return {
 		c: function create() {
@@ -32662,7 +32494,7 @@ function create_main_fragment$39(component, state) {
 				if (if_block) {
 					if_block.p(changed, state);
 				} else {
-					if_block = create_if_block$27(component, state);
+					if_block = create_if_block$28(component, state);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -32685,7 +32517,7 @@ function create_main_fragment$39(component, state) {
 }
 
 // (1:0) {{#if (field.data || {}).value != null}}
-function create_if_block$27(component, state) {
+function create_if_block$28(component, state) {
 	var div, text_value = state.field.data.value, text;
 
 	return {
@@ -32718,13 +32550,13 @@ function create_if_block$27(component, state) {
 	};
 }
 
-function SvelteComponent$39(options) {
+function SvelteComponent$40(options) {
 	init(this, options);
 	this._state = assign({}, options.data);
 
 	if (!document.getElementById("svelte-3khl0f-style")) add_css$17();
 
-	this._fragment = create_main_fragment$39(this, this._state);
+	this._fragment = create_main_fragment$40(this, this._state);
 
 	if (options.target) {
 		this._fragment.c();
@@ -32732,7 +32564,7 @@ function SvelteComponent$39(options) {
 	}
 }
 
-assign(SvelteComponent$39.prototype, proto);
+assign(SvelteComponent$40.prototype, proto);
 
 var FormLogToConsole = (function (_super) {
     __extends(FormLogToConsole, _super);
@@ -32848,40 +32680,40 @@ var Growl = (function () {
 }());
 
 var controlRegister = new ControlRegister$$1();
-controlRegister.registerInputFieldControl("text", SvelteComponent$18, StringInputController);
-controlRegister.registerInputFieldControl("email", SvelteComponent$12, EmailInputController);
-controlRegister.registerInputFieldControl("datetime", SvelteComponent$9, DateInputController);
-controlRegister.registerInputFieldControl("date-range", SvelteComponent$10, DateRangeInputController);
-controlRegister.registerInputFieldControl("number", SvelteComponent$15, NumberInputController);
-controlRegister.registerInputFieldControl("dropdown", SvelteComponent$11, DropdownInputController);
-controlRegister.registerInputFieldControl("boolean", SvelteComponent$8, BooleanInputController);
+controlRegister.registerInputFieldControl("text", SvelteComponent$19, StringInputController);
+controlRegister.registerInputFieldControl("email", SvelteComponent$13, EmailInputController);
+controlRegister.registerInputFieldControl("datetime", SvelteComponent$10, DateInputController);
+controlRegister.registerInputFieldControl("date-range", SvelteComponent$11, DateRangeInputController);
+controlRegister.registerInputFieldControl("number", SvelteComponent$16, NumberInputController);
+controlRegister.registerInputFieldControl("dropdown", SvelteComponent$12, DropdownInputController);
+controlRegister.registerInputFieldControl("boolean", SvelteComponent$9, BooleanInputController);
 controlRegister.registerInputFieldControl("paginator", null, PaginatorInputController);
-controlRegister.registerInputFieldControl("typeahead", SvelteComponent$14, TypeaheadInputController);
-controlRegister.registerInputFieldControl("my-typeahead", SvelteComponent$14, TypeaheadInputController);
-controlRegister.registerInputFieldControl("multiselect", SvelteComponent$14, MultiSelectInputController);
-controlRegister.registerInputFieldControl("password", SvelteComponent$17, PasswordInputController);
-controlRegister.registerInputFieldControl("textarea", SvelteComponent$19, TextareaInputController, new OutputControlConfiguration(false, true));
-controlRegister.registerInputFieldControl("file-uploader", SvelteComponent$13, FileUploaderController, new OutputControlConfiguration(true, true));
-controlRegister.registerInputFieldControl("number-range", SvelteComponent$16, NumberRangeInputController);
-controlRegister.registerOutputFieldControl("text", SvelteComponent$37);
-controlRegister.registerOutputFieldControl("number", SvelteComponent$31);
-controlRegister.registerOutputFieldControl("datetime", SvelteComponent$22);
-controlRegister.registerOutputFieldControl("table", SvelteComponent$35, new OutputControlConfiguration(false, true));
-controlRegister.registerOutputFieldControl("formlink", SvelteComponent$26);
-controlRegister.registerOutputFieldControl("tabstrip", SvelteComponent$36, new OutputControlConfiguration(true, true));
-controlRegister.registerOutputFieldControl("paginated-data", SvelteComponent$33, new OutputControlConfiguration(false, true));
-controlRegister.registerOutputFieldControl("action-list", SvelteComponent$20, new OutputControlConfiguration(true, true));
-controlRegister.registerOutputFieldControl("inline-form", SvelteComponent$29, new OutputControlConfiguration(true, true));
-controlRegister.registerOutputFieldControl("text-value", SvelteComponent$38);
-controlRegister.registerOutputFieldControl("text-value-multiline", SvelteComponent$39, new OutputControlConfiguration(false, true));
-controlRegister.registerOutputFieldControl("downloadable-file", SvelteComponent$24);
-controlRegister.registerOutputFieldControl("alert", SvelteComponent$21, new OutputControlConfiguration(true, true));
-controlRegister.registerOutputFieldControl("file-size", SvelteComponent$25);
-controlRegister.registerOutputFieldControl("image", SvelteComponent$28, new OutputControlConfiguration(false, true));
-controlRegister.registerOutputFieldControl("link", SvelteComponent$30);
-controlRegister.registerOutputFieldControl("object-list", SvelteComponent$32, new OutputControlConfiguration(false, true));
-controlRegister.registerOutputFieldControl("html-string", SvelteComponent$27);
-controlRegister.registerOutputFieldControl("documentation", SvelteComponent$23, new OutputControlConfiguration(true, true));
+controlRegister.registerInputFieldControl("typeahead", SvelteComponent$15, TypeaheadInputController);
+controlRegister.registerInputFieldControl("my-typeahead", SvelteComponent$15, TypeaheadInputController);
+controlRegister.registerInputFieldControl("multiselect", SvelteComponent$15, MultiSelectInputController);
+controlRegister.registerInputFieldControl("password", SvelteComponent$18, PasswordInputController);
+controlRegister.registerInputFieldControl("textarea", SvelteComponent$20, TextareaInputController, new OutputControlConfiguration(false, true));
+controlRegister.registerInputFieldControl("file-uploader", SvelteComponent$14, FileUploaderController, new OutputControlConfiguration(true, true));
+controlRegister.registerInputFieldControl("number-range", SvelteComponent$17, NumberRangeInputController);
+controlRegister.registerOutputFieldControl("text", SvelteComponent$38);
+controlRegister.registerOutputFieldControl("number", SvelteComponent$32);
+controlRegister.registerOutputFieldControl("datetime", SvelteComponent$23);
+controlRegister.registerOutputFieldControl("table", SvelteComponent$36, new OutputControlConfiguration(false, true));
+controlRegister.registerOutputFieldControl("formlink", SvelteComponent$27);
+controlRegister.registerOutputFieldControl("tabstrip", SvelteComponent$37, new OutputControlConfiguration(true, true));
+controlRegister.registerOutputFieldControl("paginated-data", SvelteComponent$34, new OutputControlConfiguration(false, true));
+controlRegister.registerOutputFieldControl("action-list", SvelteComponent$21, new OutputControlConfiguration(true, true));
+controlRegister.registerOutputFieldControl("inline-form", SvelteComponent$30, new OutputControlConfiguration(true, true));
+controlRegister.registerOutputFieldControl("text-value", SvelteComponent$39);
+controlRegister.registerOutputFieldControl("text-value-multiline", SvelteComponent$40, new OutputControlConfiguration(false, true));
+controlRegister.registerOutputFieldControl("downloadable-file", SvelteComponent$25);
+controlRegister.registerOutputFieldControl("alert", SvelteComponent$22, new OutputControlConfiguration(true, true));
+controlRegister.registerOutputFieldControl("file-size", SvelteComponent$26);
+controlRegister.registerOutputFieldControl("image", SvelteComponent$29, new OutputControlConfiguration(false, true));
+controlRegister.registerOutputFieldControl("link", SvelteComponent$31);
+controlRegister.registerOutputFieldControl("object-list", SvelteComponent$33, new OutputControlConfiguration(false, true));
+controlRegister.registerOutputFieldControl("html-string", SvelteComponent$28);
+controlRegister.registerOutputFieldControl("documentation", SvelteComponent$24, new OutputControlConfiguration(true, true));
 // Form event handlers.
 controlRegister.registerFormEventHandler("log-to-console", new FormLogToConsole());
 controlRegister.registerFormEventHandler("reload-form-after-action", new ReloadFormAfterAction());
@@ -32928,7 +32760,7 @@ var MyApp = (function (_super) {
         alertifyErrorMsg.push(msg);
     };
     return MyApp;
-}(UmfApp));
+}(UmfApp$$1));
 var server = new UmfServer("/api/form/metadata", "/api/form/run");
 var app = new MyApp(server);
 // Create a global variable, which can be accessed from any component.
@@ -32975,14 +32807,9 @@ function buildMenu(theApp) {
         target: document.getElementById("topmenu"),
         data: {
             forms: theApp.forms,
+            menu: theApp.menu,
             theApp: theApp,
-            getMenu: function (form) {
-                if (form.customProperties != null) {
-                    return theApp.getMenu(form.customProperties.menu);
-                }
-                return null;
-            },
-            makeUrl: function (formId) { return theApp.makeUrl(formId, null); }
+            makeUrl: function (formId, inputFieldValues) { return theApp.makeUrl(formId, inputFieldValues); }
         }
     });
 }

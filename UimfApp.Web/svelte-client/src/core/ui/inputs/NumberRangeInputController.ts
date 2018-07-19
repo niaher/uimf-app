@@ -1,23 +1,23 @@
 import * as umf from "core-framework";
-import { NumberInputController } from "./NumberInputController";
+import { NumberInputController } from "core-ui/inputs/NumberInputController";
 
 export class NumberRangeInputController extends umf.InputController<NumberRange> {
-	min: number = null;
-	max: number = null;
+	public min: number = null;
+	public max: number = null;
 
-	init(value: string): Promise<NumberRangeInputController> {
+	public init(value: string): Promise<NumberRangeInputController> {
 		return new Promise((resolve, reject) => {
 			this.value = this.parse(value);
 			resolve(this);
 		});
 	}
 
-	getValue(): Promise<NumberRange> {
+	public getValue(): Promise<NumberRange> {
 		return Promise.resolve(this.value);
 	}
 
-	serializeValue(number: NumberRange | string): any {
-		var parsed = this.parse(number);
+	public serializeValue(num: NumberRange | string): any {
+		const parsed = this.parse(num);
 		return parsed != null ? parsed.serialize() : "";
 	}
 
@@ -32,24 +32,25 @@ export class NumberRangeInputController extends umf.InputController<NumberRange>
 	}
 }
 
+// tslint:disable-next-line:max-classes-per-file
 class NumberRange {
 	constructor(min: number = null, max: number = null) {
 		this.min = min;
 		this.max = max;
 	}
 
-	min: number;
-	max: number;
+	public min: number;
+	public max: number;
 
-	static parse(range: string): NumberRange {
-		var split = range.split("|");
-		var minValue = parseFloat(split[0]),
-			maxValue = parseFloat(split[1]);
+	public static parse(range: string): NumberRange {
+		const split = range.split("|");
+		const minValue = parseFloat(split[0]);
+		const maxValue = parseFloat(split[1]);
 
 		return new NumberRange(minValue, maxValue);
 	}
 
-	serialize() {
+	public serialize(): string {
 		return `${NumberInputController.serialize(this.min)}|${NumberInputController.serialize(this.max)}`;
 	}
 }

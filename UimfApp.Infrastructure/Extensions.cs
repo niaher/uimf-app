@@ -74,6 +74,16 @@ namespace UimfApp.Infrastructure
 			};
 		}
 
+		public static MenuItem AsMenuItem(this FormLink formLink, string menuGroup, int orderIndex = 0)
+		{
+			return new MenuItem(menuGroup, orderIndex)
+			{
+				Label = formLink.Label,
+				Form = formLink.Form,
+				InputFieldValues = formLink.InputFieldValues
+			};
+		}
+
 		public static MultiSelect<T> AsMultiSelect<T>(this IEnumerable<T> items)
 		{
 			return new MultiSelect<T>(items.ToArray());
@@ -148,6 +158,13 @@ namespace UimfApp.Infrastructure
 		public static bool Contains(this string value, string substring, StringComparison comparison)
 		{
 			return value.IndexOf(substring, comparison) >= 0;
+		}
+
+		public static IEnumerable<T> DistinctBy<T, TKey>(this IEnumerable<T> items, Func<T, TKey> condition)
+		{
+			return items
+				.GroupBy(condition)
+				.Select(t => t.First());
 		}
 
 		public static string EnforceMaxLength(this string value, int maxLength)
@@ -327,6 +344,16 @@ namespace UimfApp.Infrastructure
 			return message;
 		}
 
+		public static T GetValueOrDefault<T>(this Dictionary<string, T> dictionary, string key, T defaultValue)
+		{
+			if (dictionary.TryGetValue(key, out var value))
+			{
+				return value;
+			}
+
+			return defaultValue;
+		}
+
 		public static bool In<T>(this T value, params T[] allowed)
 		{
 			foreach (var a in allowed)
@@ -428,6 +455,22 @@ namespace UimfApp.Infrastructure
 			return item;
 		}
 
+		public static string SubstringAfterLast(this string value, string search, StringComparison comparisonType)
+		{
+			if (value == null)
+			{
+				return null;
+			}
+
+			var last = value.LastIndexOf(search, comparisonType);
+			if (last >= 0 && last + 1 < value.Length)
+			{
+				return value.Substring(last + 1);
+			}
+
+			return null;
+		}
+
 		public static T ToEnum<T>(this string value) where T : struct
 		{
 			return Enum.TryParse(value, true, out T result) ? result : default(T);
@@ -445,7 +488,7 @@ namespace UimfApp.Infrastructure
 
 			return JObject.Parse(JsonConvert.SerializeObject(inputValues));
 		}
-		
+
 		public static string ToYesOrNoString(this bool boolean)
 		{
 			return boolean ? "Yes" : "No";
@@ -506,6 +549,17 @@ namespace UimfApp.Infrastructure
 		internal static DbConnection GetConnection(this MySqlOptionsExtension extension)
 		{
 			return extension.Connection ?? new MySqlConnection(extension.ConnectionString);
+		}
+
+		internal static T GetCustomProperty<T>(this FormMetadata form, string propertyName)
+		{
+			if (form.CustomProperties != null &&
+				form.CustomProperties.TryGetValue(propertyName, out var result))
+			{
+				return (T)result;
+			}
+
+			return default(T);
 		}
 
 		private static IEnumerable<IProperty> FindPrimaryKeyProperties<T>(this IDbContextDependencies dbContext, T entity)
