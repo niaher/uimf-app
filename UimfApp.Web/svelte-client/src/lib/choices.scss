@@ -32,7 +32,7 @@ $choices-button-offset: 8px !default;
 
   &.is-disabled {
     .#{$choices-selector}__inner,
-    .#{$choices-selector}__input {
+		.#{$choices-selector}__input {
       background-color: $choices-bg-color-disabled;
       cursor: not-allowed;
       user-select: none;

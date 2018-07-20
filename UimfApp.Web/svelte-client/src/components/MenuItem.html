@@ -1,24 +1,30 @@
-{{#if item.children.length === 0}}
-	<MyFormLink field="{field: { data: item }}"></MyFormLink>
-<!-- {{else}}
-	<div class="menu top-menu-div">
-		{{#if item.children.length > 1}}
-		<label for="menu{{id}}" class="toggle-sub" onclick="">{{item.label}}</label>
+{{#if field != null}}
+	{{#if item.children.length === 0}}
+		{{#if item.form != null}}
+		<MyFormLink field="{{field}}" app="{{app}}"/>
 		{{else}}
-		<MyFormLink field="{field: { data: item.children[0] }}"></MyFormLink>
+		<span>{{item.label}}</span>
 		{{/if}}
-	</div>
+	{{else}}
+		<div class="menu top-menu-div">
+			{{#if item.children.length > 1}}
+			<label for="menu{{id}}" class="toggle-sub" onclick="">{{item.label}}</label>
+			{{else}}
+			<!-- .<MyFormLink field="{{ { data: item.children[0] } }}" app="{{app}}" />. -->
+			{{/if}}
+		</div>
 
-	<input type="checkbox" id="menu{{id}}" class="sub-nav-check" />
-	{{#if item.children.length > 1}}
-	<ul class="sub-nav">
-		{{#each item.children as child}}
-		<li>
-			<:Self menu="{{child}}" />
-		</li>
-		{{/each}}
-	</ul>
-	{{/if}} -->
+		<input type="checkbox" id="menu{{id}}" class="sub-nav-check" />
+		{{#if item.children.length > 1}}
+		<ul class="sub-nav">
+			{{#each item.children as child}}
+			<li>
+				<:Self item="{{child}}" menu="{{menu}}" />
+			</li>
+			{{/each}}
+		</ul>
+		{{/if}}
+	{{/if}}
 {{/if}}
 
 <script>
@@ -27,8 +33,14 @@
 	let id = 0;
 	export default {
 		oncreate() {
-			this.set({ });
-			console.log(this.get());
+			const item = this.get("item");
+
+			this.set({
+				field: { data: item },
+				app: window.app
+			});
+
+			console.log(this.get("field"));
 		},
 		data() {
 			id += 1;

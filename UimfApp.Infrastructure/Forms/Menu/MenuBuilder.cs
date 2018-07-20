@@ -79,7 +79,7 @@ namespace UimfApp.Infrastructure.Forms.Menu
 
 					var current = groupNodes[folder] = groupNodes.GetValueOrDefault(folder, null) ?? new MenuGroupNode
 					{
-						Label = group.Name.SubstringAfterLast("/", StringComparison.OrdinalIgnoreCase),
+						Label = group.Name.SubstringAfterLast("/", StringComparison.OrdinalIgnoreCase) ?? group.Name,
 						OrderIndex = group.OrderIndex,
 						Children = new List<IMenuNode>()
 					};
@@ -89,7 +89,7 @@ namespace UimfApp.Infrastructure.Forms.Menu
 						parent.Children.Add(current);
 					}
 
-					if (parent == null)
+					if (parent == null && current != root)
 					{
 						root.Children.Add(current);
 					}
@@ -113,7 +113,7 @@ namespace UimfApp.Infrastructure.Forms.Menu
 
 		private MenuGroup GetGroupMetadata(string groupName)
 		{
-			string normalizedGroupName = String.IsNullOrWhiteSpace(groupName) ? "" : groupName;
+			string normalizedGroupName = string.IsNullOrWhiteSpace(groupName) ? "" : groupName;
 			this.groups.TryGetValue(normalizedGroupName, out var group);
 
 			if (group == null)
