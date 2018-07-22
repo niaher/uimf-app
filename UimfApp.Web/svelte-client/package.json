@@ -38,8 +38,8 @@
     "source-map-loader": "^0.2.3",
     "stylelint": "^9.3.0",
     "stylelint-config-standard": "^18.2.0",
-    "svelte": "^2.9.5",
-    "svelte-state-renderer": "1.2.1",
+    "svelte": "^2.9.6",
+    "svelte-cli": "^3.0.0",
     "ts-loader": "^4.4.2",
     "tslib": "^1.9.3",
     "tslint": "^5.11.0",
@@ -53,8 +53,9 @@
     "axios": "0.16.2",
     "choices.js": "^3.0.2",
     "humanize": "0.0.9",
+    "moment": "^2.22.2",
     "pikaday": "^1.7.0",
-    "uimf-core": "0.0.8",
-    "moment": "^2.22.2"
+    "svelte-state-renderer": "^2.0.0",
+    "uimf-core": "0.0.8"
   }
 }

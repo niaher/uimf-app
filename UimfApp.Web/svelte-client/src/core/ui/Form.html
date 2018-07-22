@@ -71,7 +71,7 @@
 		methods: {
 			async init() {
 				if (!this.get().initialized) {
-					const form = this.get().form;
+					const { form } = this.get();
 
 					this.set({
 						self: this,
@@ -84,7 +84,7 @@
 
 					tabindex += 1;
 
-					const app = this.get().app;
+					const { app } = this.get();
 
 					// Subscribe all event handlers (form, inputs, outputs).
 					const formMetadata = form.metadata;
@@ -151,8 +151,7 @@
 			},
 			async submit(event, redirect) {
 				const self = this;
-				const formInstance = this.get().form;
-				const app = this.get().app;
+				const { form: formInstance, app } = this.get();
 
 				if (event != null) {
 					event.preventDefault();
@@ -218,8 +217,14 @@
 		},
 		data() {
 			return {
+				cssClass: null,
+				documentation: null,
+				visibleInputFields: null,
+				outputFieldValues: null,
+				submitButtonLabel: "Submit",
 				disabled: false,
 				tabindex,
+				self: this,
 				urlData: null,
 				initialized: false,
 				responseMetadata: {},
@@ -237,25 +242,25 @@
 </script>
 
 <style>
-  .response {
-    margin-top: 15px;
-    padding-left: 10px;
-    padding-right: 10px;
-  }
+	.response {
+		margin-top: 15px;
+		padding-left: 10px;
+		padding-right: 10px;
+	}
 
-  .form-header {
-    text-align: center;
-    padding-top: 20px;
-    border-bottom: 1px solid #bbd2d6;
-    background-color: #fff;
-    position: relative;
-  }
+	.form-header {
+		text-align: center;
+		padding-top: 20px;
+		border-bottom: 1px solid #bbd2d6;
+		background-color: #fff;
+		position: relative;
+	}
 
-  .form-header h2 {
-    display: inline-block;
-  }
+	.form-header h2 {
+		display: inline-block;
+	}
 
-  .help-content {
-    text-align: left;
-  }
+	.help-content {
+		text-align: left;
+	}
 </style>

@@ -1,5 +1,5 @@
-{#if data }
-	{#if data.placement == 'Hint' }
+{#if data != null}
+	{#if data.placement == 'Hint'}
 	<div class="help-content modal-help">
 		<i on:click="open()" class="far fa-question-circle" title="Click to open help for this form"></i>
 		<input id="modal-{modalId}" type="checkbox" bind:checked="open" class="hidden" />
@@ -99,32 +99,32 @@
 </script>
 
 <style>
-  .inline-help {
-    background: #ecf8fb;
-    padding: 10px;
-  }
+	.inline-help {
+		background: #ecf8fb;
+		padding: 10px;
+	}
 
-  .modal-help > i {
-    font-size: 15pt;
-    color: #5b7b9b;
-  }
+	.modal-help > i {
+		font-size: 15pt;
+		color: #5b7b9b;
+	}
 
-  .modal-help {
-    display: block;
-    margin-left: -10px;
-    position: absolute;
-    right: 10px;
-    top: 30px;
-  }
+	.modal-help {
+		display: block;
+		margin-left: -10px;
+		position: absolute;
+		right: 10px;
+		top: 30px;
+	}
 
-  .help-files {
-    border-top: 1px solid #d8d8d8;
-    padding: 10px;
-    margin: 10px;
-    background: #ecf8fb;
-  }
+	.help-files {
+		border-top: 1px solid #d8d8d8;
+		padding: 10px;
+		margin: 10px;
+		background: #ecf8fb;
+	}
 
-  .help-files ul {
-    list-style: circle;
-  }
+	.help-files ul {
+		list-style: circle;
+	}
 </style>

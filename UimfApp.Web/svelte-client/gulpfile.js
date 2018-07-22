@@ -8,8 +8,10 @@
 
 const gulp = require("gulp"),
 	gulpSvelte = require("gulp-svelte"),
+	svelte = require("svelte"),
 	rollup = require("rollup"),
 	tsc = require("typescript"),
+	fs = require("fs"),
 	rollupTypescript = require("rollup-plugin-typescript2"),
 	commonjs = require("rollup-plugin-commonjs"),
 	resolve = require("rollup-plugin-node-resolve"),
@@ -53,6 +55,7 @@ function buildSvelteComponents(src, dest) {
 	return gulp
 		.src(src)
 		.on("error", console.log)
+		// .on("data", d => console.log(d))
 		.pipe(gulpSvelte({
 			format: "es",
 			generate: "dom",
@@ -89,15 +92,58 @@ gulp.task("svelte", ["clean"], () => {
 	// Break down Svelte build into multiple steps, because for some reason,
 	// if we pass "src/**/*.html" to the buildSvelte function, the build won't
 	// work correctly (the `pipe` will never `end`).
-	// buildSvelteComponents(["src/**/*.html"], `${svelteComponentsDir}`);
-	// return merge2([copySharedJs, copyOutputs], s1);
+	const s1 = buildSvelteComponents([
+		"src/**/*.html"
+		// "!src2/core/ui/inputs/*"
+		// "!src2/core/ui/outputs/*"
+	], `${svelteComponentsDir}`);
+	return merge2([copySharedJs, copyOutputs], s1);
 
-	const s1 = buildSvelteComponents(["src/core/ui/help/*.html"], `${svelteComponentsDir}/core/ui/help`);
-	const s2 = buildSvelteComponents(["src/core/ui/*.html"], `${svelteComponentsDir}/core/ui`);
-	const s3 = buildSvelteComponents("src/components/**/*.html", `${svelteComponentsDir}/components`);
-	const s4 = buildSvelteComponents("src/core/ui/outputs/**/*.html", `${svelteComponentsDir}/core/ui/outputs`);
-	const s5 = buildSvelteComponents("src/core/ui/inputs/**/*.html", `${svelteComponentsDir}/core/ui/inputs`);
-	return merge2([copySharedJs, copyOutputs], [s1, s2, s3, s4, s5]);
+	// const s1 = buildSvelteComponents(["src2/core/ui/help/*.html"], `${svelteComponentsDir}/core/ui/help`);
+	// const s2 = buildSvelteComponents(["src2/core/ui/*.html"], `${svelteComponentsDir}/core/ui`);
+	// const s3 = buildSvelteComponents("src2/components/**/*.html", `${svelteComponentsDir}/components`);
+	// const s4 = buildSvelteComponents("src2/core/ui/outputs/**/*.html", `${svelteComponentsDir}/core/ui/outputs`);
+	// const s5 = buildSvelteComponents("src2/core/ui/inputs/**/*.html", `${svelteComponentsDir}/core/ui/inputs`);
+	// return merge2([copySharedJs, copyOutputs], [s1, s2, s3, s4, s5]);
+});
+
+gulp.task("test", () => {
+	const input = fs.readFileSync("src/core/ui/Form.html", "utf-8");
+
+	const { js, css, ast } = svelte.compile(input, {
+		// the target module format – defaults to 'es' (ES2015 modules), can
+		// also be 'amd', 'cjs', 'umd', 'iife' or 'eval'
+		format: "es",
+
+		// the filename of the source file, used in e.g. generating sourcemaps
+		filename: "Form.html",
+
+		// the name of the constructor. Required for 'iife' and 'umd' output,
+		// but otherwise mostly useful for debugging. Defaults to 'SvelteComponent'
+		name: "Form",
+
+		// for 'amd' and 'umd' output, you can optionally specify an AMD module ID
+		// amd: {
+		// 	id: "my-component"
+		// },
+		shared: true,
+		dev: true,
+
+		// custom error/warning handlers. By default, errors will throw, and
+		// warnings will be printed to the console. Where applicable, the
+		// error/warning object will have `pos`, `loc` and `frame` properties
+		onerror: err => {
+			console.error(err.message);
+		},
+
+		onwarn: warning => {
+			console.warn(warning.message);
+		}
+	});
+
+	console.log(js);
+	console.log(css);
+	console.log(ast);
 });
 
 gulp.task("copy-html", () => gulp

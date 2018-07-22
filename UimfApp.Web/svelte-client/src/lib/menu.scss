@@ -2,152 +2,152 @@ $mainColor: #3fcae0 !default;
 $secondColor:#f3818c !default;
 
 @font-face {
-  font-family: Trocchi;
-  src: url("./fonts/Trocchi.otf") format("opentype");
+	font-family: Trocchi;
+	src: url("./fonts/Trocchi.otf") format("opentype");
 }
 
 header.top {
-  min-height: 75px;
-  overflow-x: visible;
-  overflow-y: visible;
-  padding: 0 1rem;
+	min-height: 75px;
+	overflow-x: visible;
+	overflow-y: visible;
+	padding: 0 1rem;
 }
 
 @media (max-width: 765px) {
-  header.top {
-    min-height: 186px;
-  }
+	header.top {
+		min-height: 186px;
+	}
 }
 
 header.top .logo {
-  float: left;
-  padding-top: 15px;
-  font-size: 26px;
-  color: $mainColor;
-  font-family: Trocchi;
+	float: left;
+	padding-top: 15px;
+	font-size: 26px;
+	color: $mainColor;
+	font-family: Trocchi;
 }
 
 header {
-  height: inherit !important;
-  position: relative;
-  z-index: 5;
-  background: rgba(41, 51, 63, 0.95) !important;
+	height: inherit !important;
+	position: relative;
+	z-index: 5;
+	background: rgba(41, 51, 63, 0.95) !important;
 }
 
 header.top .logo:hover {
-  color: $secondColor;
-  text-decoration: none;
+	color: $secondColor;
+	text-decoration: none;
 }
 
 .sub-nav-check {
-  position: absolute;
-  top: -9999px;
-  left: -9999px;
+	position: absolute;
+	top: -9999px;
+	left: -9999px;
 }
 
 .xmenu {
-  position: relative;
-  float: right;
-  padding: 1px;
-  margin: 0;
-  border: none;
-  padding-top: 20px;
-  padding-left: 40px;
+	position: relative;
+	float: right;
+	padding: 1px;
+	margin: 0;
+	border: none;
+	padding-top: 20px;
+	padding-left: 40px;
 }
 
 .xmenu ul {
-  list-style: none;
-  position: relative;
-  float: left;
-  margin: 0;
-  padding: 0;
-  padding-right: 15px;
+	list-style: none;
+	position: relative;
+	float: left;
+	margin: 0;
+	padding: 0;
+	padding-right: 15px;
 }
 
 .xmenu ul > li > a,
 .xmenu ul > li > label,
 .xmenu ul > li > div.top-menu-div {
-  display: block;
-  color: $mainColor;
-  text-decoration: none;
-  line-height: 44px;
-  padding: 2px 15px;
-  margin: 0;
+	display: block;
+	color: $mainColor;
+	text-decoration: none;
+	line-height: 44px;
+	padding: 2px 15px;
+	margin: 0;
 }
 
 .xmenu ul ul a,
 .xmenu ul ul label {
-  color: #ccc;
-  line-height: 120%;
-  padding: 10px 15px;
-  border: 1px solid #404040;
-  border-width: 1px 1px 0 0;
+	color: #ccc;
+	line-height: 120%;
+	padding: 10px 15px;
+	border: 1px solid #404040;
+	border-width: 1px 1px 0 0;
 }
 
 .xmenu ul > li > a:hover,
 .xmenu ul > li > div.top-menu-div:hover,
 .xmenu ul > li > label:hover {
-  color: $secondColor;
+	color: $secondColor;
 }
 
 .xmenu ul ul a:hover,
 .xmenu ul ul label:hover {
-  color: $secondColor;
-  background-color: rgb(52, 61, 73);
+	color: $secondColor;
+	background-color: rgb(52, 61, 73);
 }
 
 .xmenu ul li.current-menu-item > a {
-  background: #ddd;
+	background: #ddd;
 }
 
 .xmenu ul > li > div.top-menu-div > a {
-  color: $mainColor;
-  text-decoration: none;
+	color: $mainColor;
+	text-decoration: none;
 }
 
 .xmenu ul > li > div.top-menu-div > a:hover {
-  color: $secondColor;
+	color: $secondColor;
 }
 
 .xmenu ul > li > div.top-menu-div::before {
-  content: '';
-  border-left: 2px solid #555;
-  position: absolute;
-  height: 50%;
-  left: 0;
-  top: 25%;
+	content: '';
+	border-left: 2px solid #555;
+	position: absolute;
+	height: 50%;
+	left: 0;
+	top: 25%;
 }
 
 .xmenu ul li {
-  position: relative;
-  float: left;
-  margin: 0;
-  padding: 0;
+	position: relative;
+	float: left;
+	margin: 0;
+	padding: 0;
 }
 
 .xmenu ul ul {
-  display: none;
-  position: absolute;
-  left: 0;
-  background: #2a3038;
-  padding: 0;
-  z-index: 10;
-  top: 100%;
-  border-bottom: 5px solid $secondColor;
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
+	display: none;
+	position: absolute;
+	left: 0;
+	background: #2a3038;
+	padding: 0;
+	z-index: 10;
+	top: 100%;
+	border-bottom: 5px solid $secondColor;
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
 }
 
 .xmenu ul ul li {
-  float: none;
-  min-width: 140px;
+	float: none;
+	min-width: 140px;
 }
 
 .xmenu ul ul ul {
-  top: 0;
-  left: 100%;
+	top: 0;
+	left: 100%;
 }
 
 .xmenu ul li:hover > ul {
-  display: block;
+	display: block;
 }

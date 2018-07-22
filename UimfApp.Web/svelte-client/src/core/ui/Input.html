@@ -26,8 +26,7 @@
 
 	export default {
 		oncreate() {
-			const field = this.get().field;
-			const app = this.get().app;
+			const { field, app } = this.get();
 
 			const input = app.controlRegister.getInput(field.metadata.type);
 
@@ -49,7 +48,7 @@
 				alwaysHideLabel: inputDisplayConfig.alwaysHideLabel
 			});
 
-			const inputs = this.get().form.get().inputs;
+			const { inputs } = this.get().form.get();
 			// If `inputs` is null, then it means our parent form has been closed
 			// and "destroyed". In such cases we should just return.
 			// TODO: find a better way to implement "parent form null check".
@@ -72,13 +71,13 @@
 		},
 		methods: {
 			show(visible) {
-				const field = this.get().field;
+				const { field } = this.get();
 				const currentlyVisible = !!this.get().visible;
 
 				this.set({ visible: !!visible });
 
 				if (currentlyVisible === false && visible === true) {
-					const app = this.get().app;
+					const { app } = this.get();
 					const input = app.controlRegister.getInput(field.metadata.type);
 
 					// eslint-disable-next-line
@@ -107,11 +106,11 @@
 </script>
 
 <style>
-  .inline {
-    display: inline-block;
-  }
+	.inline {
+		display: inline-block;
+	}
 
-  .col-form-label {
-    padding-left: 0;
-  }
+	.col-form-label {
+		padding-left: 0;
+	}
 </style>

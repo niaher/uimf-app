@@ -169,19 +169,19 @@
 			}
 			else {
 				a.setChoices(mapToTypeaheadItems(source), "value", "label", true);
-
-				let initialized = false;
-				this.observe("field", () => {
-					if (!initialized) {
-						initialized = true;
-						setInputValue(a, field);
-					}
-				});
 			}
 
 			a.passedElement.addEventListener("change", () => {
 				field.value = calculateFieldValue(field, a.getValue());
 			});
+		},
+		onstate({ changed, current }) {
+			if (changed.field) {
+				if (!current.initialized) {
+					current.initialized = true;
+					setInputValue(a, field);
+				}
+			}
 		},
 		methods: {
 			onChange() {
