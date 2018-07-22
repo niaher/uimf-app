@@ -1,30 +1,29 @@
-{{#if numberConfig != null}}
+{#if numberConfig != null}
 <input type="number"
-    id="{{id}}"
+    id="{id}"
     bind:value="field.value"
-    required="{{field.metadata.required}}"
-    tabindex="{{tabindex}}"
+    required="{field.metadata.required}"
+    tabindex="{tabindex}"
     class="form-control"
-    step="{{numberConfig.step}}"
-    min="{{numberConfig.minValue}}"
-    max="{{numberConfig.maxValue}}" />
-{{/if}}
+    step="{numberConfig.step}"
+    min="{numberConfig.minValue}"
+    max="{numberConfig.maxValue}" />
+{/if}
 
 <script>
 	export default {
 		oncreate() {
-			var field = this.get("field");
-			var numberConfig = field.metadata.customProperties != null &&
-				field.metadata.customProperties["numberConfig"] != null
-				? field.metadata.customProperties["numberConfig"]
-				: {
+			const field = this.get().field;
+			const numberConfig = field.metadata.getCustomProperty("numberConfig") ||
+				{
 					minValue: null,
 					maxValue: null,
 					step: 1
 				};
+
 			this.set({
-				numberConfig: numberConfig
+				numberConfig
 			});
 		}
-	}
+	};
 </script>

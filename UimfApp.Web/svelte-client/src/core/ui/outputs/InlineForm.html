@@ -5,9 +5,9 @@
 
 	export default {
 		oncreate() {
-			const app = this.get("app");
-			const field = this.get("field");
-			const parentFormComponent = this.get("parent");
+			const app = this.get().app;
+			const field = this.get().field;
+			const parentFormComponent = this.get().parent;
 
 			const formInstance = app.getFormInstance(field.data.form, true);
 
@@ -28,10 +28,10 @@
 				this.set({ current: f });
 			});
 
-			this.get("parent").on("destroy", () => this.destroy());
+			this.get().parent.on("destroy", () => this.destroy());
 		},
 		ondestroy() {
-			const form = this.get("current");
+			const form = this.get().current;
 
 			if (form != null) {
 				form.destroy();

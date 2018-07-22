@@ -1,11 +1,11 @@
-{{#if field.data != null }}
-<span class="{{cssClass}}">{{BooleanChecker}}</span>
-{{/if}}
+{#if field.data != null }
+<span class="{cssClass}">{BooleanChecker}</span>
+{/if}
 
 <script>
 	export default {
 		computed: {
-			cssClass: (field, form) => {
+			cssClass: ({ field, form }) => {
 				let cssClass = "";
 				const dynamicCssClass = field.metadata.getCustomProperty("dynamicCssClass");
 				if (dynamicCssClass != null) {
@@ -19,7 +19,7 @@
 				}
 				return cssClass;
 			},
-			BooleanChecker: field => {
+			BooleanChecker: ({ field }) => {
 				if (typeof (field.data) === "boolean") {
 					return field.data ? "Yes" : "No";
 				}

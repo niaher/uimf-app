@@ -1,14 +1,14 @@
-{{#if field.data != null && items != null}}
-{{#each items as itemFields}}
-	<div class="object-list-item {{cssClass}}">
-		{{#each itemFields as itemField}}
-		{{#if itemField.metadata.hidden == false && !(itemField.metadata.getCustomProperty("hideIfNull") === true && itemField.data === null)}}
-		 	<FormOutput field="{{itemField}}" app="{{app}}" form="{{form}}" parent="{{parent}}" />
-		{{/if}}
-		{{/each}}
+{#if field.data != null && items != null}
+{#each items as itemFields}
+	<div class="object-list-item {cssClass}">
+		{#each itemFields as itemField}
+		{#if itemField.metadata.hidden == false && !(itemField.metadata.getCustomProperty("hideIfNull") === true && itemField.data === null)}
+		 	<FormOutput field="{itemField}" app="{app}" form="{form}" parent="{parent}" />
+		{/if}
+		{/each}
 	</div>
-{{/each}}
-{{/if}}
+{/each}
+{/if}
 
 <script>
 	import * as umf from "core-framework";
@@ -17,33 +17,33 @@
 
 	export default {
 		oncreate() {
-			var field = this.get("field");
+			const field = this.get().field;
 			if (field.data == null || field.data.metadata == null) {
 				return;
 			}
 
-			var columns = field.data.metadata;
+			const columns = field.data.metadata;
 			delete columns.customProperties;
 
-			var formMetadata = new uimfcore.FormMetadata({
+			const formMetadata = new uimfcore.FormMetadata({
 				customProperties: field.data.metadata.customProperties,
 				outputFields: columns
-			})
+			});
 
-			var items = [];
-			for (let item of field.data.items) {
+			const items = [];
+			for (const item of field.data.items) {
 				items.push(umf.FormInstance.getOutputFieldValues(formMetadata.outputFields, item));
 			}
 
 			this.set({
-				items: items,
+				items,
 				cssClass: formMetadata.getCustomProperty("cssClass") || ""
 			});
 		},
 		components: {
 			FormOutput
 		}
-	}
+	};
 </script>
 
 <style>

@@ -1,23 +1,23 @@
-{{#if visible}}
-    {{#if !alwaysHideLabel && field.metadata.label !== "" }}
-    <div class="form-group {{class}}">
-        <label for="{{id}}" class="col-form-label">
-            {{#if field.metadata.customProperties != null && field.metadata.customProperties["documentation"] != null}}
-            <div class="help-tooltip">{{field.metadata.label}}:
-                <Tooltip data="{{field.metadata.customProperties.documentation[0]}}"></Tooltip>
+{#if visible}
+    {#if !alwaysHideLabel && field.metadata.label !== "" }
+    <div class="form-group {class}">
+        <label for="{id}" class="col-form-label">
+            {#if field.metadata.customProperties != null && field.metadata.customProperties["documentation"] != null}
+            <div class="help-tooltip">{field.metadata.label}:
+                <Tooltip data="{field.metadata.customProperties.documentation[0]}"></Tooltip>
             </div>
-            {{else}}
-            {{field.metadata.label}}:
-            {{/if}}
+            {:else}
+            {field.metadata.label}:
+            {/if}
         </label>
         <div ref:container class="input-container"></div>
     </div>
-    {{else}}
-    <div class="form-group {{class}}">
+    {:else}
+    <div class="form-group {class}">
         <div ref:container class="input-container"></div>
     </div>
-    {{/if}}
-{{/if}}
+    {/if}
+{/if}
 
 <script>
 	import Tooltip from "./help/Tooltip";
@@ -26,8 +26,8 @@
 
 	export default {
 		oncreate() {
-			const field = this.get("field");
-			const app = this.get("app");
+			const field = this.get().field;
+			const app = this.get().app;
 
 			const input = app.controlRegister.getInput(field.metadata.type);
 
@@ -49,7 +49,7 @@
 				alwaysHideLabel: inputDisplayConfig.alwaysHideLabel
 			});
 
-			const inputs = this.get("form").get("inputs");
+			const inputs = this.get().form.get().inputs;
 			// If `inputs` is null, then it means our parent form has been closed
 			// and "destroyed". In such cases we should just return.
 			// TODO: find a better way to implement "parent form null check".
@@ -72,13 +72,13 @@
 		},
 		methods: {
 			show(visible) {
-				const field = this.get("field");
-				const currentlyVisible = !!this.get("visible");
+				const field = this.get().field;
+				const currentlyVisible = !!this.get().visible;
 
 				this.set({ visible: !!visible });
 
 				if (currentlyVisible === false && visible === true) {
-					const app = this.get("app");
+					const app = this.get().app;
 					const input = app.controlRegister.getInput(field.metadata.type);
 
 					// eslint-disable-next-line
@@ -86,10 +86,10 @@
 						target: this.refs.container,
 						data: {
 							field,
-							tabindex: this.get("tabindex"),
-							id: this.get("id"),
+							tabindex: this.get().tabindex,
+							id: this.get().id,
 							app,
-							form: this.get("form"),
+							form: this.get().form,
 							wrapper: this
 						}
 					});

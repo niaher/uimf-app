@@ -1,22 +1,20 @@
 
 <input type="Email"
-    id="{{id}}"
+    id="{id}"
     bind:value="field.selected"
-    required="{{field.metadata.required}}"
-    tabindex="{{tabindex}}"
+    required="{field.metadata.required}"
+    tabindex="{tabindex}"
     class="form-control"
     ref:container>
 
 <script>
-  
-    export default {
-        oncreate() {
-            var field = this.get("field");
-            var formElement = this.refs.container;
-            formElement.addEventListener("change", function (e) {
-                    field.init(field.selected);
-            });
-        }
-    }
-
+	export default {
+		oncreate() {
+			const field = this.get().field;
+			const formElement = this.refs.container;
+			formElement.addEventListener("change", () => {
+				field.init(field.selected);
+			});
+		}
+	};
 </script>

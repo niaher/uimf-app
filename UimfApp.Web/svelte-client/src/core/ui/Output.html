@@ -1,29 +1,29 @@
-{{#if showLabel === true && !alwaysHideLabel && field.metadata.label !== ""}}
+{#if showLabel === true && !alwaysHideLabel && field.metadata.label !== ""}
 <div>
-        {{#if field.metadata.customProperties != null && field.metadata.customProperties["documentation"] != null}}
-        <label class="help-tooltip output-label">{{field.metadata.label}}:
-            <Tooltip data="{{field.metadata.customProperties.documentation[0]}}"></Tooltip>
+        {#if field.metadata.customProperties != null && field.metadata.customProperties["documentation"] != null}
+        <label class="help-tooltip output-label">{field.metadata.label}:
+            <Tooltip data="{field.metadata.customProperties.documentation[0]}"></Tooltip>
         </label>
-        {{else}}
+        {:else}
 		<label class="output-label">
-        {{field.metadata.label}}:
+        {field.metadata.label}:
 		</label>
-        {{/if}}
-    <div ref:container class="output-container {{class}}"></div>
+        {/if}
+    <div ref:container class="output-container {class}"></div>
 </div>
-{{else}}
-<div ref:container class="output-container {{class}}"></div>
-{{/if}}
+{:else}
+<div ref:container class="output-container {class}"></div>
+{/if}
 
 <script>
 	import Tooltip from "./help/Tooltip";
 
 	export default {
 		oncreate() {
-			const field = this.get("field");
-			const app = this.get("app");
-			const parent = this.get("parent");
-			const form = this.get("form");
+			const field = this.get().field;
+			const app = this.get().app;
+			const parent = this.get().parent;
+			const form = this.get().form;
 
 			const output = app.controlRegister.getOutput(field);
 

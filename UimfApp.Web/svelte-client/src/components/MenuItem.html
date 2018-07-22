@@ -1,31 +1,31 @@
-{{#if field != null}}
-	{{#if item.children.length === 0}}
-		{{#if item.form != null}}
-		<MyFormLink field="{{field}}" app="{{app}}"/>
-		{{else}}
-		<span>{{item.label}}</span>
-		{{/if}}
-	{{else}}
+{#if field != null}
+	{#if item.children.length === 0}
+		{#if item.form != null}
+		<MyFormLink field="{field}" app="{app}"/>
+		{:else}
+		<span>{item.label}</span>
+		{/if}
+	{:else}
 		<div class="menu top-menu-div">
-			{{#if item.children.length > 1}}
-			<label for="menu{{id}}" class="toggle-sub" onclick="">{{item.label}}</label>
-			{{else}}
+			{#if item.children.length > 1}
+			<label for="menu{id}" class="toggle-sub" onclick="">{item.label}</label>
+			{:else}
 			<!-- .<MyFormLink field="{{ { data: item.children[0] } }}" app="{{app}}" />. -->
-			{{/if}}
+			{/if}
 		</div>
 
-		<input type="checkbox" id="menu{{id}}" class="sub-nav-check" />
-		{{#if item.children.length > 1}}
+		<input type="checkbox" id="menu{id}" class="sub-nav-check" />
+		{#if item.children.length > 1}
 		<ul class="sub-nav">
-			{{#each item.children as child}}
+			{#each item.children as child}
 			<li>
-				<:Self item="{{child}}" menu="{{menu}}" />
+				<svelte:self item="{child}" menu="{menu}" />
 			</li>
-			{{/each}}
+			{/each}
 		</ul>
-		{{/if}}
-	{{/if}}
-{{/if}}
+		{/if}
+	{/if}
+{/if}
 
 <script>
 	import MyFormLink from "../core/ui/outputs/MyFormLink";
@@ -33,19 +33,21 @@
 	let id = 0;
 	export default {
 		oncreate() {
-			const item = this.get("item");
+			const { item } = this.get();
 
 			this.set({
 				field: { data: item },
 				app: window.app
 			});
 
-			console.log(this.get("field"));
+			console.log(this.get().field);
 		},
 		data() {
 			id += 1;
 			return {
-				id
+				id,
+				field: null,
+				app: null
 			};
 		},
 		components: {

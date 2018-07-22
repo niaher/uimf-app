@@ -1,18 +1,18 @@
-{{#if field.metadata.required}}
+{#if field.metadata.required}
 <input type="checkbox"
-	id="{{id}}"
+	id="{id}"
 	class="checkbox form-control"
 	bind:checked="field.value"
-	tabindex="{{tabindex}}">
-{{else}}
+	tabindex="{tabindex}">
+{:else}
 <select bind:value="field.value"
-	id="{{id}}"
+	id="{id}"
 	class="form-control">
 	<option></option>
-	<option value="{{true}}">Yes</option>
-	<option value="{{false}}">No</option>
+	<option value="{true}">Yes</option>
+	<option value="{false}">No</option>
 </select>
-{{/if}}
+{/if}
 
 <style>
   .checkbox {

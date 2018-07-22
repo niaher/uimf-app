@@ -1,28 +1,29 @@
-{{filesize(field.data.bytes)}}
+{filesize(field.data.bytes)}
 
 <script>
 	export default {
 		helpers: {
-			filesize: function (bytes) {
-				var si = true;
-				var thresh = si ? 1000 : 1024;
+			filesize(bytes) {
+				const si = true;
+				const thresh = si ? 1000 : 1024;
 				if (Math.abs(bytes) < thresh) {
-					return bytes + ' B';
+					return `${bytes} B`;
 				}
 
-				var units = si
-					? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-					: ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+				const units = si ?
+					["kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"] :
+					["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
 
-				var u = -1;
+				let u = -1;
+				let result = bytes;
 
 				do {
-					bytes /= thresh;
-					++u;
-				} while (Math.abs(bytes) >= thresh && u < units.length - 1);
+					result /= thresh;
+					u += 1;
+				} while (Math.abs(result) >= thresh && u < units.length - 1);
 
-				return bytes.toFixed(1) + ' ' + units[u];
+				return `${result.toFixed(1)} ${units[u]}`;
 			}
 		}
-	}
+	};
 </script>

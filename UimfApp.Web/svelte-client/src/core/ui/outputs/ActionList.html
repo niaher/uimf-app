@@ -1,43 +1,45 @@
-{{#if field.data != null && field.data.actions != null && field.data.actions.length > 0}}
+{#if field.data != null && field.data.actions != null && field.data.actions.length > 0}
 <ul class="actionlist">
-	{{#each field.data.actions as action}}
+	{#each field.data.actions as action}
 	<li>
-		{{#if action.action !== "redirect"}}
-		<button on:click="run(action, app)" class="btn btn-default {{action.cssClass}}">{{{action.label}}}</button>
-		{{else }}
-		<a href="{{app.makeUrl(action.form, action.inputFieldValues)}}" class="btn btn-default {{action.cssClass}}">{{action.label}}</a>
-		{{/if}}
+		{#if action.action !== "redirect"}
+		<button on:click="run(action, app)" class="btn btn-default {action.cssClass}">{@html action.label}</button>
+		{:else }
+		<a href="{app.makeUrl(action.form, action.inputFieldValues)}" class="btn btn-default {action.cssClass}">{action.label}</a>
+		{/if}
 	</li>
-	{{/each}}
+	{/each}
 </ul>
 
-<input id="modal-{{modalId}}" type="checkbox" bind:checked="open" class="hidden" />
+<input id="modal-{modalId}" type="checkbox" bind:checked="open" class="hidden" />
 <div class="modal">
 	<div class="card">
 		<label class="close" on:click="close()"></label>
 		<div ref:container></div>
 	</div>
 </div>
-{{/if}}
+{/if}
 
 <script>
 	import FormComponent from "core-ui/Form";
-	import { ActionListEventArguments } from "./ActionListEventArguments";
 	import * as alertifyLib from "alertifyjs";
-	var alertify = alertifyLib.default;
+	import { ActionListEventArguments } from "./ActionListEventArguments";
 
-	var modalId = 0;
-	var modals = [];
+	const alertify = alertifyLib.default;
+
+	let modalId = 0;
+	const modals = [];
 
 	// https://stackoverflow.com/a/3369743/111438
 	// Close topmost modal when user presses escape key.
-	document.addEventListener("keydown", function (evt) {
-		evt = evt || window.event;
-		var isEscape = false;
+	document.addEventListener("keydown", e => {
+		const evt = e || window.event;
+		let isEscape = false;
 		if ("key" in evt) {
-			isEscape = (evt.key == "Escape" || evt.key == "Esc");
-		} else {
-			isEscape = (evt.keyCode == 27);
+			isEscape = (evt.key === "Escape" || evt.key === "Esc");
+		}
+		else {
+			isEscape = (evt.keyCode === 27);
 		}
 		if (isEscape) {
 			if (modals.length > 0) {
@@ -50,45 +52,46 @@
 	export default {
 		methods: {
 			async run(action, app) {
-				var self = this;
-				var formInstance = app.getFormInstance(action.form, true);
+				const self = this;
+				const formInstance = app.getFormInstance(action.form, true);
 
 				// TODO: find a way to initialize from action.inputFieldValues directly.
-				var serializedInputValues = formInstance.getSerializedInputValuesFromObject(action.inputFieldValues);
+				const serializedInputValues = formInstance.getSerializedInputValuesFromObject(action.inputFieldValues);
 				await formInstance.initializeInputFields(serializedInputValues);
 
-				var allRequiredInputsHaveData = await formInstance.allRequiredInputsHaveData(false);
+				const allRequiredInputsHaveData = await formInstance.allRequiredInputsHaveData(false);
 				if (action.action === "run" && allRequiredInputsHaveData) {
 					if (action.confirmationMessage) {
-						alertify.confirm("Warning",
-						action.confirmationMessage,
-						async function(){
-							var response = await formInstance.submit(self.get("app"), false);
-							self.onActionRun(formInstance.metadata.id, response, action);
-						   }, 
-						  function(){ return;});
-
-					} else {
-						var response = await formInstance.submit(this.get("app"), false);
+						alertify.confirm(
+							"Warning",
+							action.confirmationMessage,
+							async () => {
+								const response = await formInstance.submit(self.get().app, false);
+								self.onActionRun(formInstance.metadata.id, response, action);
+							},
+							() => { }
+						);
+					}
+					else {
+						const response = await formInstance.submit(this.get().app, false);
 						this.onActionRun(formInstance.metadata.id, response, action);
 					}
 				}
 				else {
 					this.set({ open: true });
 
-					var f = new FormComponent({
+					const f = new FormComponent({
 						target: this.refs.container,
 						data: {
 							metadata: formInstance.metadata,
 							form: formInstance,
-							app: app,
+							app,
 							useUrl: false
 						}
 					});
 
 					f.init();
 
-					var self = this;
 					f.on("form:responseHandled", e => {
 						if (e.invokedByUser && formInstance.metadata.closeOnPostIfModal) {
 							self.close(e.response);
@@ -104,20 +107,19 @@
 				this.set({ open: false });
 
 				// Destroy underlying form instance.
-				var modalForm = this.get("current");
+				const modalForm = this.get().current;
 
 				if (response != null) {
-					let formId = modalForm.get("metadata").id;
+					const formId = modalForm.get().metadata.id;
 					this.onActionRun(formId, response);
 				}
 
 				modalForm.destroy();
 				modals.pop();
 			},
-			async onActionRun(formId, response, action) {
-				let parentForm = this.get("parent");
-				let app = parentForm.get("app");
-				let formInstance = parentForm.get("form");
+			async onActionRun(formId, response) {
+				const parentForm = this.get().parent;
+				const { app } = parentForm.get();
 
 				if (response.metadata.handler !== "redirect" &&
 					response.metadata.handler !== "reload") {
@@ -126,8 +128,8 @@
 					await parentForm.submit(null, true);
 				}
 
-				var eventArgs = new ActionListEventArguments(app, formId);
-				parentForm.fireAndBubbleUp(`action-list:run`, eventArgs);
+				const eventArgs = new ActionListEventArguments(app, formId);
+				parentForm.fireAndBubbleUp("action-list:run", eventArgs);
 			}
 		},
 		data() {
@@ -135,13 +137,10 @@
 			return {
 				open: false,
 				current: null,
-				modalId: modalId
-			}
-		},
-		components: {
-			FormComponent
+				modalId
+			};
 		}
-	}
+	};
 </script>
 
 <style>

@@ -1,17 +1,29 @@
-{{#if canViewHelpFiles === true}}
-<p style="margin-top:20px">
+{#if canViewHelpFiles === true}
+<p>
 	Welcome to the UimfApp. To help you get started, please <a href="/#/form/help?FileId=intro.md">read the documentation</a>.
 </p>
-{{else}}
-<p style="margin-top:20px">Welcome to UimfApp.</p>
-{{/if}}
+{:else}
+<p>Welcome to UimfApp.</p>
+{/if}
 
 <script>
 	export default {
 		oncreate() {
+			const { app } = this.get();
 			this.set({
-				canViewHelpFiles: window.app.getForm("help") != null
+				canViewHelpFiles: app.getForm("help") != null
 			});
+		},
+		data() {
+			return {
+				canViewHelpFiles: false
+			};
 		}
 	};
 </script>
+
+<style>
+  p {
+    margin-top: 20px;
+  }
+</style>

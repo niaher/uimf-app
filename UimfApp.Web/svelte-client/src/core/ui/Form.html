@@ -1,41 +1,41 @@
-{{#if initialized}}
-<div class="inputs-horizontal-one-column {{cssClass}}">
-	 {{#if (responseMetadata.title != null && responseMetadata.title != "") || (metadata.label != null && metadata.label != "")}}
+{#if initialized}
+<div class="inputs-horizontal-one-column {cssClass}">
+	 {#if (responseMetadata.title != null && responseMetadata.title != "") || (metadata.label != null && metadata.label != "")}
 	  <div class="form-header">
-		<h2>{{responseMetadata.title || metadata.label}}</h2>
+		<h2>{responseMetadata.title || metadata.label}</h2>
 
-		{{#if documentation }}
-			{{#each documentation as document }}
-				<Help data={{document}}/>
-			{{/each}}
-		{{/if}}
+		{#if documentation }
+			{#each documentation as document }
+				<Help data={document}/>
+			{/each}
+		{/if}
 	  </div>
-	{{/if}}
+	{/if}
 
-	{{#if initialized && visibleInputFields.length > 0}}
+	{#if initialized && visibleInputFields.length > 0}
 	<div class="form-body">
 	<form on:submit="submit(event, true)">
-		{{#each visibleInputFields as inputField}}
-		<FormInput field="{{inputField}}" app="{{app}}" tabindex="{{tabindex * 100 + inputField.metadata.orderIndex}}" form="{{self}}" />
-		{{/each}}
+		{#each visibleInputFields as inputField}
+		<FormInput field="{inputField}" app="{app}" tabindex="{tabindex * 100 + inputField.metadata.orderIndex}" form="{self}" />
+		{/each}
 		<div class="full-width">
-			<button type="submit" disabled="{{disabled}}" tabindex="-1" class="btn btn-info">{{{submitButtonLabel}}}</button>
+			<button type="submit" disabled="{disabled}" tabindex="-1" class="btn btn-info">{@html submitButtonLabel}</button>
 		</div>
 	</form>
 	</div>
-	{{/if}}
+	{/if}
 
-	{{#if outputFieldValues != null}}
+	{#if outputFieldValues != null}
 	<div class="response">
-		{{#each outputFieldValues as outputField }}
-		{{#if outputField.metadata.hidden == false && !(outputField.metadata.getCustomProperty("hideIfNull") === true && outputField.data === null)}}
-		<FormOutput field="{{outputField}}" app="{{app}}" form="{{form}}" parent="{{self}}" />
-		{{/if}}
-		{{/each}}
+		{#each outputFieldValues as outputField }
+		{#if outputField.metadata.hidden == false && !(outputField.metadata.getCustomProperty("hideIfNull") === true && outputField.data === null)}
+		<FormOutput field="{outputField}" app="{app}" form="{form}" parent="{self}" />
+		{/if}
+		{/each}
 	</div>
-	{{/if}}
+	{/if}
 </div>
-{{/if}}
+{/if}
 
 <script>
 	import FormInput from "./Input";
@@ -46,7 +46,7 @@
 	let openForms = [];
 
 	function bindEventHandlersToCustomEvents(formComponent, eventHandlers) {
-		const formInstance = formComponent.get("form");
+		const formInstance = formComponent.get().form;
 
 		for (const eventHandler of eventHandlers) {
 			// Don't bind default event handlers, because they are already auto-bound inside FormInstance.
@@ -70,8 +70,8 @@
 		},
 		methods: {
 			async init() {
-				if (!this.get("initialized")) {
-					const form = this.get("form");
+				if (!this.get().initialized) {
+					const form = this.get().form;
 
 					this.set({
 						self: this,
@@ -84,7 +84,7 @@
 
 					tabindex += 1;
 
-					const app = this.get("app");
+					const app = this.get().app;
 
 					// Subscribe all event handlers (form, inputs, outputs).
 					const formMetadata = form.metadata;
@@ -103,8 +103,8 @@
 
 					openForms.push(this);
 
-					if (this.get("parent") == null) {
-						if (this.get("responseMetadata").title == null) {
+					if (this.get().parent == null) {
+						if (this.get().responseMetadata.title == null) {
 							document.title = form.metadata.label;
 						}
 					}
@@ -112,14 +112,14 @@
 			},
 			fireAndBubbleUp(eventName, eventArgs) {
 				this.fire(eventName, eventArgs);
-				const parentFormComponent = this.get("parent");
+				const parentFormComponent = this.get().parent;
 
 				if (parentFormComponent != null) {
 					parentFormComponent.fireAndBubbleUp(eventName, eventArgs);
 				}
 			},
 			enableForm() {
-				const formInstance = this.get("form");
+				const formInstance = this.get().form;
 
 				// Hide all inputs, to re-render them. This is needed due to the way that
 				// Svelte *seems* to work - it doesn't re-render nested components, unless they are recreated.
@@ -133,7 +133,7 @@
 				});
 			},
 			renderResponse(response) {
-				const formInstance = this.get("form");
+				const formInstance = this.get().form;
 
 				// Force Svelte to re-render outputs.
 				this.set({
@@ -145,14 +145,14 @@
 					responseMetadata: response.metadata
 				});
 
-				if (this.get("parent") == null) {
+				if (this.get().parent == null) {
 					document.title = response.metadata.title;
 				}
 			},
 			async submit(event, redirect) {
 				const self = this;
-				const formInstance = this.get("form");
-				const app = this.get("app");
+				const formInstance = this.get().form;
+				const app = this.get().app;
 
 				if (event != null) {
 					event.preventDefault();
@@ -172,7 +172,7 @@
 				// their filters to be saved in the url. This does not apply to forms
 				// with postOnLoad == false, because those forms are usually for creating new data
 				// and hence should not be tracked in browser's history based on parameters.
-				if (formInstance.metadata.postOnLoad && redirect && this.get("useUrl")) {
+				if (formInstance.metadata.postOnLoad && redirect && this.get().useUrl) {
 					const urlParams = await formInstance.getSerializedInputValues();
 
 					// Update url in the browser.
@@ -198,7 +198,7 @@
 				}
 			},
 			reloadTopForm() {
-				const parentFormComponent = this.get("parent");
+				const parentFormComponent = this.get().parent;
 
 				if (parentFormComponent != null) {
 					parentFormComponent.reloadTopForm();
@@ -213,7 +213,7 @@
 				}
 			},
 			getInputComponent(inputId) {
-				return this.get("inputs").find(t => t.get("field").metadata.id === inputId);
+				return this.get().inputs.find(t => t.get().field.metadata.id === inputId);
 			}
 		},
 		data() {

@@ -4,15 +4,12 @@
 	FormResponse,
 	FormResponseMetadata } from "uimf-core";
 
-import {
-	ControlRegister,
-	FormInstance,
-	IAppRouter,
-	IFormResponseHandler,
-	Menu,
-	MenuGroup,
-	MenuItem,
-	UmfServer } from "./index";
+import { ControlRegister } from "./ControlRegister";
+import { FormInstance } from "./FormInstance";
+import { IAppRouter } from "./IAppRouter";
+import { IFormResponseHandler } from "./IFormResponseHandler";
+import { Menu } from "./Menu";
+import { UmfServer } from "./UmfServer";
 
 export class UmfApp implements IAppRouter {
 	public forms: FormMetadata[];

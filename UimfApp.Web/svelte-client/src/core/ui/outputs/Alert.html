@@ -1,14 +1,14 @@
-{{#if field.data != null}}
-<div class="alert {{field.data.style}}">
-	{{#if field.data.heading != null}}
-	<div class="heading">{{field.data.heading}}</div>
-	{{/if}}
+{#if field.data != null}
+<div class="alert {field.data.style}">
+	{#if field.data.heading != null}
+	<div class="heading">{field.data.heading}</div>
+	{/if}
 
-	{{#if field.data.message != null}}
-	<div class="body">{{{field.data.message}}}</div>
-	{{/if}}
+	{#if field.data.message != null}
+	<div class="body">{@html field.data.message}</div>
+	{/if}
 </div>
-{{/if}}
+{/if}
 
 <style>
   .alert {

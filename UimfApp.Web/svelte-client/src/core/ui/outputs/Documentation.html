@@ -1,6 +1,6 @@
 <div class="wrapper">
 	<div class="content" ref:container>
-		{{#if field.data != null && field.data.value != null}} {{{field.data.value}}} {{/if}}
+		{#if field.data != null && field.data.value != null} {@html field.data.value} {/if}
 	</div>
 
 	<div class='table-of-contents' ref:toc>

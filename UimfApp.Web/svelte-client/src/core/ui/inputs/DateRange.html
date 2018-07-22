@@ -1,52 +1,63 @@
 <div class="input-group">
-    <span class="input-group-addon">Min</span>
-    <input type="text" bind:value="field.minValueAsText" required="{{field.metadata.required}}" tabindex="{{tabindex}}" autocomplete="off"
-        class="form-control" ref:minContainer>
+	<span class="input-group-addon">Min</span>
+	<input type="text"
+		bind:value="field.minValueAsText"
+		required="{field.metadata.required}"
+		tabindex="{tabindex}"
+		autocomplete="off"
+		class="form-control"
+		ref:minContainer>
 
     <span class="input-group-addon">Max</span>
-    <input type="text" bind:value="field.maxValueAsText" required="{{field.metadata.required}}" tabindex="{{tabindex}}" autocomplete="off"
-        class="form-control" ref:maxContainer>
+	<input type="text"
+		bind:value="field.maxValueAsText"
+		required="{field.metadata.required}"
+		tabindex="{tabindex}"
+		autocomplete="off"
+		class="form-control"
+		ref:maxContainer>
 </div>
 
 <script>
-    import Pikaday from "pikaday";
+	import Pikaday from "pikaday";
 
-    export default {
-        oncreate() {
-            var field = this.get("field");
+	export default {
+		oncreate() {
+			const field = this.get().field;
 
-            new Pikaday({
-                field: this.refs.minContainer,
-                format: 'YYYY-MM-DD',
-                onSelect: function (date) {
-                    field.value.min = date;
-                }
-            });
+			// eslint-disable-next-line no-new
+			new Pikaday({
+				field: this.refs.minContainer,
+				format: "YYYY-MM-DD",
+				onSelect(date) {
+					field.value.min = date;
+				}
+			});
 
-            new Pikaday({
-                field: this.refs.maxContainer,
-                format: 'YYYY-MM-DD',
-                onSelect: function (date) {
-                    field.value.max = date;
-                }
-            });
-            var minElement = this.refs.minContainer;
-            var self = this;
-            minElement.addEventListener("change", function (e) {
-                if (minElement.value == "") {
-                     field.value.min = null;
-                }
-            });
-            var maxElement = this.refs.maxContainer;
-            var self = this;
-            maxElement.addEventListener("change", function (e) {
-                if (maxElement.value == "") {
-                    field.value.max = null;
-                }
-            });
-        }
-    }
+			// eslint-disable-next-line no-new
+			new Pikaday({
+				field: this.refs.maxContainer,
+				format: "YYYY-MM-DD",
+				onSelect(date) {
+					field.value.max = date;
+				}
+			});
 
+			const minElement = this.refs.minContainer;
+			minElement.addEventListener("change", () => {
+				if (minElement.value === "") {
+					field.value.min = null;
+				}
+			});
+
+			const maxElement = this.refs.maxContainer;
+			maxElement.addEventListener("change", () => {
+				if (maxElement.value === "") {
+					field.value.max = null;
+				}
+			});
+		}
+	};
 </script>
 
 <style>
