@@ -41,6 +41,7 @@ export class DateRangeInputController extends umf.InputController<DateRange> {
 	}
 }
 
+// tslint:disable-next-line:max-classes-per-file
 class DateRange {
 	constructor(min: Date = null, max: Date = null) {
 		this.min = min;
@@ -52,13 +53,13 @@ class DateRange {
 
 	public static parse(date: string): DateRange {
 		const split = date.split("|");
-		const minPart = DateInputController.parseDate(split[0]),
-			maxPart = DateInputController.parseDate(split[1]);
+		const minPart = DateInputController.parseDate(split[0]);
+		const maxPart = DateInputController.parseDate(split[1]);
 
 		return new DateRange(minPart, maxPart);
 	}
 
-	public serialize() {
+	public serialize(): string {
 		return `${DateInputController.serialize(this.min)}|${DateInputController.serialize(this.max)}`;
 	}
 }

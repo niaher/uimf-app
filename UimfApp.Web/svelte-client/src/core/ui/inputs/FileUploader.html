@@ -68,7 +68,7 @@
 	}
 
 	function addFiles(component, files) {
-		const app = component.get().app;
+		const { app } = component.get();
 		const filesToAdd = objectToArray(files);
 		let listedFiles = [];
 
@@ -106,7 +106,7 @@
 			}
 		},
 		oncreate() {
-			const field = this.get().field;
+			const { field } = this.get();
 
 			const uploaderConfig =
 				field.metadata.getCustomProperty("fileUploaderConfig") ||

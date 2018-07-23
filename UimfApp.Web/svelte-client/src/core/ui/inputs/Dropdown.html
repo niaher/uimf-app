@@ -43,7 +43,7 @@
 
 	export default {
 		oncreate() {
-			const field = this.get().field;
+			const { field } = this.get();
 			const { source, items } = field.metadata.customProperties;
 
 			if (items != null) {
@@ -51,7 +51,7 @@
 			}
 			else if (typeof (source) === "string") {
 				const { parameters } = field.metadata.customProperties;
-				const app = this.get().app;
+				const { app } = this.get();
 				const parentForm = this.get().form;
 
 				buildFilter(parentForm, parameters).then(filter => {

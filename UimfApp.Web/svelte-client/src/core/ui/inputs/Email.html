@@ -10,7 +10,7 @@
 <script>
 	export default {
 		oncreate() {
-			const field = this.get().field;
+			const { field } = this.get();
 			const formElement = this.refs.container;
 			formElement.addEventListener("change", () => {
 				field.init(field.selected);

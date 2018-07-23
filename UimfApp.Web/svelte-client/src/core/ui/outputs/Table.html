@@ -188,14 +188,14 @@
 			async runBulkAction(action) {
 				// eslint-disable-next-line no-underscore-dangle
 				const selectedItems = this.get().field.data.filter(t => t.__selected === true);
-				const map = this.get().map;
+				const { map } = this.get();
 				const selectedItemIds = selectedItems.map(t => t[map[action.itemIdentifierField.toLowerCase()]]);
 
 				this.set({
 					isBulkActionModalOpen: true
 				});
 
-				const app = this.get().app;
+				const { app } = this.get();
 				const formInstance = app.getFormInstance(action.formId, true);
 
 				const filter = await buildFilter(this.get().form, action.parameters);
@@ -226,7 +226,7 @@
 				modals.push(this);
 			},
 			async closeBulkActionModal(response) {
-				const currentBulkActionForm = this.get().currentBulkActionForm;
+				const { currentBulkActionForm } = this.get();
 
 				this.set({
 					isBulkActionModalOpen: false,
@@ -272,9 +272,8 @@
 				this.set({ selectedItemsCount: selectedItems.length });
 			},
 			sortData(column, columns) {
-				const parent = this.get().parent;
-				const form = parent.get().form;
-				const field = this.get().field;
+				const { parent, form, field } = this.get();
+
 				const paginatorInput = form.inputs
 					.find(t => t.metadata.id === field.metadata.customProperties.customizations.paginator);
 

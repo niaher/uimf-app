@@ -28,8 +28,7 @@
 
 	export default {
 		oncreate() {
-			const field = this.get().field;
-			const form = this.get().form;
+			const { field, form } = this.get();
 
 			if (field.data == null) {
 				return;
@@ -59,16 +58,13 @@
 		},
 		methods: {
 			goToPage(page) {
-				const parent = this.get().parent;
-				const form = parent.get().form;
+				const { parent, form } = this.get();
 
 				form.setInputFields(page.params);
 				parent.submit(null, false);
 			},
 			changePageSize() {
-				const parent = this.get().parent;
-				const form = parent.get().form;
-				const field = this.get().field;
+				const { parent, form, field } = this.get();
 
 				const paginatorInput = form.inputs
 					.find(t => t.metadata.id === field.metadata.customProperties.customizations.paginator);

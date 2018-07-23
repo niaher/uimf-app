@@ -120,7 +120,7 @@
 
 	export default {
 		oncreate() {
-			const field = this.get().field;
+			const { field } = this.get();
 			const { source } = field.metadata.customProperties;
 			const a = new Choices(this.refs.input, {
 				duplicateItems: true,
@@ -169,19 +169,21 @@
 			}
 			else {
 				a.setChoices(mapToTypeaheadItems(source), "value", "label", true);
+
+				this.onstate = ({ changed, current }) => {
+					if (changed.field) {
+						if (!current.initialized) {
+							// eslint-disable-next-line no-param-reassign
+							current.initialized = true;
+							setInputValue(a, field);
+						}
+					}
+				};
 			}
 
 			a.passedElement.addEventListener("change", () => {
 				field.value = calculateFieldValue(field, a.getValue());
 			});
-		},
-		onstate({ changed, current }) {
-			if (changed.field) {
-				if (!current.initialized) {
-					current.initialized = true;
-					setInputValue(a, field);
-				}
-			}
 		},
 		methods: {
 			onChange() {

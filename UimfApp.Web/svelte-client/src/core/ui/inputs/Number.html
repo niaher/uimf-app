@@ -13,7 +13,7 @@
 <script>
 	export default {
 		oncreate() {
-			const field = this.get().field;
+			const { field } = this.get();
 			const numberConfig = field.metadata.getCustomProperty("numberConfig") ||
 				{
 					minValue: null,

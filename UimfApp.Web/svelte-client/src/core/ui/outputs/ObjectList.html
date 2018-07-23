@@ -17,7 +17,7 @@
 
 	export default {
 		oncreate() {
-			const field = this.get().field;
+			const { field } = this.get();
 			if (field.data == null || field.data.metadata == null) {
 				return;
 			}
