@@ -3,12 +3,12 @@
 		{#if item.form != null}
 		<MyFormLink field="{field}" app="{app}"/>
 		{:else}
-		<span>{item.label}</span>
+		<span>{@html item.label}</span>
 		{/if}
 	{:else}
 		<div class="menu top-menu-div">
 			{#if item.children.length > 1}
-			<label for="menu{id}" class="toggle-sub" onclick="">{item.label}</label>
+			<label for="menu{id}" class="toggle-sub" onclick="">{@html item.label}</label>
 			{:else}
 			<MyFormLink field="{ { data: item.children[0] } }" app="{app}" />
 			{/if}
@@ -40,7 +40,7 @@
 				app: window.app
 			});
 
-			console.log(this.get().field);
+			// console.log(this.get().field);
 		},
 		data() {
 			id += 1;

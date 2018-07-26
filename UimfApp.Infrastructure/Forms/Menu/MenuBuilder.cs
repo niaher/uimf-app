@@ -2,6 +2,7 @@ namespace UimfApp.Infrastructure.Forms.Menu
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using UiMetadataFramework.Basic.Output;
 	using UiMetadataFramework.Core;
 
@@ -80,31 +81,32 @@ namespace UimfApp.Infrastructure.Forms.Menu
 					var current = groupNodes[folder] = groupNodes.GetValueOrDefault(folder, null) ?? new MenuGroupNode
 					{
 						Label = group.Name.SubstringAfterLast("/", StringComparison.OrdinalIgnoreCase) ?? group.Name,
-						OrderIndex = group.OrderIndex,
-						Children = new List<IMenuNode>()
+						OrderIndex = group.OrderIndex
 					};
 
-					if (parent != null && parent.Children.Contains(current))
+					if (parent != null && 
+						!parent.Children.Contains(current))
 					{
-						parent.Children.Add(current);
+						parent.AddNode(current);
 					}
 
-					if (parent == null && current != root)
+					if (parent == null && 
+						current != root && 
+						!root.Children.Contains(current))
 					{
-						root.Children.Add(current);
+						root.AddNode(current);
 					}
 
 					parent = current;
 				}
 
-				(parent ?? root).Children.Add(new MenuItemNode
+				(parent ?? root).AddNode(new MenuItemNode
 				{
 					Label = item.Label,
 					OrderIndex = item.OrderIndex,
 					InputFieldValues = item.InputFieldValues,
 					Form = item.Form,
-					Action = item.Action,
-					Children = new List<IMenuNode>()
+					Action = item.Action
 				});
 			}
 

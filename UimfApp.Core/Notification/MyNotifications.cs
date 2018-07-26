@@ -4,7 +4,6 @@ namespace UimfApp.Core.Notification
 	using System.Linq;
 	using MediatR;
 	using Microsoft.EntityFrameworkCore;
-	using UimfApp.Core.Menus;
 	using UimfApp.Core.Security;
 	using UimfApp.Help;
 	using UimfApp.Infrastructure;
@@ -20,8 +19,7 @@ namespace UimfApp.Core.Notification
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.Core.Binding;
 
-	[MyForm(Id = "my-notifications", PostOnLoad = true, Menu = CoreMenus.Notifications, Label = UiFormConstants.NotificationsLabel,
-		SubmitButtonLabel = UiFormConstants.SearchLabel)]
+	[MyForm(Id = "my-notifications", PostOnLoad = true, Label = "Notifications", SubmitButtonLabel = UiFormConstants.SearchLabel)]
 	[Secure(typeof(CoreActions), nameof(CoreActions.ViewNotifications))]
 	[Documentation(DocumentationPlacement.Inline, DocumentationSourceType.String, "Below is a list of new notifications for your account.")]
 	[CssClass(UiFormConstants.InputsVerticalMultipleColumn)]

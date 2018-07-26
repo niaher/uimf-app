@@ -7,8 +7,9 @@ namespace UimfApp.Infrastructure.Forms.Menu
 	/// </summary>
 	public interface IMenuNode
 	{
-		IList<IMenuNode> Children { get; }
+		IReadOnlyCollection<IMenuNode> Children { get; }
 		string Label { get; }
 		int OrderIndex { get; }
+		void AddNode(IMenuNode node);
 	}
 }
