@@ -1,33 +1,33 @@
-{{#if numberConfig != null}}
+{#if numberConfig != null}
 <div class="input-group">
     <span class="input-group-addon">Min</span>
 	<input type="number"
 		bind:value="field.value.min"
-		required="{{field.metadata.required}}"
-		tabindex="{{tabindex}}"
+		required="{field.metadata.required}"
+		tabindex="{tabindex}"
 		autocomplete="off"
         class="form-control"
-        step="{{numberConfig.step}}"
-        min="{{numberConfig.minValue}}"
-        max="{{numberConfig.maxValue}}">
+        step="{numberConfig.step}"
+        min="{numberConfig.minValue}"
+        max="{numberConfig.maxValue}">
 
     <span class="input-group-addon">Max</span>
 	<input type="number"
 		bind:value="field.value.max"
-		required="{{field.metadata.required}}"
-		tabindex="{{tabindex}}"
+		required="{field.metadata.required}"
+		tabindex="{tabindex}"
 		autocomplete="off"
         class="form-control"
-        step="{{numberConfig.step}}"
-        min="{{numberConfig.minValue}}"
-        max="{{numberConfig.maxValue}}">
+        step="{numberConfig.step}"
+        min="{numberConfig.minValue}"
+        max="{numberConfig.maxValue}">
 </div>
-{{/if}}
+{/if}
 
 <script>
 	export default {
 		oncreate() {
-			const field = this.get("field");
+			const { field } = this.get();
 
 			if (field == null) {
 				return;
@@ -47,7 +47,7 @@
 </script>
 
 <style>
-    .input-group-addon {
-      font-size: 0.8rem !important;
-    }
+		.input-group-addon {
+			font-size: 0.8rem !important;
+		}
 </style>

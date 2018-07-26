@@ -23,6 +23,8 @@ namespace UimfApp.Infrastructure.Forms
 		public const string OutputsVerticalMultipleColumn = "outputs-vertical-multiple-column";
 
 		public const string CardLayout = "card-layout";
+
+		public static string CounterForTopMenu(int count) => count == 0 ? "" : $"<span class='count'>{count}</span>";
 		public static string FileUrl(int fileId) => $"/file/download?id={fileId}";
 	}
 }

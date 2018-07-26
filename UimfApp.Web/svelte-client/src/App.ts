@@ -1,9 +1,7 @@
-﻿import { UmfApp, UmfServer } from "core-framework";
-import * as handlers from "core-handlers";
-import * as umf from "uimf-core";
-
-import * as alertifyLib from "alertifyjs";
+﻿import * as alertifyLib from "alertifyjs";
 import Menu from "components/Menu";
+import { UmfApp, UmfServer } from "core-framework";
+import * as handlers from "core-handlers";
 import { AppRouter } from "./AppRouter";
 import controlRegister from "./ControlRegister";
 const alertify = alertifyLib.default;
@@ -33,7 +31,7 @@ alertify.defaults = {
 	}
 };
 
-const alertifyErrorMsg = [];
+const alertifyErrorMsg: any[] = [];
 class MyApp extends UmfApp {
 	constructor(theServer: UmfServer) {
 		super(theServer, controlRegister);
@@ -83,6 +81,7 @@ app.load().then((response) => {
 			return app.makeUrl(form, inputFieldValues);
 		});
 	}));
+
 	app.registerResponseHandler(new handlers.RedirectResponseHandler((form, inputFieldValues) => {
 		app.go(form, inputFieldValues);
 	}));

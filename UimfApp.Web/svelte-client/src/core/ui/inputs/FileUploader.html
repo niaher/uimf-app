@@ -1,29 +1,29 @@
-{{#if selectedFiles != null && selectedFiles.length > 0}}
+{#if selectedFiles != null && selectedFiles.length > 0}
 <ul class="files-list">
-	{{#each selectedFiles as file, index}}
-	<li>{{file.name}}
+	{#each selectedFiles as file, index}
+	<li>{file.name}
 		<i class="fa fa-times second-color" on:click="removeFile(index)"></i>
 	</li>
-	{{/each}}
+	{/each}
 </ul>
-{{/if}}
+{/if}
 
 <div class="file-drop-area"	ref:dropzone>
-	{{#if uploaderConfig != null && uploaderConfig.allowMultipleFiles}}
+	{#if uploaderConfig != null && uploaderConfig.allowMultipleFiles}
 	<input type="file"
-		id="{{id}}"
-		tabindex="{{tabindex}}"
+		id="{id}"
+		tabindex="{tabindex}"
 		on:change="addFiles(this.files)"
 		multiple="multiple"
-		accept="{{uploaderConfig ? uploaderConfig.allowedFileExtensions : '*'}}"/>
-	{{else}}
+		accept="{uploaderConfig ? uploaderConfig.allowedFileExtensions : '*'}"/>
+	{:else}
 	<input type="file"
-		id="{{id}}"
-		tabindex="{{tabindex}}"
+		id="{id}"
+		tabindex="{tabindex}"
 		on:change="addFiles(this.files)"
-		accept="{{uploaderConfig ? uploaderConfig.allowedFileExtensions : '*'}}"/>
-	{{/if}}
-	<label for="{{id}}">drag or <strong class='second-color'>upload</strong> files</label>
+		accept="{uploaderConfig ? uploaderConfig.allowedFileExtensions : '*'}"/>
+	{/if}
+	<label for="{id}">drag or <strong class='second-color'>upload</strong> files</label>
 </div>
 
 <script>
@@ -60,20 +60,20 @@
 
 	function getAllowedFileExtensions(component) {
 		let	allowedExtension = "*";
-		if (component.get("uploaderConfig") && component.get("uploaderConfig").allowedFileExtensions) {
-			allowedExtension = component.get("uploaderConfig").allowedFileExtensions.split(",").map(item => item.trim());
+		if (component.get().uploaderConfig && component.get().uploaderConfig.allowedFileExtensions) {
+			allowedExtension = component.get().uploaderConfig.allowedFileExtensions.split(",").map(item => item.trim());
 		}
 
 		return allowedExtension;
 	}
 
 	function addFiles(component, files) {
-		const app = component.get("app");
+		const { app } = component.get();
 		const filesToAdd = objectToArray(files);
 		let listedFiles = [];
 
-		if (component.get("selectedFiles")) {
-			listedFiles = component.get("selectedFiles");
+		if (component.get().selectedFiles) {
+			listedFiles = component.get().selectedFiles;
 		}
 
 		const allowedFileExtensions = getAllowedFileExtensions(component);
@@ -81,7 +81,7 @@
 			.filter(file => canFileBeAdded(listedFiles, file, allowedFileExtensions, app));
 
 		if (filesThatCanBeAdded.length > 0) {
-			if (!component.get("uploaderConfig").allowMultipleFiles) {
+			if (!component.get().uploaderConfig.allowMultipleFiles) {
 				component.set({ selectedFiles: filesThatCanBeAdded.slice(0, 1) });
 			}
 			else {
@@ -94,19 +94,19 @@
 		methods: {
 			addFiles(files) {
 				addFiles(this, files);
-				this.get("field").selected = this.get("selectedFiles");
+				this.get().field.selected = this.get().selectedFiles;
 			},
 			removeFile(index) {
-				this.get("selectedFiles").splice(index, 1).splice(index, 1);
+				this.get().selectedFiles.splice(index, 1).splice(index, 1);
 				this.set({
-					selectedFiles: this.get("selectedFiles")
+					selectedFiles: this.get().selectedFiles
 				});
 
-				this.get("field").selected = this.get("selectedFiles");
+				this.get().field.selected = this.get().selectedFiles;
 			}
 		},
 		oncreate() {
-			const field = this.get("field");
+			const { field } = this.get();
 
 			const uploaderConfig =
 				field.metadata.getCustomProperty("fileUploaderConfig") ||
@@ -142,28 +142,28 @@
 </script>
 
 <style>
-  .file-drop-area {
-    text-align: center;
-    border: dashed 2px #9c9c9c;
-    min-height: 60px;
-    z-index: 99999;
-  }
+	.file-drop-area {
+		text-align: center;
+		border: dashed 2px #9c9c9c;
+		min-height: 60px;
+		z-index: 99999;
+	}
 
-  .file-drop-area.hover {
-    background: #fffde6;
-  }
+	.file-drop-area.hover {
+		background: #fffde6;
+	}
 
-  .file-drop-area label {
-    margin: auto;
-    line-height: 60px;
-    display: block;
-  }
+	.file-drop-area label {
+		margin: auto;
+		line-height: 60px;
+		display: block;
+	}
 
-  .files-list i {
-    margin-left: 10px;
-  }
+	.files-list i {
+		margin-left: 10px;
+	}
 
-  .second-color {
-    color: #f3818c;
-  }
+	.second-color {
+		color: #f3818c;
+	}
 </style>

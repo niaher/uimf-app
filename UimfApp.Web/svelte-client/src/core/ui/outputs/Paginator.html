@@ -1,4 +1,4 @@
-{{#if field.data != null && pages.length > 0}}
+{#if field.data != null && pages.length > 0}
 <div>
 	<select class="pagination-size input-sm" bind:value="field.pageSize" on:change="changePageSize()">
 		<option value="10">10</option>
@@ -8,17 +8,17 @@
 	</select>
 
 	<ul class="pagination pagination-sm">
-		{{#each pages as page}}
-			{{#if parent.get('useUrl')}}
-			<li class="page-item"><a href="{{app.makeUrl(form.metadata.id, page.params)}}" class="{{page.cssClass}} page-link">{{page.text}}</a></li>
-			{{else}}
-			<li class="page-item"><button on:click="goToPage(page)" class="{{page.cssClass}} page-link">{{page.text}}</button></li>
-			{{/if}}
-		{{/each}}
+		{#each pages as page}
+			{#if parent.get().useUrl}
+			<li class="page-item"><a href="{app.makeUrl(form.metadata.id, page.params)}" class="{page.cssClass} page-link">{page.text}</a></li>
+			{:else}
+			<li class="page-item"><button on:click="goToPage(page)" class="{page.cssClass} page-link">{page.text}</button></li>
+			{/if}
+		{/each}
 	</ul>
 </div>
-<div class="paginator-summary">showing {{field.data.results.length}} out of {{field.data.totalCount}} items</div>
-{{/if}}
+<div class="paginator-summary">showing {field.data.results.length} out of {field.data.totalCount} items</div>
+{/if}
 
 <div ref:container></div>
 
@@ -28,8 +28,7 @@
 
 	export default {
 		oncreate() {
-			const field = this.get("field");
-			const form = this.get("form");
+			const { field, form } = this.get();
 
 			if (field.data == null) {
 				return;
@@ -51,26 +50,25 @@
 				target: this.refs.container,
 				data: {
 					field: tableField,
-					app: this.get("app"),
+					app: this.get().app,
 					form,
-					parent: this.get("parent")
+					parent: this.get().parent
 				}
 			});
 		},
 		methods: {
 			goToPage(page) {
-				const parent = this.get("parent");
-				const form = parent.get("form");
+				const { parent, form } = this.get();
 
 				form.setInputFields(page.params);
 				parent.submit(null, false);
 			},
 			changePageSize() {
-				const parent = this.get("parent");
-				const form = parent.get("form");
-				const field = this.get("field");
+				const { parent, form, field } = this.get();
 
-				const paginatorInput = form.inputs.find(t => t.metadata.id === field.metadata.customProperties.customizations.paginator);
+				const paginatorInput = form.inputs
+					.find(t => t.metadata.id === field.metadata.customProperties.customizations.paginator);
+
 				paginatorInput.value.pageSize = field.pageSize;
 				paginatorInput.value.pageIndex = 1;
 				const params = {};
@@ -82,8 +80,9 @@
 			}
 		},
 		computed: {
-			pages: (field, form, parent) => {
-				const paginatorInput = form.inputs.find(t => t.metadata.id === field.metadata.customProperties.customizations.paginator);
+			pages: ({ field, form, parent }) => {
+				const paginatorInput = form.inputs
+					.find(t => t.metadata.id === field.metadata.customProperties.customizations.paginator);
 
 				const pageCount = Math.ceil(field.data.totalCount / paginatorInput.value.pageSize);
 
@@ -180,9 +179,6 @@
 			return {
 				totalCount: 0
 			};
-		},
-		components: {
-			TableOutput
 		}
 	};
 </script>

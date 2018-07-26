@@ -1,17 +1,17 @@
-{{#if options != null }}
+{#if options != null }
 <select
-	id="{{id}}"
+	id="{id}"
 	bind:value="field.selected"
-	required="{{field.metadata.required}}"
-	tabindex="{{tabindex}}"
+	required="{field.metadata.required}"
+	tabindex="{tabindex}"
 	on:change="onChange()"
 	class="form-control">
 	<option value=""></option>
-	{{#each options as option}}
-	<option value="{{option.value}}">{{option.label}}</option>
-	{{/each}}
+	{#each options as option}
+	<option value="{option.value}">{option.label}</option>
+	{/each}
 </select>
-{{/if}}
+{/if}
 
 <script>
 	function mapToTypeaheadItems(items) {
@@ -26,7 +26,7 @@
 
 		const filter = {};
 		if (parameters != null && parameters.length > 0) {
-			promise = parentForm.get("form").getSerializedInputValues().then(data => {
+			promise = parentForm.get().form.getSerializedInputValues().then(data => {
 				for (const p of parameters) {
 					filter[p] = data[p];
 				}
@@ -43,7 +43,7 @@
 
 	export default {
 		oncreate() {
-			const field = this.get("field");
+			const { field } = this.get();
 			const { source, items } = field.metadata.customProperties;
 
 			if (items != null) {
@@ -51,8 +51,8 @@
 			}
 			else if (typeof (source) === "string") {
 				const { parameters } = field.metadata.customProperties;
-				const app = this.get("app");
-				const parentForm = this.get("form");
+				const { app } = this.get();
+				const parentForm = this.get().form;
 
 				buildFilter(parentForm, parameters).then(filter => {
 					app.server.postForm(source, filter).then(data => {
@@ -63,10 +63,10 @@
 		},
 		methods: {
 			onChange() {
-				this.get("field").initFromSelected();
-				this.get("form").fireAndBubbleUp("input:changed", {
-					app: this.get("app"),
-					form: this.get("form"),
+				this.get().field.initFromSelected();
+				this.get().form.fireAndBubbleUp("input:changed", {
+					app: this.get().app,
+					form: this.get().form,
 					input: this
 				});
 			}

@@ -1,9 +1,9 @@
 import * as umf from "core-framework";
 
 export class DropdownInputController extends umf.InputController<DropdownValue> {
-	selected: string;
+	public selected: string;
 
-	serializeValue(value: DropdownValue | string): string {
+	public serializeValue(value: DropdownValue | string): string {
 		if (typeof (value) === "string") {
 			return value;
 		}
@@ -11,7 +11,7 @@ export class DropdownInputController extends umf.InputController<DropdownValue> 
 		return value != null ? value.value : null;
 	}
 
-	init(value: string): Promise<DropdownInputController> {
+	public init(value: string): Promise<DropdownInputController> {
 		return new Promise((resolve, reject) => {
 			this.selected = value != null ? value.toString() : null;
 
@@ -20,19 +20,20 @@ export class DropdownInputController extends umf.InputController<DropdownValue> 
 		});
 	}
 
-	getValue(): Promise<DropdownValue> {
+	public getValue(): Promise<DropdownValue> {
 		return Promise.resolve(this.parse(this.selected));
 	}
 
-	initFromSelected() {
+	public initFromSelected(): void {
 		this.value = this.parse(this.selected);
 	}
 
 	private parse(value: string): DropdownValue {
-		return value == null || value == "" ? null : { value: value };
+		return value == null || value === "" ? null : { value };
 	}
 }
 
+// tslint:disable-next-line:max-classes-per-file
 class DropdownValue {
-	value: string;
+	public value: string;
 }

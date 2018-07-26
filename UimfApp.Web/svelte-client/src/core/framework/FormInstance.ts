@@ -1,6 +1,7 @@
 import * as umf from "uimf-core";
 import { ControlRegister } from "./ControlRegister";
-import { FormEventArguments, FormResponseEventArguments } from "./index";
+import { FormEventArguments } from "./FormEventArguments";
+import { FormResponseEventArguments } from "./FormResponseEventArguments";
 import { InputController } from "./InputController";
 import { OutputFieldValue } from "./OutputFieldValue";
 import { UmfApp } from "./UmfApp";

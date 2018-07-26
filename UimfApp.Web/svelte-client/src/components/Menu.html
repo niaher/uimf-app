@@ -1,36 +1,24 @@
-{{#if menu != null}}
+{#if menu != null}
 <ul class="menu">
-	{{#each menu.children as item}}
+	{#each menu.children as item}
 	<li>
-		<MenuItem item="{{item}}" menu="{{self}}">
+		<MenuItem item="{item}" menu="{self}" />
 	</li>
-	{{/each}}
+	{/each}
 </ul>
-{{/if}}
+{/if}
 
 <script>
 	import MenuItem from "./MenuItem";
 
-	// function nestedSort(array, comparison) {
-	// 	array.sort(comparison);
-
-	// 	for (const item of array) {
-	// 		if (item.items != null) {
-	// 			nestedSort(item.items, comparison);
-	// 		}
-	// 	}
-	// }
-
 	export default {
 		oncreate() {
-			console.log(this.get().menu);
 			this.set({ self: this });
-			// const getMenuGroup = this.get("getMenuGroup");
-			// const makeUrl = this.get("makeUrl");
-
-			// Make sure we respect both parent menu sorting order and then leaf-level menu sorting order.
-			// orderIndex: (group.orderIndex * 100000) + formLink.orderIndex
-			// nestedSort(tree, (a, b) => a.orderIndex - b.orderIndex);
+		},
+		data() {
+			return {
+				menu: null
+			};
 		},
 		components: {
 			MenuItem

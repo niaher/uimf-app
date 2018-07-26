@@ -1,49 +1,49 @@
-{{#if data }}
-	{{#if data.placement == 'Hint' }}
+{#if data != null}
+	{#if data.placement == 'Hint'}
 	<div class="help-content modal-help">
 		<i on:click="open()" class="far fa-question-circle" title="Click to open help for this form"></i>
-		<input id="modal-{{modalId}}" type="checkbox" bind:checked="open" class="hidden" />
+		<input id="modal-{modalId}" type="checkbox" bind:checked="open" class="hidden" />
 		<div class="modal">
 			<div class="card">
 				<label class="close" on:click="close()"></label>
 				<div ref:container>
-					{{{data.content}}}
+					{@html data.content}
 
-					{{ #if files && files.length >0 }}
+					{ #if files && files.length >0 }
 					<div class="help-files">
 						<span>For more information:</span>
 							<ul>
-								{{#each files as file}}
+								{#each files as file}
 								<li>
-									<a href="/#/form/help?FileId={{file.file}}">{{ file.name }}</a>
+									<a href="/#/form/help?FileId={file.file}">{ file.name }</a>
 								</li>
-								{{/each}}
+								{/each}
 							</ul>
 
 					</div>
-					{{/if}}
+					{/if}
 				</div>
 			</div>
 		</div>
 	</div>
-	{{elseif data.placement == 'Inline' }}
+	{:elseif data.placement == 'Inline' }
 	<div class="help-content inline-help">
-		{{{data.content}}}
-		{{#if files && files.length >0 }}
+		{@html data.content}
+		{#if files && files.length >0 }
 		<div class="help-files">
 			<span>For more information</span>
 			<ul>
-				{{#each files as file}}
+				{#each files as file}
 				<li>
-					<a href="/#/form/help?FileId={{file.file}}">{{ file.name }}</a>
+					<a href="/#/form/help?FileId={file.file}">{ file.name }</a>
 				</li>
-				{{/each}}
+				{/each}
 			</ul>
 		</div>
-		{{/if}}
+		{/if}
 	</div>
-	{{/if}}
-{{/if}}
+	{/if}
+{/if}
 
 <script>
 	function humanize(e) {
@@ -71,7 +71,7 @@
 
 	export default {
 		oncreate() {
-			const files = this.get("data").files.map(i => ({ file: i, name: humanize(i) }));
+			const files = this.get().data.files.map(i => ({ file: i, name: humanize(i) }));
 
 			this.set({
 				files,
@@ -99,36 +99,32 @@
 </script>
 
 <style>
-  ul.help-files {
-    list-style: none;
-  }
+	.inline-help {
+		background: #ecf8fb;
+		padding: 10px;
+	}
 
-  .inline-help {
-    background: #ecf8fb;
-    padding: 10px;
-  }
+	.modal-help > i {
+		font-size: 15pt;
+		color: #5b7b9b;
+	}
 
-  .modal-help > i {
-    font-size: 15pt;
-    color: #5b7b9b;
-  }
+	.modal-help {
+		display: block;
+		margin-left: -10px;
+		position: absolute;
+		right: 10px;
+		top: 30px;
+	}
 
-  .modal-help {
-    display: block;
-    margin-left: -10px;
-    position: absolute;
-    right: 10px;
-    top: 30px;
-  }
+	.help-files {
+		border-top: 1px solid #d8d8d8;
+		padding: 10px;
+		margin: 10px;
+		background: #ecf8fb;
+	}
 
-  .help-files {
-    border-top: 1px solid #d8d8d8;
-    padding: 10px;
-    margin: 10px;
-    background: #ecf8fb;
-  }
-
-  .help-files ul {
-    list-style: circle;
-  }
+	.help-files ul {
+		list-style: circle;
+	}
 </style>

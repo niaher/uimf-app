@@ -1,24 +1,23 @@
-{{format(field)}}
+{format(field)}
 
 <script>
 	import moment from "moment";
 
 	export default {
 		helpers: {
-
-			format: function(field) {
-				 if(field.data != null){
-					 var dateTimeStyle = field.metadata.getCustomProperty("dateTimeStyle");
-					 var format ="D MMM YYYY";
-					 if(dateTimeStyle == "dateTime"){
+			format(field) {
+				if (field.data != null) {
+					const dateTimeStyle = field.metadata.getCustomProperty("dateTimeStyle");
+					let format = "D MMM YYYY";
+					if (dateTimeStyle === "dateTime") {
 						format = "D MMM YYYY HH:mm A";
-					 }else if(dateTimeStyle == "time"){
-						 format = "HH:mm";
-					 }
-					 return moment(field.data).format(format);
-				 }
+					}
+					else if (dateTimeStyle === "time") {
+						format = "HH:mm";
+					}
+					return moment(field.data).format(format);
+				}
 				return "";
-
 			}
 		}
 	};

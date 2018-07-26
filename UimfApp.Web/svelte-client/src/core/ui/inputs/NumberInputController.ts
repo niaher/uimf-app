@@ -1,19 +1,19 @@
 import * as umf from "core-framework";
 
 export class NumberInputController extends umf.InputController<number> {
-	serializeValue(value: number | string): string {
+	public serializeValue(value: number | string): string {
 		return NumberInputController.serialize(value);
 	}
 
-	init(value: string): Promise<NumberInputController> {
+	public init(value: string): Promise<NumberInputController> {
 		return new Promise((resolve, reject) => {
-			var v = parseFloat(value);
+			const v = parseFloat(value);
 			this.value = isNaN(v) ? null : v;
 			resolve(this);
 		});
 	}
 
-	getValue(): Promise<number> {
+	public getValue(): Promise<number> {
 		return Promise.resolve(this.value);
 	}
 

@@ -1,29 +1,29 @@
-{{#if showLabel === true && !alwaysHideLabel && field.metadata.label !== ""}}
+{#if showLabel === true && !alwaysHideLabel && field.metadata.label !== ""}
 <div>
-        {{#if field.metadata.customProperties != null && field.metadata.customProperties["documentation"] != null}}
-        <label class="help-tooltip output-label">{{field.metadata.label}}:
-            <Tooltip data="{{field.metadata.customProperties.documentation[0]}}"></Tooltip>
-        </label>
-        {{else}}
-		<label class="output-label">
-        {{field.metadata.label}}:
-		</label>
-        {{/if}}
-    <div ref:container class="output-container {{class}}"></div>
+	{#if field.metadata.customProperties != null && field.metadata.customProperties["documentation"] != null}
+	<label class="help-tooltip output-label">{field.metadata.label}:
+		<Tooltip data="{field.metadata.customProperties.documentation[0]}"></Tooltip>
+	</label>
+	{:else}
+	<label class="output-label">{field.metadata.label}:</label>
+	{/if}
+    <div ref:container class="output-container {class}"></div>
 </div>
-{{else}}
-<div ref:container class="output-container {{class}}"></div>
-{{/if}}
+{:else}
+<div ref:container class="output-container {class}"></div>
+{/if}
 
 <script>
 	import Tooltip from "./help/Tooltip";
 
 	export default {
 		oncreate() {
-			const field = this.get("field");
-			const app = this.get("app");
-			const parent = this.get("parent");
-			const form = this.get("form");
+			const {
+				field,
+				app,
+				form,
+				parent
+			} = this.get();
 
 			const output = app.controlRegister.getOutput(field);
 
@@ -32,6 +32,11 @@
 			this.set({
 				alwaysHideLabel: outputDisplayConfig.alwaysHideLabel
 			});
+
+			// Set correct css class based on the field type.
+			const cssClass = field.metadata.customProperties != null ? field.metadata.customProperties.cssClass : null;
+			const layoutCssClass = outputDisplayConfig.block ? "block" : "inline";
+			this.set({ class: `${layoutCssClass} ${cssClass}` });
 
 			// eslint-disable-next-line
 			new output.constructor({
@@ -43,20 +48,12 @@
 					parent
 				}
 			});
-
-			const cssClass = field.metadata.customProperties != null ? field.metadata.customProperties.cssClass : null;
-
-			// Set correct css class based on the field type.
-			if (outputDisplayConfig.block) {
-				this.set({ class: `block ${cssClass}` });
-			}
-			else {
-				this.set({ class: `inline ${cssClass}` });
-			}
 		},
 		data() {
 			return {
-				showLabel: true
+				alwaysHideLabel: false,
+				showLabel: true,
+				class: ""
 			};
 		},
 		components: {
@@ -66,7 +63,7 @@
 </script>
 
 <style>
-    .inline {
-      display: inline-block;
-    }
+	.inline {
+		display: inline-block;
+	}
 </style>

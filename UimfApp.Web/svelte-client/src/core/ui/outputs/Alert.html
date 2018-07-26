@@ -1,36 +1,36 @@
-{{#if field.data != null}}
-<div class="alert {{field.data.style}}">
-	{{#if field.data.heading != null}}
-	<div class="heading">{{field.data.heading}}</div>
-	{{/if}}
+{#if field.data != null}
+<div class="alert {field.data.style}">
+	{#if field.data.heading != null}
+	<div class="heading">{field.data.heading}</div>
+	{/if}
 
-	{{#if field.data.message != null}}
-	<div class="body">{{{field.data.message}}}</div>
-	{{/if}}
+	{#if field.data.message != null}
+	<div class="body">{@html field.data.message}</div>
+	{/if}
 </div>
-{{/if}}
+{/if}
 
 <style>
-  .alert {
-    margin: 5px 8px;
-    padding: 10px 15px;
-    border: 1px solid #bbb;
-  }
+	.alert {
+		margin: 5px 8px;
+		padding: 10px 15px;
+		border: 1px solid #bbb;
+	}
 
-  .alert > .heading {
-    font-weight: bold;
-    font-size: 16px;
-  }
+	.alert > .heading {
+		font-weight: bold;
+		font-size: 16px;
+	}
 
-  .alert.success {
-    background: #ebfff8;
-  }
+	.alert.success {
+		background: #ebfff8;
+	}
 
-  .alert.warning {
-    background: #fdffeb;
-  }
+	.alert.warning {
+		background: #fdffeb;
+	}
 
-  .alert.danger {
-    background: #ffeaea;
-  }
+	.alert.danger {
+		background: #ffeaea;
+	}
 </style>

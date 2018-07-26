@@ -1,73 +1,73 @@
-{{#if visible && field.data != null && field.data.length > 0}}
+{#if visible && field.data != null && field.data.length > 0}
 	<table class="table" ref:table>
 		<thead>
-			{{#if bulkActions.length > 0 }}
+			{#if bulkActions.length > 0 }
 			<tr>
-				<td colspan="{{columnsOrdered.length + 1}}" class="btn-row">
-					{{#each bulkActions as action}}
-						{{#if selectedItemsCount > 0 }}
-							<button class="btn btn-default" on:click="runBulkAction(action)">{{action.label}} <small>({{selectedItemsCount}})</small></button>
-						{{else}}
-							<button class="btn btn-default" disabled>{{action.label}}</button>
-						{{/if}}
-					{{/each}}
+				<td colspan="{columnsOrdered.length + 1}" class="btn-row">
+					{#each bulkActions as action}
+						{#if selectedItemsCount > 0}
+							<button class="btn btn-default" on:click="runBulkAction(action)">{action.label} <small>({selectedItemsCount})</small></button>
+						{:else}
+							<button class="btn btn-default" disabled>{action.label}</button>
+						{/if}
+					{/each}
 				</td>
 			</tr>
-			{{/if}}
+			{/if}
 			<tr>
-				{{#if bulkActions.length > 0}}
+				{#if bulkActions.length > 0}
 				<th>
 					<input type="checkbox" class="checkbox" on:change="selectAllItems(this)">
 				</th>
-				{{/if}}
+				{/if}
 
-				{{#each columnsOrdered as column}}
-				{{#if column.customProperties != null && column.customProperties["sortableBy"] != null}}
-					{{#if column.ascending}}
-					<th class="sortable-column" on:click="sortData(column,columnsOrdered)">{{column.label}} <i class="fa fa-sort-down"></i></th>
-					{{else}}
-					<th class="sortable-column" on:click="sortData(column,columnsOrdered)">{{column.label}} <i class="fa fa-sort-up"></i></th>
-					{{/if}}
-				{{else}}
+				{#each columnsOrdered as column}
+				{#if column.customProperties != null && column.customProperties["sortableBy"] != null}
+					{#if column.ascending}
+					<th class="sortable-column" on:click="sortData(column,columnsOrdered)">{column.label} <i class="fa fa-sort-down"></i></th>
+					{:else}
+					<th class="sortable-column" on:click="sortData(column,columnsOrdered)">{column.label} <i class="fa fa-sort-up"></i></th>
+					{/if}
+				{:else}
 				<th>
-					{{#if column.customProperties != null && column.customProperties["documentation"] != null}}
-					<div class="help-tooltip">{{column.label}}
-						<Tooltip data="{{column.customProperties.documentation[0]}}"></Tooltip>
+					{#if column.customProperties != null && column.customProperties["documentation"] != null}
+					<div class="help-tooltip">{column.label}
+						<Tooltip data="{column.customProperties.documentation[0]}"></Tooltip>
 					</div>
-					{{else}}
-					{{column.label}}
-					{{/if}}
+					{:else}
+					{column.label}
+					{/if}
 				</th>
-				{{/if}}
-				{{/each}}
+				{/if}
+				{/each}
 			</tr>
 		</thead>
 		<tbody>
-			{{#if map != null}}
-			{{#each field.data as row}}
-			<tr class="{{getRowCssClass(row)}}">
-				{{#if bulkActions.length > 0}}
+			{#if map != null}
+			{#each field.data as row}
+			<tr class="{getRowCssClass(row)}">
+				{#if bulkActions.length > 0}
 					<td>
 						<div class="form-group form-check">
 							<input type="checkbox" class="checkbox" on:change="selectItem(this, row)">
 						</div>
 					</td>
-				{{/if}}
+				{/if}
 
-				{{#each columnsOrdered as column}}
+				{#each columnsOrdered as column}
 				<td>
-					{{#if !(getField(row, column).metadata.getCustomProperty("hideIfNull") === true && getField(row, column).data === null)}}
-					 <FormOutput field="{{getField(row, column)}}" app="{{app}}" form="{{form}}" parent="{{parent}}" showLabel="false" />
-				 	{{/if}}
+					{#if !(getField(row, column).metadata.getCustomProperty("hideIfNull") === true && getField(row, column).data === null)}
+					 <FormOutput field="{getField(row, column)}" app="{app}" form="{form}" parent="{parent}" showLabel="false" />
+				 	{/if}
 				</td>
-				{{/each}}
+				{/each}
 			</tr>
-			{{/each}}
-			{{/if}}
+			{/each}
+			{/if}
 		</tbody>
 	</table>
 
-	{{#if bulkActions.length > 0}}
+	{#if bulkActions.length > 0}
 		<input type="checkbox" bind:checked="isBulkActionModalOpen" class="hidden" />
 		<div class="modal">
 			<div class="card">
@@ -75,25 +75,25 @@
 				<div ref:bulkActionContainer></div>
 			</div>
 		</div>
-	{{/if}}
-{{else}}
+	{/if}
+{:else}
 	<div class="alert-nodata">
 		No data.
 	</div>
-{{/if}}
+{/if}
 
 <script>
-	import FormOutput from "../Output";
 	import FormComponent from "core-ui/Form";
-	import Tooltip from '../help/Tooltip';
+	import FormOutput from "../Output";
+	import Tooltip from "../help/Tooltip";
 
 	function buildFilter(currentFormInstance, parameters) {
-		var promise;
+		let promise;
 
-		var filter = {};
+		const filter = {};
 		if (parameters != null && parameters.length > 0) {
 			promise = currentFormInstance.getSerializedInputValues().then(data => {
-				for (let p of parameters) {
+				for (const p of parameters) {
 					filter[p] = data[p];
 				}
 
@@ -107,18 +107,18 @@
 		return promise;
 	}
 
-	var modalId = 0;
-	var modals = [];
+	const modals = [];
 
 	// https://stackoverflow.com/a/3369743/111438
 	// Close topmost modal when user presses escape key.
-	document.addEventListener("keydown", function(evt) {
-		evt = evt || window.event;
-		var isEscape = false;
+	document.addEventListener("keydown", e => {
+		const evt = e || window.event;
+		let isEscape = false;
 		if ("key" in evt) {
-			isEscape = (evt.key == "Escape" || evt.key == "Esc");
-		} else {
-			isEscape = (evt.keyCode == 27);
+			isEscape = (evt.key === "Escape" || evt.key === "Esc");
+		}
+		else {
+			isEscape = (evt.keyCode === 27);
 		}
 		if (isEscape) {
 			if (modals.length > 0) {
@@ -130,26 +130,23 @@
 
 	export default {
 		oncreate() {
-			var data = this.get("field").data;
+			const { data } = this.get().field;
 
 			if (data == null) {
 				return;
 			}
 
-			var app = this.get("app");
-			var metadata = this.get("field").metadata;
-			var rowCssClass = (metadata.customProperties || {}).rowCssClass;
+			const { metadata } = this.get().field;
+			const { rowCssClass } = (metadata.customProperties || {});
 
 			// Create map, with key being the lowercase version of the property name
 			// and value being the actual property name.
-			var map = {};
+			const map = {};
 			if (data.length > 0) {
-				let firstRow = data[0];
+				const firstRow = data[0];
 
-				for (let property in firstRow) {
-					if (firstRow.hasOwnProperty(property)) {
-						map[property.toLowerCase()] = property;
-					}
+				for (const property of Object.keys(firstRow)) {
+					map[property.toLowerCase()] = property;
 				}
 			}
 
@@ -157,20 +154,19 @@
 				// Show table only after the `oncreate` method has run.
 				visible: true,
 				bulkActions: (metadata.customProperties || {}).bulkAction || [],
-				map: map,
-				getField: function(row, column) {
-					var data = row[map[column.id.toLowerCase()]];
+				map,
+				getField(row, column) {
+					const value = row[map[column.id.toLowerCase()]];
 
 					return {
-						data: data,
+						data: value,
 						metadata: column
 					};
 				},
-				getRowCssClass: function (row) {
-					var cssClass = "";
+				getRowCssClass(row) {
+					let cssClass = "";
 
-					if (rowCssClass != null)
-					{
+					if (rowCssClass != null) {
 						cssClass = rowCssClass.cssClass || "";
 
 						if (rowCssClass.suffix != null) {
@@ -180,64 +176,57 @@
 
 					return cssClass;
 				},
-				selectedItemsCount:0
+				selectedItemsCount: 0
 			});
 		},
 		computed: {
-			columnsOrdered: (field) => {
-				return field.metadata.customProperties.columns.filter(b => !b.hidden).sort((a, b) => {
-            		return a.orderIndex - b.orderIndex;
-        		});
-			}
+			columnsOrdered: ({ field }) => field.metadata.customProperties.columns
+				.filter(b => !b.hidden)
+				.sort((a, b) => a.orderIndex - b.orderIndex)
 		},
 		methods: {
 			async runBulkAction(action) {
-				var selectedItems = this.get("field").data.filter(t => t.__selected === true);
-				var map = this.get("map");
-				var selectedItemIds = selectedItems.map(t => t[map[action.itemIdentifierField.toLowerCase()]]);
+				// eslint-disable-next-line no-underscore-dangle
+				const selectedItems = this.get().field.data.filter(t => t.__selected === true);
+				const { map } = this.get();
+				const selectedItemIds = selectedItems.map(t => t[map[action.itemIdentifierField.toLowerCase()]]);
 
 				this.set({
 					isBulkActionModalOpen: true
 				});
 
-				var app = this.get("app");
-				var formInstance = app.getFormInstance(action.formId, true);
+				const { app } = this.get();
+				const formInstance = app.getFormInstance(action.formId, true);
 
-				var inputFieldValues = {
-					Items: {
-						items: selectedItemIds
-					}
-				};
-
-				var filter = await buildFilter(this.get("form"), action.parameters);
+				const filter = await buildFilter(this.get().form, action.parameters);
 				filter.Items = { items: selectedItemIds };
 				formInstance.setInputFields(filter);
 
-				var f = new FormComponent({
+				const f = new FormComponent({
 					target: this.refs.bulkActionContainer,
 					data: {
 						metadata: formInstance.metadata,
 						form: formInstance,
-						app: app,
+						app,
 						useUrl: false
 					}
 				});
 
 				f.init();
 
-				var self = this;
+				const self = this;
 				f.on("form:responseHandled", e => {
 					self.closeBulkActionModal(e.response);
 				});
 
 				this.set({
 					currentBulkActionForm: f
-				})
+				});
 
 				modals.push(this);
 			},
 			async closeBulkActionModal(response) {
-				var currentBulkActionForm = this.get("currentBulkActionForm");
+				const { currentBulkActionForm } = this.get();
 
 				this.set({
 					isBulkActionModalOpen: false,
@@ -246,7 +235,7 @@
 
 				currentBulkActionForm.destroy();
 
-				var parentFormComponent = this.get("parent");
+				const parentFormComponent = this.get().parent;
 
 				if (response != null &&
 					response.metadata.handler !== "redirect" &&
@@ -259,68 +248,81 @@
 				modals.pop();
 			},
 			selectItem(checkboxElement, row) {
+				// eslint-disable-next-line no-underscore-dangle, no-param-reassign
 				row.__selected = checkboxElement.checked;
-				
-				var selectedItems = this.get("field").data.filter(t => t.__selected === true);
-				this.set({"selectedItemsCount":selectedItems.length})
+
+				// eslint-disable-next-line no-underscore-dangle
+				const selectedItems = this.get().field.data.filter(t => t.__selected === true);
+				this.set({ selectedItemsCount: selectedItems.length });
 			},
 			selectAllItems(checkboxElement) {
-				for (var row of this.get("field").data) {
+				for (const row of this.get().field.data) {
+					// eslint-disable-next-line no-underscore-dangle, no-param-reassign
 					row.__selected = checkboxElement.checked;
 				}
 
-				var checkboxes = this.refs.table.querySelectorAll(`tbody>tr>td .checkbox`);
+				const checkboxes = this.refs.table.querySelectorAll("tbody>tr>td .checkbox");
 
-				for (var checkbox of checkboxes) {
+				for (const checkbox of checkboxes) {
 					checkbox.checked = checkboxElement.checked;
 				}
 
-				var selectedItems = this.get("field").data.filter(t => t.__selected === true);
-				this.set({"selectedItemsCount":selectedItems.length})
+				// eslint-disable-next-line no-underscore-dangle
+				const selectedItems = this.get().field.data.filter(t => t.__selected === true);
+				this.set({ selectedItemsCount: selectedItems.length });
 			},
 			sortData(column, columns) {
-					var parent = this.get("parent");
-					var form = parent.get("form");
-					var field = this.get("field");
-					var paginatorInput = form.inputs.find(t => t.metadata.id == field.metadata.customProperties.customizations.paginator);
-					if(paginatorInput != null){
-						paginatorInput.value.orderBy = column.customProperties["sortableBy"];
-						for (let i of columns) {
-							i.ascending = false;
-						}
-						column.ascending = paginatorInput.value.ascending = !paginatorInput.value.ascending;
-						
-						var params = {};
-						for (let i of form.inputs) {
-							params[i.metadata.id] = i.value;
-						}
-						form.setInputFields(params);
-						parent.submit(null, false);
+				const { parent, form, field } = this.get();
+
+				const paginatorInput = form.inputs
+					.find(t => t.metadata.id === field.metadata.customProperties.customizations.paginator);
+
+				if (paginatorInput != null) {
+					paginatorInput.value.orderBy = column.customProperties.sortableBy;
+					for (const i of columns) {
+						i.ascending = false;
 					}
-				},
+
+					paginatorInput.value.ascending = !paginatorInput.value.ascending;
+					// eslint-disable-next-line no-param-reassign
+					column.ascending = paginatorInput.value.ascending;
+
+					const params = {};
+					for (const i of form.inputs) {
+						params[i.metadata.id] = i.value;
+					}
+					form.setInputFields(params);
+					parent.submit(null, false);
+				}
+			}
 		},
-        components: {
+		data() {
+			return {
+				bulkActions: [],
+				getRowCssClass: () => ""
+			};
+		},
+		components: {
 			FormOutput,
-			FormComponent,
 			Tooltip
-        }
+		}
 	};
 </script>
 
 <style>
-  .btn-row {
-    text-align: right;
-  }
+	.btn-row {
+		text-align: right;
+	}
 
-  .checkbox {
-    clip: unset;
-    clip-path: unset;
-    position: unset;
-    width: 15px;
-    height: 15px;
-  }
+	.checkbox {
+		clip: unset;
+		clip-path: unset;
+		position: unset;
+		width: 15px;
+		height: 15px;
+	}
 
-  .sortable-column {
-    cursor: pointer;
-  }
+	.sortable-column {
+		cursor: pointer;
+	}
 </style>

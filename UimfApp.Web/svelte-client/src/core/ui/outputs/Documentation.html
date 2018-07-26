@@ -1,6 +1,6 @@
 <div class="wrapper">
 	<div class="content" ref:container>
-		{{#if field.data != null && field.data.value != null}} {{{field.data.value}}} {{/if}}
+		{#if field.data != null && field.data.value != null} {@html field.data.value} {/if}
 	</div>
 
 	<div class='table-of-contents' ref:toc>
@@ -73,116 +73,116 @@
 </script>
 
 <style>
-  .wrapper {
-    max-width: 1224px;
-    margin: 0 auto;
-    display: grid;
-    grid-gap: 20px;
-    grid-template-areas: "content" "nav";
-  }
+	.wrapper {
+		max-width: 1224px;
+		margin: 0 auto;
+		display: grid;
+		grid-gap: 20px;
+		grid-template-areas: "content" "nav";
+	}
 
-  .table-of-contents {
-    background: white;
-    grid-area: nav;
-    margin-top: 35px;
-  }
+	.table-of-contents {
+		background: white;
+		grid-area: nav;
+		margin-top: 35px;
+	}
 
-  .content {
-    grid-area: content;
-    margin-bottom: 100px;
-  }
+	.content {
+		grid-area: content;
+		margin-bottom: 100px;
+	}
 
-  @media (min-width: 700px) {
-    .wrapper {
-      grid-template-columns: 75% auto;
-      grid-template-areas: "content nav";
-    }
+	@media (min-width: 700px) {
+		.wrapper {
+			grid-template-columns: 75% auto;
+			grid-template-areas: "content nav";
+		}
 
-    .table-of-contents > ul {
-      position: fixed;
-    }
-  }
+		.table-of-contents > ul {
+			position: fixed;
+		}
+	}
 
-  @media (max-width: 699px) {
-    .wrapper {
-      grid-template-areas: "nav";
-    }
+	@media (max-width: 699px) {
+		.wrapper {
+			grid-template-areas: "nav";
+		}
 
-    .content {
-      grid-area: unset;
-    }
+		.content {
+			grid-area: unset;
+		}
 
-    .content img {
-      width: 100%;
-    }
-  }
+		.content img {
+			width: 100%;
+		}
+	}
 
-  .content h1 em {
-    font-size: unset;
-  }
+	.content h1 em {
+		font-size: unset;
+	}
 
-  .content h1 {
-    border-bottom: 3px solid #ececec;
-    margin: 30px 0 20px;
-    text-align: center;
-    padding: 0 0 5px 0;
-  }
+	.content h1 {
+		border-bottom: 3px solid #ececec;
+		margin: 30px 0 20px;
+		text-align: center;
+		padding: 0 0 5px 0;
+	}
 
-  .content h2 {
-    margin-top: 25px;
-    padding: 10px 0;
-    border-bottom: 1px solid #b4b4b4;
-    margin-bottom: 25px;
-    font-weight: bold;
-  }
+	.content h2 {
+		margin-top: 25px;
+		padding: 10px 0;
+		border-bottom: 1px solid #b4b4b4;
+		margin-bottom: 25px;
+		font-weight: bold;
+	}
 
-  .content h3 {
-    margin-top: 25px;
-  }
+	.content h3 {
+		margin-top: 25px;
+	}
 
-  .content h4 {
-    font-size: 1.5rem;
-    opacity: 0.8;
-  }
+	.content h4 {
+		font-size: 1.5rem;
+		opacity: 0.8;
+	}
 
-  .content > ul {
-    margin-left: 25px;
-  }
+	.content > ul {
+		margin-left: 25px;
+	}
 
-  .content img {
-    margin-bottom: 35px;
-    border: 1px solid #ececec;
-    background-color: white;
-    box-shadow: 5px 5px 10px #aaa;
-    max-width: 100%;
-  }
+	.content img {
+		margin-bottom: 35px;
+		border: 1px solid #ececec;
+		background-color: white;
+		box-shadow: 5px 5px 10px #aaa;
+		max-width: 100%;
+	}
 
-  .table-of-contents ul {
-    list-style: none;
-  }
+	.table-of-contents ul {
+		list-style: none;
+	}
 
-  li.active > a {
-    font-weight: 500;
-  }
+	li.active > a {
+		font-weight: 500;
+	}
 
-  .table-of-contents a:hover {
-    font-weight: 600;
-  }
+	.table-of-contents a:hover {
+		font-weight: 600;
+	}
 
-  .table-of-contents li {
-    cursor: pointer;
-  }
+	.table-of-contents li {
+		cursor: pointer;
+	}
 
-  .table-of-contents ul li {
-    display: none;
-  }
+	.table-of-contents ul li {
+		display: none;
+	}
 
-  .table-of-contents > ul > li,
-  .table-of-contents > ul > li > ul > li {
-    display: block;
-  }
+	.table-of-contents > ul > li,
+	.table-of-contents > ul > li > ul > li {
+		display: block;
+	}
 
-  .table-of-contents li.active > ul > li {
-    display: block;
-  }
+	.table-of-contents li.active > ul > li {
+		display: block;
+	}
 </style>

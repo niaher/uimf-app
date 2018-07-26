@@ -1,34 +1,34 @@
 <input type="text"
-    id="{{id}}"
+    id="{id}"
     bind:value="field.valueAsText"
-    required="{{field.metadata.required}}"
-    tabindex="{{tabindex}}"
+    required="{field.metadata.required}"
+    tabindex="{tabindex}"
     autocomplete="off"
     class="form-control"
     ref:container>
 
 <script>
-    import Pikaday from "pikaday";
+	import Pikaday from "pikaday";
 
-    export default {
-        oncreate() {
-            var field = this.get("field");
-            new Pikaday({
-                field: this.refs.container,
-                format: 'YYYY-MM-DD',
-                onSelect: async function (date) {
-                    await field.init(date.toISOString());
-                }
-            });
+	export default {
+		oncreate() {
+			const { field } = this.get();
 
-            var formElement =  this.refs.container;
-                var self = this;
-                formElement.addEventListener("change", function (e) {
-                     if (formElement.value == "") {
-                        field.init(null);
-                     }
-                });
-        }
-    }
-    
+			// eslint-disable-next-line no-new
+			new Pikaday({
+				field: this.refs.container,
+				format: "YYYY-MM-DD",
+				async onSelect(date) {
+					await field.init(date.toISOString());
+				}
+			});
+
+			const formElement = this.refs.container;
+			formElement.addEventListener("change", () => {
+				if (formElement.value === "") {
+					field.init(null);
+				}
+			});
+		}
+	};
 </script>

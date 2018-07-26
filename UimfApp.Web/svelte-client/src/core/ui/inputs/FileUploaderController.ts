@@ -1,16 +1,16 @@
-import * as umf from "core-framework";
 import * as axiosLib from "axios";
+import * as umf from "core-framework";
 
-var axios = axiosLib.default;
+const axios = axiosLib.default;
 
 export class FileUploaderController extends umf.InputController<FileUploaderValue> {
-	selected: any[];
-	filesIds: any[] = [];
-	serializeValue(value: FileUploaderValue | string): string {
+	public selected: any[];
+	public filesIds: any[] = [];
+	public serializeValue(value: FileUploaderValue | string): string {
 		return value != null ? JSON.stringify(value) : null;
 	}
 
-	init(): Promise<FileUploaderController> {
+	public init(): Promise<FileUploaderController> {
 		return new Promise((resolve, reject) => {
 			// Don't do anything. File uploader doesn't allow initialization
 			// from pre-existing value.
@@ -18,40 +18,40 @@ export class FileUploaderController extends umf.InputController<FileUploaderValu
 		});
 	}
 
-	getValue(): Promise<FileUploaderValue> {
-		var self = this;
+	public getValue(): Promise<FileUploaderValue> {
+		const self = this;
 
 		if (self.selected == null ||
 			self.selected.length === 0) {
 			return Promise.resolve(new FileUploaderValue());
 		}
 
-		var promises = [];
-		var result = new FileUploaderValue();
-		var files = self.selected;
+		const promises = [];
+		const result = new FileUploaderValue();
+		const files = self.selected;
 
 		if (self.filesIds.length > 0) {
-			for (let fileId of self.filesIds) {
+			for (const fileId of self.filesIds) {
 				result.files.push(fileId);
 			}
 			self.filesIds = [];
 			self.selected = null;
 		} else {
-			let p = new Promise((resolve, reject) => {
+			const p = new Promise((resolve, reject) => {
 
-				var formData = new FormData();
-				for (let f of files) {
+				const formData = new FormData();
+				for (const f of files) {
 					formData.append("file", f);
 				}
 
 				// Make http request to upload the files.
-				axios.post("/file/upload", formData, <axiosLib.AxiosRequestConfig>{
+				axios.post("/file/upload", formData, {
 					headers: {
 						"Content-Type": "multipart/form-data"
 					}
 				}).then((response: axiosLib.AxiosResponse) => {
 					if (response.data.fileIds != null && response.data.fileIds.length > 0) {
-						for (let fileId of response.data.fileIds) {
+						for (const fileId of response.data.fileIds) {
 							result.files.push(fileId);
 							self.filesIds.push(fileId);
 						}
@@ -66,12 +66,13 @@ export class FileUploaderController extends umf.InputController<FileUploaderValu
 			promises.push(p);
 		}
 
-		return Promise.all(promises).then(t => {
+		return Promise.all(promises).then((t) => {
 			return result;
 		});
 	}
 }
 
+// tslint:disable-next-line:max-classes-per-file
 class FileUploaderValue {
-	files: number[] = [];
+	public files: number[] = [];
 }
