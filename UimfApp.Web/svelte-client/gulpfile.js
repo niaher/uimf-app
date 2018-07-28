@@ -1,5 +1,12 @@
 /* eslint-disable no-console */
 
+/*
+Available commands:
+1. `gulp watch`
+2. `gulp watch --minify`
+3. `gulp build`
+*/
+
 // Compilation process:
 // 1. build svelte components and copy them to "./build" (the build is done with typescript compilation)
 // 2. compile compile-app-ts and move it to "../wwwroot/js/app.js"
@@ -8,6 +15,7 @@
 
 const gulp = require("gulp"),
 	gulpSvelte = require("gulp-svelte"),
+	sourcemaps = require("gulp-sourcemaps"),
 	rollup = require("rollup"),
 	tsc = require("typescript"),
 	rollupTypescript = require("rollup-plugin-typescript2"),
@@ -19,8 +27,13 @@ const gulp = require("gulp"),
 	concat = require("gulp-concat"),
 	del = require("del"),
 	merge2 = require("merge2"),
+	es6Minifier = require("rollup-plugin-terser").terser,
+	{ argv } = require("yargs"),
+	cleanCSS = require("gulp-clean-css"),
 	distDir = "../wwwroot",
 	svelteComponentsDir = "build/svelte";
+
+const minify = !!argv.minify;
 
 process.on("unhandledRejection", r => console.log(r)); // eslint-disable-line no-console
 
@@ -47,7 +60,7 @@ gulp.task("svelte", ["clean"], () => {
 			dev: true,
 			css: true,
 			onwarn(e) {
-			// Ignore css-unused-selector warning, because it's incorrect.
+				// Ignore css-unused-selector warning, because it's incorrect.
 				if (e.code !== "css-unused-selector") {
 					console.log("\x1b[33m%s\x1b[0m", e.filename);
 					console.log(e.toString());
@@ -62,29 +75,37 @@ gulp.task("svelte", ["clean"], () => {
 	return merge2([copySharedJs, copyOutputs], buildComponents);
 });
 
-gulp.task("compile-app-ts", ["svelte"], () => rollup
-	.rollup({
-		input: "src/App.ts",
-		plugins: [
-			resolve({
-				jsnext: true,
-				main: true,
-				browser: true
-			}),
-			commonjs(),
-			rollupTypescript({
-				typescript: tsc,
-				tsconfig: "src/tsconfig.json"
-			}),
-			globals(),
-			builtins()
-		]
-	}).then(bundle => bundle.write({
-		format: "iife",
-		file: `${distDir}/js/App.js`,
-		sourceMap: true,
-		name: "app"
-	})));
+gulp.task("compile-app-ts", ["svelte"], () => {
+	const plugins = [
+		resolve({
+			jsnext: true,
+			main: true,
+			browser: true
+		}),
+		commonjs(),
+		rollupTypescript({
+			typescript: tsc,
+			tsconfig: "src/tsconfig.json"
+		}),
+		globals(),
+		builtins()
+	];
+
+	if (minify) {
+		plugins.push(es6Minifier());
+	}
+
+	return rollup
+		.rollup({
+			input: "src/App.ts",
+			plugins
+		}).then(bundle => bundle.write({
+			format: "iife",
+			file: `${distDir}/js/App.js`,
+			sourceMap: true,
+			name: "app"
+		}));
+});
 
 gulp.task("copy-html", () => gulp
 	.src("wwwroot/**")
@@ -94,7 +115,8 @@ gulp.task("sass", () => gulp
 	.src(["src/**/*.scss", "src/**/*.css"])
 	.pipe(sass().on("error", sass.logError))
 	.pipe(concat("main.css"))
-	// TODO: uglify
+	.pipe(cleanCSS({ compatibility: "*" }))
+	.pipe(sourcemaps.write())
 	.pipe(gulp.dest(`${distDir}/css/`)));
 
 gulp.task("watch", ["compile-app-ts", "sass", "copy-html"], () => {
