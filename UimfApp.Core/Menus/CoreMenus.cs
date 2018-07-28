@@ -7,6 +7,7 @@ namespace UimfApp.Core.Menus
 	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Forms;
 	using UimfApp.Infrastructure.Forms.Menu;
+	using UimfApp.Infrastructure.Security;
 	using UimfApp.Notifications;
 
 	[RegisterEntry("core")]
@@ -16,22 +17,27 @@ namespace UimfApp.Core.Menus
 		public const string System = "System";
 		public const string Notifications = "Notifications";
 		private readonly NotificationsDbContext context;
+		private readonly UserSecurityContext userSecurityContext;
 
-		public CoreMenus(NotificationsDbContext context)
+		public CoreMenus(NotificationsDbContext context, UserSecurityContext userSecurityContext)
 		{
 			this.context = context;
+			this.userSecurityContext = userSecurityContext;
 		}
 
 		public override IEnumerable<MenuItem> GetDynamicMenuItems()
 		{
-			var notificationCount = this.context.Notifications
-				.Count(t => t.ReadOn == null && t.ArchivedOn == null);
+			if (this.userSecurityContext.CanAccess(typeof(MyNotifications)))
+			{
+				//var notificationCount = this.context.Notifications
+				//	.Count(t => t.ReadOn == null && t.ArchivedOn == null);
 
-			var count = new Random().Next(1, 100);
+				var count = new Random().Next(1, 100);
 
-			yield return MyNotifications
-				.Button($"<i class='far fa-bell' title='Notifications'></i>{UiFormConstants.CounterForTopMenu(count)}")
-				.AsMenuItem(Notifications);
+				yield return MyNotifications
+					.Button($"<i class='far fa-bell' title='Notifications'></i>{UiFormConstants.CounterForTopMenu(count)}")
+					.AsMenuItem(Notifications);
+			}
 		}
 
 		public override IEnumerable<MenuGroup> GetMenuGroups()
