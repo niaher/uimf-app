@@ -214,8 +214,16 @@ namespace UimfApp.DependencyInjection
 					childConfig.For<AppDependencyInjectionContainer>()
 						.Use(t => new AppDependencyInjectionContainer(c => child.GetInstance(c)));
 				});
-
-				var register = child.GetInstance(registerType);
+				
+				var register = child
+					// For some reason, if we don't set explicit dependency then the wrong
+					// instance of `AppDependencyInjectionContainer` will be injected...
+					// This happens only in some cases, but not others, which makes
+					// it an absolute mystery. To avoid all this trouble we inject explicit
+					// dependency using `With`. Strangely enough this only affects `Register<>`
+					// classes...
+					.With(child.GetInstance<AppDependencyInjectionContainer>())
+					.GetInstance(registerType);
 
 				var assembliesToRegister = AppDomain.CurrentDomain
 					.GetAssemblies()
