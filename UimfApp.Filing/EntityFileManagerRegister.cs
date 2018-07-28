@@ -3,9 +3,9 @@ namespace UimfApp.Filing
 	using System.Reflection;
 	using UimfApp.Infrastructure;
 
-	public class EntityFileManagerCollection : Register<IEntityFileManager>
+	public class EntityFileManagerRegister : Register<IEntityFileManager>
 	{
-		public EntityFileManagerCollection(DependencyInjectionContainer dependencyInjectionContainer) : base(dependencyInjectionContainer)
+		public EntityFileManagerRegister(DependencyInjectionContainer dependencyInjectionContainer) : base(dependencyInjectionContainer)
 		{
 		}
 

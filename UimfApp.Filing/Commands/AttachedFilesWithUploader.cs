@@ -26,11 +26,11 @@ namespace UimfApp.Filing.Commands
 	public class AttachedFilesWithUploader : AsyncForm<AttachedFilesWithUploader.Request, AttachedFilesWithUploader.Response>
 	{
 		private readonly IFileManager context;
-		private readonly EntityFileManagerCollection entityFileManagers;
+		private readonly EntityFileManagerRegister entityFileManagers;
 		private readonly UserContext userContext;
 
 		public AttachedFilesWithUploader(
-			EntityFileManagerCollection entityFileManagers,
+			EntityFileManagerRegister entityFileManagers,
 			IFileManager context,
 			UserContext userContext)
 		{
@@ -50,12 +50,12 @@ namespace UimfApp.Filing.Commands
 		/// <param name="metadata">An arbitrary string indicating the type of file being attached. Can be used for security checks.</param>
 		/// <returns></returns>
 		public static InlineForm InlineForm<TContext>(
-			EntityFileManagerCollection entityFileManagers,
+			EntityFileManagerRegister entityFileManagers,
 			int contextId,
 			bool isMultiple = true,
 			string metadata = null)
 		{
-			var contextType = EntityFileManagerCollection.ContextTypeOf<TContext>();
+			var contextType = EntityFileManagerRegister.ContextTypeOf<TContext>();
 			var fileManager = entityFileManagers.GetInstance(contextType);
 			var canUploadFiles = fileManager.CanUploadFiles(contextId);
 			if (canUploadFiles)

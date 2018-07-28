@@ -9,17 +9,17 @@ namespace UimfApp.Notifications
 	[Form(Id = "notification-details", PostOnLoad = true)]
 	public class NotificationDetails : MyForm<NotificationDetails.Request, NotificationDetail>
 	{
-		private readonly NotificationManagerCollection notificationManagerCollection;
+		private readonly NotificationManagerRegister notificationManagerRegister;
 
 		public NotificationDetails(
-			NotificationManagerCollection notificationManagerCollection)
+			NotificationManagerRegister notificationManagerRegister)
 		{
-			this.notificationManagerCollection = notificationManagerCollection;
+			this.notificationManagerRegister = notificationManagerRegister;
 		}
 
 		protected override NotificationDetail Handle(Request message)
 		{
-			var repository = this.notificationManagerCollection.GetInstance(message.ContextType);
+			var repository = this.notificationManagerRegister.GetInstance(message.ContextType);
 			return repository.GetLink(message.ContextId);
 		}
 

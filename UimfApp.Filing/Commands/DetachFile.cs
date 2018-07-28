@@ -17,10 +17,10 @@ namespace UimfApp.Filing.Commands
 	public class DetachFile : Form<DetachFile.Request, DetachFile.Response>
 	{
 		private readonly IFileManager context;
-		private readonly EntityFileManagerCollection documentSecurityRules;
+		private readonly EntityFileManagerRegister documentSecurityRules;
 		private readonly UserContext userContext;
 
-		public DetachFile(IFileManager context, EntityFileManagerCollection documentSecurityRule, UserContext userContext)
+		public DetachFile(IFileManager context, EntityFileManagerRegister documentSecurityRule, UserContext userContext)
 		{
 			this.context = context;
 			this.documentSecurityRules = documentSecurityRule;

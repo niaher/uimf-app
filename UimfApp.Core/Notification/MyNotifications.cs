@@ -31,18 +31,18 @@ namespace UimfApp.Core.Notification
 			ShowArchivedOnly = 2
 		}
 
-		private readonly NotificationManagerCollection notificationManagerCollection;
+		private readonly NotificationManagerRegister notificationManagerRegister;
 		private readonly NotificationsDbContext notificationsDbContext;
 		private readonly UserContext userContext;
 
 		public MyNotifications(
 			UserContext userContext,
 			NotificationsDbContext notificationsDbContext,
-			NotificationManagerCollection notificationManagerCollection)
+			NotificationManagerRegister notificationManagerRegister)
 		{
 			this.userContext = userContext;
 			this.notificationsDbContext = notificationsDbContext;
-			this.notificationManagerCollection = notificationManagerCollection;
+			this.notificationManagerRegister = notificationManagerRegister;
 		}
 
 		public static FormLink Button(string label)
@@ -96,7 +96,7 @@ namespace UimfApp.Core.Notification
 					Summary = t.Summary,
 					Actions = GetActions(t),
 					Archived = t.ArchivedOn != null,
-					Link = this.notificationManagerCollection.GetInstance(t.RelatedTo.EntityType).GetLink(t.RelatedTo.EntityId).Link
+					Link = this.notificationManagerRegister.GetInstance(t.RelatedTo.EntityType).GetLink(t.RelatedTo.EntityId).Link
 				})
 			};
 		}

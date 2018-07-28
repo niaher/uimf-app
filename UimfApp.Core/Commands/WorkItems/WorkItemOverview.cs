@@ -27,13 +27,13 @@
 	{
 		private readonly CoreDbContext context;
 		private readonly UserSecurityContext userSecurityContext;
-		private readonly EntityFileManagerCollection entityFileManagerCollection;
+		private readonly EntityFileManagerRegister entityFileManagerRegister;
 
-		public WorkItemOverview(CoreDbContext context, UserSecurityContext userSecurityContext, EntityFileManagerCollection entityFileManagerCollection)
+		public WorkItemOverview(CoreDbContext context, UserSecurityContext userSecurityContext, EntityFileManagerRegister entityFileManagerRegister)
 		{
 			this.context = context;
 			this.userSecurityContext = userSecurityContext;
-			this.entityFileManagerCollection = entityFileManagerCollection;
+			this.entityFileManagerRegister = entityFileManagerRegister;
 		}
 
 		public static FormLink Button(int workItemId, string label = null)
@@ -68,7 +68,7 @@
 				CreatedBy = item.CreatedByUser?.Name,
 				AssignedTo = item.AssignedToUser?.Name,
 				Actions = this.GetActions(item).AsActionList(),
-				Files = AttachedFilesWithUploader.InlineForm<WorkItem>(this.entityFileManagerCollection, item.Id)
+				Files = AttachedFilesWithUploader.InlineForm<WorkItem>(this.entityFileManagerRegister, item.Id)
 			};
 		}
 

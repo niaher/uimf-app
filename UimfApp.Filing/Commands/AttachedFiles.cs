@@ -20,11 +20,11 @@ namespace UimfApp.Filing.Commands
 	[Form(Id = "attached-files", PostOnLoad = true, Label = "Files")]
 	public class AttachedFiles : AsyncForm<AttachedFiles.Request, AttachedFiles.Response>
 	{
-		private readonly EntityFileManagerCollection entityFileManagers;
+		private readonly EntityFileManagerRegister entityFileManagers;
 		private readonly IFileManager filer;
 
 		public AttachedFiles(
-			EntityFileManagerCollection entityFileManagers,
+			EntityFileManagerRegister entityFileManagers,
 			IFileManager filer)
 		{
 			this.entityFileManagers = entityFileManagers;
