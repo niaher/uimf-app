@@ -102,7 +102,7 @@ function buildMenu(theApp: UmfApp): void {
 		data: {
 			forms: theApp.forms,
 			menu: theApp.menu,
-			theApp,
+			app: theApp,
 			makeUrl: (formId: string, inputFieldValues: any) => theApp.makeUrl(formId, inputFieldValues)
 		}
 	});
