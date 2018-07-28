@@ -72,8 +72,8 @@ export class FormInstance {
 			let value = null;
 
 			if (data != null) {
-				for (const prop in data) {
-					if (data.hasOwnProperty(prop) && prop.toLowerCase() === fieldMetadata.metadata.id.toLowerCase()) {
+				for (const prop of Object.keys(data)) {
+					if (prop.toLowerCase() === fieldMetadata.metadata.id.toLowerCase()) {
 						value = data[prop];
 						break;
 					}
@@ -114,11 +114,13 @@ export class FormInstance {
 	public getSerializedInputValuesFromObject(value: any): any {
 		const data = {};
 
+		if (value == null || data === undefined) {
+			return data;
+		}
+
 		const normalizedObject = {};
-		for (const prop in value) {
-			if (value.hasOwnProperty(prop)) {
-				normalizedObject[prop.toLowerCase()] = value[prop];
-			}
+		for (const prop of Object.keys(value)) {
+			normalizedObject[prop.toLowerCase()] = value[prop];
 		}
 
 		for (const input of this.inputs) {
@@ -272,8 +274,8 @@ export class FormInstance {
 
 	private static getNormalizedObject(response: umf.FormResponse): any {
 		const normalizedResponse = {};
-		for (const field in response) {
-			if (response.hasOwnProperty(field) && field !== "metadata") {
+		for (const field of Object.keys(response)) {
+			if (field !== "metadata") {
 				normalizedResponse[field.toLowerCase()] = response[field];
 			}
 		}
