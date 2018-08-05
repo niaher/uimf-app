@@ -119,71 +119,72 @@
 	}
 
 	export default {
-		oncreate() {
-			const { field } = this.get();
-			const { source } = field.metadata.customProperties;
-			const a = new Choices(this.refs.input, {
-				duplicateItems: true,
-				searchResultLimit: 10,
-				removeItemButton: true,
-				maxItemCount: field.maxItemCount,
-				noChoicesText: "Please start typing to search..."
-			});
-
-			const formElement = this.refs.input.closest("form");
-			const self = this;
-			formElement.addEventListener("submit", () => {
-				if (typeof field.value.value === "undefined" && field.metadata.required) {
-					self.refs.input.parentElement.classList.add("divError");
-				}
-			});
-
-			if (typeof (source) === "string") {
-				const addedItems = {};
-				let query = "";
-				let timer = null;
-
-				a.passedElement.addEventListener("search", value => {
-					query = value.detail.value;
-
-					if (timer != null) {
-					// Cancel previous timer, thus extending the delay until user has stopped typing.
-						clearTimeout(timer);
-					}
-
-					// Search when user types something, but introduce a short delay
-					// to avoid excessive http requests.
-					timer = setTimeout(() => {
-						populateChoicesWithAjax(a, self, addedItems, query);
-					}, 300);
+		onstate({ changed, current, previous }) {
+			if (previous == null) {
+				const { field } = this.get();
+				const { source } = field.metadata.customProperties;
+				const a = new Choices(this.refs.input, {
+					duplicateItems: true,
+					searchResultLimit: 10,
+					removeItemButton: true,
+					maxItemCount: field.maxItemCount,
+					noChoicesText: "Please start typing to search..."
 				});
 
-				const currentValue = getIdsQuery(field);
-				populateChoicesWithAjax(a, self, addedItems, "");
+				const formElement = this.refs.input.closest("form");
+				const self = this;
+				formElement.addEventListener("submit", () => {
+					if (typeof field.value.value === "undefined" && field.metadata.required) {
+						self.refs.input.parentElement.classList.add("divError");
+					}
+				});
 
-				// If the field has a value, we need to load it.
-				if (currentValue.length > 0) {
-					populateChoicesWithAjax(a, self, addedItems, query, currentValue)
-						.then(() => setInputValue(a, field));
+				if (typeof (source) === "string") {
+					const addedItems = {};
+					let query = "";
+					let timer = null;
+
+					a.passedElement.addEventListener("search", value => {
+						query = value.detail.value;
+
+						if (timer != null) {
+						// Cancel previous timer, thus extending the delay until user has stopped typing.
+							clearTimeout(timer);
+						}
+
+						// Search when user types something, but introduce a short delay
+						// to avoid excessive http requests.
+						timer = setTimeout(() => {
+							populateChoicesWithAjax(a, self, addedItems, query);
+						}, 300);
+					});
+
+					const currentValue = getIdsQuery(field);
+					populateChoicesWithAjax(a, self, addedItems, "");
+
+					// If the field has a value, we need to load it.
+					if (currentValue.length > 0) {
+						populateChoicesWithAjax(a, self, addedItems, query, currentValue)
+							.then(() => setInputValue(a, field));
+					}
+				}
+				else {
+					a.setChoices(mapToTypeaheadItems(source), "value", "label", true);
+					this.set({ inlineChoices: a });
+				}
+
+				a.passedElement.addEventListener("change", () => {
+					field.value = calculateFieldValue(field, a.getValue());
+				});
+			}
+
+			if (changed.inlineChoices) {
+				if (!current.initialized && current.inlineChoices != null) {
+					// eslint-disable-next-line no-param-reassign
+					current.initialized = true;
+					setInputValue(current.inlineChoices, current.field);
 				}
 			}
-			else {
-				a.setChoices(mapToTypeaheadItems(source), "value", "label", true);
-
-				this.onstate = ({ changed, current }) => {
-					if (changed.field) {
-						if (!current.initialized) {
-							// eslint-disable-next-line no-param-reassign
-							current.initialized = true;
-							setInputValue(a, field);
-						}
-					}
-				};
-			}
-
-			a.passedElement.addEventListener("change", () => {
-				field.value = calculateFieldValue(field, a.getValue());
-			});
 		},
 		methods: {
 			onChange() {
