@@ -1,0 +1,12 @@
+{#if field.data != null}
+	{#if field.data.form != null}
+		<a href="{app.makeUrl(field.data.form, field.data.inputFieldValues)}">{field.data.label}</a>
+	{:else}
+		<span>{field.data.label}</span>
+	{/if}
+{/if}
+
+<script>
+	export let field;
+	export let app;
+</script>

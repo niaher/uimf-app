@@ -1,18 +1,18 @@
 .choices__inner {
-	min-width: 250px;
+	min-width:250px;
 	min-height: 32px;
 	background-color: #fff !important;
-}
+ }
 
-.choices__input {
-	min-width: 100px;
-	background-color: transparent !important;
-	margin-bottom: 5px !important;
-	border: 0 !important;
-	border-radius: 0 !important;
-	padding: 4px 0 4px 2px !important;
-}
+ .choices__input {
+	 min-width: 100px;
+	 background-color: transparent !important;
+	 margin-bottom: 5px !important;
+	 border: 0 !important;
+	 border-radius: 0 !important;
+	 padding: 4px 0 4px 2px !important;
+ }
 
-.choices__list--dropdown {
-	z-index: 100;
-}
+ .choices__list--dropdown {
+	 z-index: 100;
+ }

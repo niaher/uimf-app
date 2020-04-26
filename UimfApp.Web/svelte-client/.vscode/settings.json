@@ -28,9 +28,5 @@
 	"tslint.autoFixOnSave": true,
 	"tslint.configFile": "tslint.json",
 	"tslint.enable": true,
-	"tslint.exclude": ["node_modules"],
-	"css.validate": false,
-	"less.validate": false,
-	"scss.validate": false,
-	"stylelint.enable": true
+	"tslint.exclude": ["node_modules"]
 }

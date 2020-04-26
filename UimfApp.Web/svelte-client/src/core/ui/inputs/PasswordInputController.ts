@@ -1,9 +1,9 @@
-import * as umf from "core-framework";
+import * as umf from "../../framework";
 
 export class PasswordInputController extends umf.InputController<Password> {
-	public selected: string;
+	selected: string;
 
-	public serializeValue(value: Password | string): string {
+	serializeValue(value: Password | string): string {
 		if (typeof (value) === "string") {
 			return value;
 		}
@@ -11,7 +11,7 @@ export class PasswordInputController extends umf.InputController<Password> {
 		return value != null ? value.value : null;
 	}
 
-	public init(value: string): Promise<PasswordInputController> {
+	init(value: string): Promise<PasswordInputController> {
 		return new Promise((resolve, reject) => {
 			this.selected = value;
 			this.value = this.parse(value);
@@ -19,16 +19,15 @@ export class PasswordInputController extends umf.InputController<Password> {
 		});
 	}
 
-	public getValue(): Promise<Password> {
+	getValue(): Promise<Password> {
 		return Promise.resolve(this.parse(this.selected));
 	}
 
 	private parse(value: string): Password {
-		return value == null || value === "" ? null : { value };
+		return value == null || value == "" ? null : { value: value };
 	}
 }
 
-// tslint:disable-next-line:max-classes-per-file
 class Password {
-	public value: string;
+	value: string;
 }

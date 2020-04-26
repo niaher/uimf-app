@@ -1,20 +1,16 @@
-﻿import {
-	ClientFunctionMetadata,
-	FormMetadata,
-	FormResponse,
-	FormResponseMetadata } from "uimf-core";
-
+﻿import { ClientFunctionMetadata, FormMetadata, FormResponse, FormResponseMetadata } from "uimf-core";
 import { ControlRegister } from "./ControlRegister";
 import { FormInstance } from "./FormInstance";
 import { IAppRouter } from "./IAppRouter";
 import { IFormResponseHandler } from "./IFormResponseHandler";
-import { Menu } from "./Menu";
+import { MenuMetadata } from "./MenuMetadata";
 import { UmfServer } from "./UmfServer";
 
 export class UmfApp implements IAppRouter {
 	public forms: FormMetadata[];
-	public menu: Menu;
+	public menus: MenuMetadata[];
 	private formsById: { [id: string]: FormMetadata } = {};
+	private menusByName: { [id: string]: MenuMetadata } = {};
 	private eventHandlers: any[] = [];
 	public readonly server: UmfServer;
 	public readonly formResponseHandlers: { [id: string]: IFormResponseHandler } = {};
@@ -65,18 +61,27 @@ export class UmfApp implements IAppRouter {
 		return this.server.getAllMetadata()
 			.then((response) => {
 				this.forms = response.forms;
-				this.menu = response.menu;
+				this.menus = response.menus;
 
 				this.formsById = {};
+				this.menusByName = {};
 
 				for (const form of this.forms) {
 					this.formsById[form.id] = new FormMetadata(form);
+				}
+
+				for (const menu of this.menus) {
+					this.menusByName[menu.name] = menu;
 				}
 			});
 	}
 
 	public getForm(id: string): FormMetadata {
 		return this.formsById[id];
+	}
+
+	public getMenu(name: string): MenuMetadata {
+		return this.menusByName[name];
 	}
 
 	public getFormInstance(formId: string, throwError: boolean = false): FormInstance {

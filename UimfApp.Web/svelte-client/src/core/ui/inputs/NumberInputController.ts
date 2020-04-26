@@ -1,19 +1,19 @@
-import * as umf from "core-framework";
+import * as umf from "../../framework";
 
 export class NumberInputController extends umf.InputController<number> {
-	public serializeValue(value: number | string): string {
+	serializeValue(value: number | string): string {
 		return NumberInputController.serialize(value);
 	}
 
-	public init(value: string): Promise<NumberInputController> {
+	init(value: string): Promise<NumberInputController> {
 		return new Promise((resolve, reject) => {
-			const v = parseFloat(value);
+			var v = parseFloat(value);
 			this.value = isNaN(v) ? null : v;
 			resolve(this);
 		});
 	}
 
-	public getValue(): Promise<number> {
+	getValue(): Promise<number> {
 		return Promise.resolve(this.value);
 	}
 

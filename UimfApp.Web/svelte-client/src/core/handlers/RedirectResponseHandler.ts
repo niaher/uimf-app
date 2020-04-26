@@ -1,4 +1,4 @@
-import { FormInstance, IFormResponseHandler } from "core-framework";
+import { FormInstance, IFormResponseHandler } from "../framework";
 import * as umf from "uimf-core";
 
 export class RedirectResponseHandler implements IFormResponseHandler {

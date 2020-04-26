@@ -1,5 +1,5 @@
 import * as alertifyLib from "alertifyjs";
-import { IFunctionRunner } from "core-framework";
+import { IFunctionRunner } from "../framework";
 import * as umf from "uimf-core";
 const alertify = alertifyLib.default;
 

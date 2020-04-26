@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+		"target": "es5",
+		"lib": [
+			"es2015",
+			"dom",
+			"es5"
+		],
+		"baseUrl": "./src",
+		"types": [
+			"@pyoner/svelte-types"
+		]
+	},
+	"include": [
+		"src/**/*",
+		"node_modules/uimf-core/src/*"
+	]
+}

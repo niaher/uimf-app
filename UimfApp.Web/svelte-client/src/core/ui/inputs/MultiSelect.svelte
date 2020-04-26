@@ -1,0 +1,206 @@
+<select on:change={() => onChange()} 
+	class="multi-select form-control"
+	id={id}
+	tabindex="{tabindex}"
+	bind:this={input}
+	multiple>
+</select>
+
+<script>
+	import Choices from "choices.js/public/assets/scripts/choices.js";
+	import * as axiosLib from "axios";
+	var axios = axiosLib.default;
+	
+	let input;
+	export let id;
+    export let field;
+	export let tabindex;
+	export let form;
+
+	function mapToTypeaheadItems(items) {
+		return items.map(t => {
+			return {
+				label: t.label,
+				value: t.value.toString()
+			};
+		});
+	}
+
+	function setFieldValue(field, value) {
+		if (field.maxItemCount == 1) {
+			field.value = {
+				value: value[0] != null ? value[0].value : null
+			};
+
+			// We need to convert the value to string, otherwise it doesn't work.
+			// This is due to the way UmfApp deals with url parameters (or something
+			// along those lines).
+			if (field.value.value != null) {
+				field.value.value = field.value.value.toString();
+			}
+		}
+		else {
+			field.value = {
+				items: value.map(t => t.value)
+			};
+		}
+	}
+
+	function setInputValue(a, field) {
+		if (field.maxItemCount == 1) {
+			let v = (field.value || {}).value || null;
+			if (v != null) {
+				a.setValueByChoice(v.toString());
+			}
+		}
+		else {
+			let v = ((field.value || {}).items || []).map(t => t.toString());
+			a.setValueByChoice(v);
+		}
+	}
+
+	function getIdsQuery(field) {
+		var currentValue = field.maxItemCount == 1
+			? [(field.value || {}).value || ""]
+			: (field.value || {}).items || [];
+
+		// Put values into an array.
+		if (currentValue[0] === "") {
+			currentValue = [];
+		}
+
+		return currentValue;
+	}
+
+	function buildFilter(parentForm, parameters, query) {
+		var promise;
+
+		var filter = { query: query };
+		if (parameters != null && parameters.length > 0) {
+			promise = parentForm.get("form").getSerializedInputValues().then(data => {
+				for (let p of parameters) {
+					filter[p] = data[p];
+				}
+
+				return filter;
+			});
+		}
+		else {
+			promise = Promise.resolve(filter);
+		}
+
+		return promise;
+	}
+
+	function populateChoicesWithAjax(choicesComponent, multiSelectComponent, existingChoices, query, selectedItemIds) {
+		var componentData = multiSelectComponent.get();
+		var parameters = componentData.field.metadata.customProperties.parameters;
+		var source = componentData.field.metadata.customProperties.source;
+		var parentForm = componentData.form;
+		var app = componentData.app;
+
+		return new Promise((resolve, reject) => {
+			choicesComponent.ajax(callback => {
+				return buildFilter(parentForm, parameters, query).then(filter => {
+					if (selectedItemIds != null) {
+						filter.ids = { items: selectedItemIds };
+					}
+
+					return app.server.postForm(source, filter).then(data => {
+						// Mark items as added as "choices".
+						var toAdd = data.items.filter(t => {
+							var key = JSON.stringify(t.value);
+							if (existingChoices[key] == null) {
+								existingChoices[key] = true;
+
+								// Add item.
+								return true;
+							}
+
+							// Don't add item.
+							return false;
+						});
+
+						callback(mapToTypeaheadItems(toAdd), "value", "label");
+
+						resolve();
+					});
+				});
+			});
+		});
+	}
+
+	var source = field.metadata.customProperties.source;
+	var parameters = field.metadata.customProperties.parameters;
+	
+	var parentForm = form;
+	var a = new Choices(this.refs.input, {
+		duplicateItems: true,
+		searchResultLimit: 10,
+		removeItemButton: true,
+		maxItemCount: field.maxItemCount,
+		noChoicesText: "Please start typing to search..."
+	});
+
+	var formElement = input.closest("form");
+	var self = this;
+	formElement.addEventListener("submit", function (e) {
+		if (field.metadata.required && typeof field.value.value == 'undefined') {
+			self.refs.input.parentElement.classList.add("divError");
+		}
+	});
+
+	if (typeof (source) === "string") {
+		var addedItems = {};
+		var query = "";
+		var timer = null;
+
+		a.passedElement.addEventListener("search", function (value) {
+			query = value.detail.value;
+
+			if (timer != null) {
+				// Cancel previous timer, thus extending the delay until user has stopped typing.
+				clearTimeout(timer);
+			}
+
+			// Search when user types something, but introduce a short delay
+			// to avoid excessive http requests.
+			timer = setTimeout(function () {
+				populateChoicesWithAjax(a, self, addedItems, query);
+			}, 300);
+		});
+
+		var currentValue = getIdsQuery(field);
+		populateChoicesWithAjax(a, self, addedItems, "");
+
+		// If the field has a value, we need to load it.
+		if (currentValue.length > 0) {
+			populateChoicesWithAjax(a, self, addedItems, query, currentValue)
+				.then(() => setInputValue(a, field));
+		}
+	}
+	else {
+		a.setChoices(mapToTypeaheadItems(source), "value", "label", true);
+
+		var initialized = false;
+		this.observe("field", (newValue, oldValue) => {
+			if (!initialized) {
+				initialized = true;
+				setInputValue(a, field);
+			}
+		});
+	}
+
+	a.passedElement.addEventListener("change", function (e) {
+		setFieldValue(field, a.getValue());
+	});
+
+
+	function onChange() {
+		this.get("form").fireAndBubbleUp('input:changed', {
+			app: this.get('app'),
+			form: this.get('form'),
+			input: this
+		});
+	}
+</script>

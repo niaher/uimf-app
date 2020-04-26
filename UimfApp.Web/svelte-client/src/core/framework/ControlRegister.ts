@@ -1,9 +1,9 @@
 import * as umf from "uimf-core";
+import { OutputControlConfiguration } from "./OutputControlConfiguration";
 import { FormEventHandler } from "./FormEventHandler";
 import { IFunctionRunner } from "./IFunctionRunner";
 import { InputController } from "./InputController";
 import { InputFieldEventHandler } from "./InputFieldEventHandler";
-import { OutputControlConfiguration } from "./OutputControlConfiguration";
 import { OutputFieldEventHandler } from "./OutputFieldEventHandler";
 import { OutputFieldValue } from "./OutputFieldValue";
 import { StringInputController } from "./StringInputController";

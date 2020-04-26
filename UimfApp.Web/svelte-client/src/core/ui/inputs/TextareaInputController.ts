@@ -1,9 +1,9 @@
-import * as umf from "core-framework";
+import * as umf from "../../framework";
 
 export class TextareaInputController extends umf.InputController<Textarea> {
-	public selected: string;
+	selected: string;
 
-	public serializeValue(value: Textarea | string): string {
+	serializeValue(value: Textarea | string): string {
 		if (typeof (value) === "string") {
 			return value;
 		}
@@ -11,7 +11,7 @@ export class TextareaInputController extends umf.InputController<Textarea> {
 		return value != null ? value.value : null;
 	}
 
-	public init(value: string): Promise<TextareaInputController> {
+	init(value: string): Promise<TextareaInputController> {
 		return new Promise((resolve, reject) => {
 			this.selected = value;
 			this.value = this.parse(value);
@@ -19,16 +19,15 @@ export class TextareaInputController extends umf.InputController<Textarea> {
 		});
 	}
 
-	public getValue(): Promise<Textarea> {
+	getValue(): Promise<Textarea> {
 		return Promise.resolve(this.parse(this.selected));
 	}
 
 	private parse(value: string): Textarea {
-		return value == null || value === "" ? null : { value };
+		return value == null || value == "" ? null : { value: value };
 	}
 }
 
-// tslint:disable-next-line:max-classes-per-file
 class Textarea {
-	public value: string;
+	value: string;
 }

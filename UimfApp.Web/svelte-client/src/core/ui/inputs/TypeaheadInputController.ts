@@ -1,15 +1,16 @@
-import * as umf from "core-framework";
+import * as umf from "../../framework";
 
 export interface ITypeaheadConfig {
 	maxItemCount: number;
 }
 
-export class TypeaheadInputController
-	extends umf.InputController<TypeaheadValue>
-	implements ITypeaheadConfig {
-	public maxItemCount: number = 1;
+export class TypeaheadInputController 
+	extends umf.InputController<TypeaheadValue> 
+	implements ITypeaheadConfig 
+{
+	public maxItemCount = 1;
 
-	public serializeValue(value: TypeaheadValue | string): string {
+	serializeValue(value: TypeaheadValue | string): string {
 		if (typeof (value) === "string") {
 			return value;
 		}
@@ -17,15 +18,15 @@ export class TypeaheadInputController
 		return value != null ? value.value : null;
 	}
 
-	public init(value: string): Promise<TypeaheadInputController> {
+	init(value: string): Promise<TypeaheadInputController> {
 		return new Promise((resolve, reject) => {
 			this.value = this.parse(value);
 			resolve(this);
 		});
 	}
 
-	public getValue(): Promise<TypeaheadValue> {
-		const valueToSubmit = this.value == null || this.value.value == null
+	getValue(): Promise<TypeaheadValue> {
+		var valueToSubmit = this.value == null || this.value.value == null
 			? null
 			: this.value;
 
@@ -33,17 +34,16 @@ export class TypeaheadInputController
 	}
 
 	private parse(value: string): TypeaheadValue {
-		return value == null || value === ""
-			? new TypeaheadValue()
+		return value == null || value == "" 
+			? new TypeaheadValue() 
 			: new TypeaheadValue(value);
 	}
 }
 
-// tslint:disable-next-line:max-classes-per-file
 class TypeaheadValue {
-	constructor(value?: any) {
+	constructor(value?) {
 		this.value = value;
 	}
 
-	public value: any;
+	value:any;
 }

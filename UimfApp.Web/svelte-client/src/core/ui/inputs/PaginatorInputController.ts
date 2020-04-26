@@ -1,4 +1,4 @@
-import * as umf from "../../framework/index";
+import * as umf from "../../framework";
 
 class PaginationParameters {
 	constructor(pageIndex?: number | string, pageSize?: number | string, orderBy?: string, ascending?: boolean | string) {
@@ -8,14 +8,14 @@ class PaginationParameters {
 		this.ascending = PaginationParameters.asBool(ascending, null);
 	}
 
-	public pageSize: number;
-	public pageIndex: number;
-	public ascending: boolean;
-	public orderBy: string;
+	pageSize: number;
+	pageIndex: number;
+	ascending: boolean;
+	orderBy: string;
 
 	private static asInt(value: number | string, defaultValue: number): number {
 		if (typeof (value) === "string") {
-			const result = parseInt(value, 10);
+			var result = parseInt(value);
 			return isNaN(result) ? defaultValue : result;
 		}
 
@@ -37,22 +37,21 @@ class PaginationParameters {
 	}
 }
 
-// tslint:disable-next-line:max-classes-per-file
 export class PaginatorInputController extends umf.InputController<PaginationParameters> {
-	public serializeValue(value: PaginationParameters | string): string {
+	serializeValue(value: PaginationParameters | string): string {
 
-		const p = typeof (value) === "string" || value == null
-			? this.parse(value as string)
+		var p = typeof (value) === "string" || value == null
+			? this.parse(<string>value)
 			: value;
 
-		if (p.pageIndex === 1 &&
-			p.pageSize === 10 &&
+		if (p.pageIndex == 1 &&
+			p.pageSize == 10 &&
 			p.ascending == null &&
 			p.orderBy == null) {
 			return "";
 		}
 
-		let result = `${p.pageIndex}-${p.pageSize}`;
+		var result = `${p.pageIndex}-${p.pageSize}`;
 
 		if (p.orderBy != null) {
 			result += `-${p.orderBy}-${p.ascending}}`;
@@ -61,14 +60,14 @@ export class PaginatorInputController extends umf.InputController<PaginationPara
 		return result;
 	}
 
-	public init(value: string): Promise<PaginatorInputController> {
+	init(value: string): Promise<PaginatorInputController> {
 		return new Promise((resolve, reject) => {
 			this.value = this.parse(value);
 			resolve(this);
 		});
 	}
 
-	public getValue(): Promise<PaginationParameters> {
+	getValue(): Promise<PaginationParameters> {
 		return Promise.resolve(this.value);
 	}
 
@@ -80,7 +79,7 @@ export class PaginatorInputController extends umf.InputController<PaginationPara
 			return new PaginationParameters();
 		}
 
-		const components = value.split("-");
+		var components = value.split("-");
 		return new PaginationParameters(
 			components[0],
 			components[1],

@@ -1,4 +1,4 @@
-import * as umf from "core-framework";
+import * as umf from "./core/framework";
 
 export class RouteParameterBuilder {
 	public readonly parameterName: string;

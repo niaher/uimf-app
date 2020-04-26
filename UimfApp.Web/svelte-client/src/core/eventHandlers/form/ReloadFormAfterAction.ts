@@ -1,4 +1,4 @@
-import { ActionListEventArguments } from "core-ui/outputs/ActionListEventArguments";
+import { ActionListEventArguments } from "../../ui/outputs/ActionListEventArguments";
 import { EventHandlerMetadata } from "uimf-core";
 import { FormEventHandler, FormInstance } from "../../framework/index";
 
