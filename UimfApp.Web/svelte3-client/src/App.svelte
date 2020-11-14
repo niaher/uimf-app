@@ -1,5 +1,7 @@
 <script lang="ts">
+	import type { UmfApp } from "core/framework";
 	export let name: string;
+	export let app: UmfApp;
 </script>
 
 <style type="text/scss">
