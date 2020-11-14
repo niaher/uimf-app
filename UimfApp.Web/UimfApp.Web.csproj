@@ -7,14 +7,24 @@
 
   <ItemGroup>
 	<Content Remove="Temp\**" />
-	<Compile Remove="Temp\**" />  
-	<EmbeddedResource Remove="Temp\**" />
+	<Compile Remove="Temp\**" />
+	<Compile Remove="wwwroot\font-awesome\**" />
+	<Compile Remove="wwwroot\js\**" />  
+	<EmbeddedResource Remove="Temp\**" />  
+	<EmbeddedResource Remove="wwwroot\font-awesome\**" />  
+	<EmbeddedResource Remove="wwwroot\js\**" />
 	<None Remove="Temp\**" />
 	  
 	<Content Remove="svelte-client\**" />
+	  
+	<Content Remove="wwwroot\font-awesome\**" />
+	  
+	<Content Remove="wwwroot\js\**" />
 	<Compile Remove="svelte-client\**" />  
     <EmbeddedResource Remove="svelte-client\**" />
     <None Remove="svelte-client\**" />
+    <None Remove="wwwroot\font-awesome\**" />
+    <None Remove="wwwroot\js\**" />
 	
 	<Content Include="Help\**">
 		<CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -53,22 +63,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\font-awesome\webfonts\fa-brands-400.svg" />
-    <None Include="wwwroot\font-awesome\webfonts\fa-brands-400.woff2" />
-    <None Include="wwwroot\font-awesome\webfonts\fa-regular-400.svg" />
-    <None Include="wwwroot\font-awesome\webfonts\fa-regular-400.woff2" />
-    <None Include="wwwroot\font-awesome\webfonts\fa-solid-900.svg" />
-    <None Include="wwwroot\font-awesome\webfonts\fa-solid-900.woff2" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\js\" />
   </ItemGroup>
 
 </Project>
