@@ -2,13 +2,13 @@
 import type { ControlRegister } from "./ControlRegister";
 import type { IAppRouter } from "./IAppRouter";
 import type { IFormResponseHandler } from "./IFormResponseHandler";
-import type { Menu } from "./Menu";
 import type { UmfServer } from "./UmfServer";
+import type { MenuItem } from "./MenuItem";
 import { FormInstance } from "./FormInstance";
 
 export class UmfApp implements IAppRouter {
 	public forms: server.FormMetadata[];
-	public menu: Menu;
+	public menu: MenuItem;
 	private formsById: { [id: string]: server.FormMetadata } = {};
 	private eventHandlers: any[] = [];
 	public readonly server: UmfServer;
@@ -50,6 +50,8 @@ export class UmfApp implements IAppRouter {
 		this.makeUrl = (form: string, values: any) => {
 			return router.makeUrl(form, values);
 		};
+
+		this.fire("app:router-assigned", null);
 	}
 
 	public registerResponseHandler(handler: IFormResponseHandler): void {

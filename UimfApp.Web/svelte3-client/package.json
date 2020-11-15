@@ -12,6 +12,7 @@
     "@rollup/plugin-typescript": "^6.0.0",
     "@tsconfig/svelte": "^1.0.0",
     "@types/axios": "^0.14.0",
+    "abstract-state-router": "^6.1.0",
     "autoprefixer": "^10.0.2",
     "axios": "^0.21.0",
     "bootstrap": "^4.5.3",
@@ -25,6 +26,7 @@
     "svelte": "^3.0.0",
     "svelte-check": "^1.0.0",
     "svelte-preprocess": "^4.0.0",
+    "svelte-state-renderer": "^3.0.1",
     "tslib": "^2.0.0",
     "typescript": "^3.9.3"
   },

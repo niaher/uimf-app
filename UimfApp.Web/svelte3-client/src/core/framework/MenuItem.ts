@@ -1,4 +1,5 @@
 export class MenuItem {
-	public menuGroup: string;
+	public label: string;
 	public orderIndex: number;
+	public children: MenuItem[];
 }

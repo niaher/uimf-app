@@ -16,6 +16,4 @@ export * from "core/framework/FormEventArguments";
 export * from "core/framework/FormResponseEventArguments";
 export * from "core/framework/InputEventArguments";
 export * from "core/framework/IFunctionRunner";
-export * from "core/framework/MenuGroup";
 export * from "core/framework/MenuItem";
-export * from "core/framework/Menu";
