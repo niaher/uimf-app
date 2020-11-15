@@ -6,13 +6,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+	<Content Remove="svelte3-client\**" />
 	<Content Remove="Temp\**" />
+	<Compile Remove="svelte3-client\**" />
 	<Compile Remove="Temp\**" />
 	<Compile Remove="wwwroot\font-awesome\**" />
-	<Compile Remove="wwwroot\js\**" />  
+	<Compile Remove="wwwroot\js\**" />
+	<EmbeddedResource Remove="svelte3-client\**" />  
 	<EmbeddedResource Remove="Temp\**" />  
 	<EmbeddedResource Remove="wwwroot\font-awesome\**" />  
-	<EmbeddedResource Remove="wwwroot\js\**" />
+	<EmbeddedResource Remove="wwwroot\js\**" />  
+	<None Remove="svelte3-client\**" />
 	<None Remove="Temp\**" />
 	  
 	<Content Remove="svelte-client\**" />
