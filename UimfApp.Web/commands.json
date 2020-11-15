@@ -1,0 +1,14 @@
+{
+  "commands": {
+    "watch-client": {
+      "fileName": "cmd.exe",
+      "workingDirectory": ".",
+      "arguments": "/c cd svelte3-client && npm run dev"
+    },
+    "build-client": {
+      "fileName": "cmd.exe",
+      "workingDirectory": ".",
+      "arguments": "/c cd svelte3-client && npm run build"
+    }
+  }
+}
