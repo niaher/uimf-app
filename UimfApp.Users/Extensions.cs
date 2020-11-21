@@ -18,7 +18,7 @@ namespace UimfApp.Users
 		{
 			if (!result.Succeeded)
 			{
-				throw new ApplicationException($"{message}\n{result.Errors.Select(t => t.Description).Join("\n")}");
+				throw new ApplicationException($"{message}\n{result.Errors.Select(t => t.Description).JoinStrings("\n")}");
 			}
 		}
 

@@ -5,7 +5,7 @@ namespace UimfApp.Infrastructure.Forms.CustomProperties
 	public class CssClassAttribute : StringPropertyAttribute
 	{
 		public CssClassAttribute(params string[] value)
-			: base("cssClass", value.Join(" "))
+			: base("cssClass", value.JoinStrings(" "))
 		{
 		}
 	}

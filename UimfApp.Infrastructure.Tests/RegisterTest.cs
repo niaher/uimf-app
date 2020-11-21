@@ -67,7 +67,7 @@ namespace UimfApp.Infrastructure.Tests
 			var newItem = register.GetInstance("item");
 			newItem.DoSomething();
 
-			Logger.HashCodes.Count.ShouldBeEquivalentTo(2);
+			Logger.HashCodes.Count.Should().Be(2);
 			Logger.HashCodes["loggers"][0].Should().NotBe(Logger.HashCodes["loggers"][1]);
 			Logger.HashCodes["handlers"][0].Should().NotBe(Logger.HashCodes["handlers"][1]);
 		}

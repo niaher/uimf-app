@@ -10,8 +10,12 @@ namespace UimfApp.Web
 	{
 		public static void ConfigureMvc(this IServiceCollection services, IConfiguration configuration)
 		{
-			services.AddMvc()
-				.AddJsonOptions(options =>
+			services.AddApplicationInsightsTelemetry();
+			services.AddDatabaseDeveloperPageExceptionFilter();
+
+			services
+				.AddControllers()
+				.AddNewtonsoftJson(options =>
 				{
 					options.SerializerSettings.Converters.Add(new StringEnumConverter());
 					options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Include;

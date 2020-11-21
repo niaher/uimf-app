@@ -3,9 +3,7 @@ namespace UimfApp.DataSeed
 	using System;
 	using System.Data.Common;
 	using System.Threading.Tasks;
-	using MySql.Data.MySqlClient;
 	using Respawn;
-	using UimfApp.Infrastructure;
 	using ApplicationException = System.ApplicationException;
 
 	public static class Database
@@ -35,9 +33,7 @@ namespace UimfApp.DataSeed
 
 			var checkpoint = new Checkpoint
 			{
-				DbAdapter = connection is MySqlConnection
-					? DbAdapter.MySql
-					: DbAdapter.SqlServer
+				DbAdapter = DbAdapter.SqlServer
 			};
 
 			await checkpoint.Reset(connection);

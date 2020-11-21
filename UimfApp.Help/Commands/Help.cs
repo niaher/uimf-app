@@ -11,7 +11,6 @@ namespace UimfApp.Help.Commands
     using UimfApp.Help.Security;
     using UimfApp.Infrastructure;
     using UimfApp.Infrastructure.Forms;
-	using UimfApp.Infrastructure.Forms.CustomProperties;
 	using UimfApp.Infrastructure.Forms.Outputs;
     using UimfApp.Infrastructure.Security;
 

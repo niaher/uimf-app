@@ -5,7 +5,7 @@ namespace UimfApp.Web
 	using Microsoft.AspNetCore.Hosting;
 	using Microsoft.Extensions.Configuration;
 	using Microsoft.Extensions.DependencyInjection;
-	using Microsoft.Extensions.Logging;
+	using Microsoft.Extensions.Hosting;
 	using StructureMap;
 	using UimfApp.DependencyInjection;
 	using UimfApp.Infrastructure;
@@ -25,43 +25,37 @@ namespace UimfApp.Web
 
 		public IConfiguration Configuration { get; }
 
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
-			loggerFactory.AddConsole(this.Configuration.GetSection("Logging"));
-			loggerFactory.AddDebug();
-
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
-				//app.UseBrowserLink();
-				app.UseDatabaseErrorPage();
+				app.UseMigrationsEndPoint();
 			}
 			else
 			{
 				app.UseExceptionHandler("/Home/Error");
 			}
-			
+
 			app.UseMiddleware(typeof(ErrorHandlingMiddleware));
 			app.UseStaticFiles();
-			app.UseAuthentication();
-			app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
-			app.UseMvc(routes =>
+			app.UseAuthentication();
+			app.UseRouting();
+			app.UseCors(CorsAllowAllPolicy);
+			app.UseEndpoints(endpoints =>
 			{
-				routes.MapRoute(
-					name: "default",
-					template: "{controller=Home}/{action=Index}/{id?}");
+				endpoints.MapControllers();
+				endpoints.MapFallbackToFile("index.html");
 			});
 
 			app.UseSession();
 		}
 
-		// This method gets called by the runtime. Use this method to add services to the container.
 		public IServiceProvider ConfigureServices(IServiceCollection services)
 		{
 			services.ConfigureMvc(this.Configuration);
-
+			
 			var container = new Container();
 
 			container.ConfigureInfrastructure();

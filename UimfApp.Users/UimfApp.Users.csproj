@@ -1,16 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.0" />
-    <PackageReference Include="UiMetadataFramework.Basic" Version="0.0.16-beta" />
-    <PackageReference Include="UiMetadataFramework.Core" Version="0.0.15-beta" />
-    <PackageReference Include="UiMetadataFramework.MediatR" Version="0.0.12-beta" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="UiMetadataFramework.Basic" Version="0.0.24-beta" />
+    <PackageReference Include="UiMetadataFramework.MediatR" Version="0.0.19-beta" />
   </ItemGroup>
 
   <ItemGroup>

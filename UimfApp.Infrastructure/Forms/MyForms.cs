@@ -11,7 +11,7 @@ namespace UimfApp.Infrastructure.Forms
 	using UimfApp.Infrastructure.User;
 	using UiMetadataFramework.Core;
 	using UiMetadataFramework.MediatR;
-
+	
 	/// <summary>
 	/// Gets all forms available to the current user.
 	/// </summary>

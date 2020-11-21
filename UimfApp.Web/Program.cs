@@ -3,6 +3,7 @@ namespace UimfApp.Web
 	using System.IO;
 	using Microsoft.AspNetCore;
 	using Microsoft.AspNetCore.Hosting;
+	using Microsoft.Extensions.Logging;
 	using StructureMap.AspNetCore;
 
 	public class Program
@@ -14,11 +15,15 @@ namespace UimfApp.Web
 
 		public static IWebHost BuildWebHost(string[] args) =>
 			WebHost.CreateDefaultBuilder(args)
-				.UseKestrel()
 				.UseContentRoot(Directory.GetCurrentDirectory())
 				.UseIISIntegration()
 				.UseStartup<Startup>()
-				.UseApplicationInsights()
+				.ConfigureLogging((hostingContext, logging) =>
+				{
+					logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+					logging.AddConsole();
+					logging.AddDebug();
+				})
 				.UseStructureMap()
 				.Build();
 	}

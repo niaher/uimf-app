@@ -27,15 +27,15 @@ namespace UimfApp.Web
 				//We have a remote address set up
 				return connection.LocalIpAddress.IsSet()
 					//Is local is same as remote, then we are local
-					? connection.RemoteIpAddress.Equals(connection.LocalIpAddress)
+					? connection.RemoteIpAddress?.Equals(connection.LocalIpAddress) == true
 					//else we are remote if the remote IP address is not a loopback address
-					: IPAddress.IsLoopback(connection.RemoteIpAddress);
+					: connection.RemoteIpAddress != null && IPAddress.IsLoopback(connection.RemoteIpAddress);
 			}
 
 			return true;
 		}
 
-		public static string MapPath(this IHostingEnvironment environment, string virtualPath)
+		public static string MapPath(this IWebHostEnvironment environment, string virtualPath)
 		{
 			return Path.Combine(environment.WebRootPath, virtualPath.TrimStart("~/"));
 		}

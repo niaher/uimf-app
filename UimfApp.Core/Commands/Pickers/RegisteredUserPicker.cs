@@ -5,7 +5,6 @@
 	using Microsoft.EntityFrameworkCore;
 	using UimfApp.Core.DataAccess;
 	using UimfApp.Core.Security;
-	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Forms;
 	using UimfApp.Infrastructure.Forms.Typeahead;
 	using UimfApp.Infrastructure.Security;

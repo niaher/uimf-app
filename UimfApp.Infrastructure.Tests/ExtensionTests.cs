@@ -39,16 +39,16 @@ namespace UimfApp.Infrastructure.Tests
 		public void BaseClassOfTypeIsReceivedCorrectly()
 		{
 			typeof(A).GetBaseClassOfType(typeof(B)).Should().BeNull();
-			typeof(B).GetBaseClassOfType(typeof(A)).ShouldBeEquivalentTo(typeof(A));
+			typeof(B).GetBaseClassOfType(typeof(A)).Should().Be<A>();
 
-			typeof(E).GetBaseClassOfType(typeof(D<>)).ShouldBeEquivalentTo(typeof(D<int>));
-			typeof(E).GetBaseClassOfType(typeof(D<int>)).ShouldBeEquivalentTo(typeof(D<int>));
-			typeof(F).GetBaseClassOfType(typeof(E)).ShouldBeEquivalentTo(typeof(E));
-			typeof(F).GetBaseClassOfType(typeof(D<>)).ShouldBeEquivalentTo(typeof(D<int>));
-			typeof(F).GetBaseClassOfType(typeof(D<int>)).ShouldBeEquivalentTo(typeof(D<int>));
+			typeof(E).GetBaseClassOfType(typeof(D<>)).Should().Be<D<int>>();
+			typeof(E).GetBaseClassOfType(typeof(D<int>)).Should().Be<D<int>>();
+			typeof(F).GetBaseClassOfType(typeof(E)).Should().Be<E>();
+			typeof(F).GetBaseClassOfType(typeof(D<>)).Should().Be<D<int>>();
+			typeof(F).GetBaseClassOfType(typeof(D<int>)).Should().Be<D<int>>();
 
-			typeof(G<>).GetBaseClassOfType(typeof(D<>)).ShouldBeEquivalentTo(typeof(D<>));
-			typeof(G<int>).GetBaseClassOfType(typeof(D<>)).ShouldBeEquivalentTo(typeof(D<int>));
+			typeof(G<>).GetBaseClassOfType(typeof(D<>)).Should().Be(typeof(D<>));
+			typeof(G<int>).GetBaseClassOfType(typeof(D<>)).Should().Be<D<int>>();
 		}
 
 		[Fact]
@@ -77,12 +77,12 @@ namespace UimfApp.Infrastructure.Tests
 		[Fact]
 		public void InFunctionWorks()
 		{
-			DayOfWeek.Monday.In(DayOfWeek.Monday, DayOfWeek.Friday).ShouldBeEquivalentTo(true);
-			DayOfWeek.Monday.In(DayOfWeek.Tuesday, DayOfWeek.Wednesday).ShouldBeEquivalentTo(false);
-			DayOfWeek.Monday.In(DayOfWeek.Monday, DayOfWeek.Monday, DayOfWeek.Tuesday).ShouldBeEquivalentTo(true);
+			DayOfWeek.Monday.In(DayOfWeek.Monday, DayOfWeek.Friday).Should().BeTrue();
+			DayOfWeek.Monday.In(DayOfWeek.Tuesday, DayOfWeek.Wednesday).Should().BeFalse();
+			DayOfWeek.Monday.In(DayOfWeek.Monday, DayOfWeek.Monday, DayOfWeek.Tuesday).Should().BeTrue();
 
-			DayOfWeek.Monday.In(DayOfWeek.Saturday).ShouldBeEquivalentTo(false);
-			DayOfWeek.Monday.In(DayOfWeek.Saturday, DayOfWeek.Sunday).ShouldBeEquivalentTo(false);
+			DayOfWeek.Monday.In(DayOfWeek.Saturday).Should().BeFalse();
+			DayOfWeek.Monday.In(DayOfWeek.Saturday, DayOfWeek.Sunday).Should().BeFalse();
 		}
 	}
 }

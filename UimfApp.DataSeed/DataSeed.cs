@@ -4,7 +4,6 @@ namespace UimfApp.DataSeed
 	using System.Threading.Tasks;
 	using Microsoft.AspNetCore.Identity;
 	using Microsoft.EntityFrameworkCore;
-	using Microsoft.EntityFrameworkCore.Internal;
 	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.Security;
 	using UimfApp.Users;
@@ -32,7 +31,7 @@ namespace UimfApp.DataSeed
 			if (dynamicRoles.Any())
 			{
 				throw new BusinessException(
-					$"Cannot assign dynamic roles {dynamicRoles.Select(t => $"'{t.Name}'").Join()} to a user.");
+					$"Cannot assign dynamic roles {dynamicRoles.Select(t => $"'{t.Name}'").JoinStrings(", ")} to a user.");
 			}
 
 			await this.userManager.CreateAsync(new ApplicationUser

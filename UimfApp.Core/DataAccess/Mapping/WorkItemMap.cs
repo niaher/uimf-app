@@ -10,7 +10,7 @@ namespace UimfApp.Core.DataAccess.Mapping
 		{
 			entity.ToTable("WorkItem");
 			entity.HasKey(c => c.Id);
-			entity.Property(t => t.Id).HasColumnName("Id").UseSqlServerIdentityColumn();
+			entity.Property(t => t.Id).HasColumnName("Id").UseIdentityColumn();
 
 			entity.HasOne(t => t.AssignedToUser)
 				.WithMany()

@@ -16,7 +16,7 @@ namespace UimfApp.Notifications
 		{
 			builder.ToTable("Notification", this.schema);
 			builder.HasKey(t => t.Id);
-			builder.Property(t => t.Id).HasColumnName("Id").UseSqlServerIdentityColumn();
+			builder.Property(t => t.Id).HasColumnName("Id").UseIdentityColumn();
 			builder.Property(t => t.ArchivedOn).HasColumnName("ArchivedOn");
 			builder.Property(t => t.CreatedOn).HasColumnName("CreatedOn");
 			builder.Property(t => t.Description).HasColumnName("Description");

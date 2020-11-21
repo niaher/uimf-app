@@ -3,7 +3,6 @@ namespace UimfApp.Infrastructure
 	using System;
 	using System.Collections.Generic;
 	using System.Data.Common;
-	using System.Data.SqlClient;
 	using System.Linq;
 	using System.Linq.Expressions;
 	using System.Reflection;
@@ -12,15 +11,21 @@ namespace UimfApp.Infrastructure
 	using Humanizer;
 	using MediatR;
 	using Microsoft.AspNetCore.Http;
+	using Microsoft.Data.SqlClient;
 	using Microsoft.EntityFrameworkCore;
 	using Microsoft.EntityFrameworkCore.Internal;
 	using Microsoft.EntityFrameworkCore.Metadata;
 	using Microsoft.EntityFrameworkCore.Metadata.Builders;
 	using Microsoft.EntityFrameworkCore.SqlServer.Infrastructure.Internal;
-	using MySql.Data.MySqlClient;
 	using Newtonsoft.Json;
 	using Newtonsoft.Json.Linq;
-	using Pomelo.EntityFrameworkCore.MySql.Infrastructure.Internal;
+	using UiMetadataFramework.Basic.Input;
+	using UiMetadataFramework.Basic.Input.Typeahead;
+	using UiMetadataFramework.Basic.Output;
+	using UiMetadataFramework.Basic.Response;
+	using UiMetadataFramework.Core;
+	using UiMetadataFramework.Core.Binding;
+	using UiMetadataFramework.MediatR;
 	using UimfApp.Infrastructure.Domain;
 	using UimfApp.Infrastructure.Emails;
 	using UimfApp.Infrastructure.Forms;
@@ -31,13 +36,6 @@ namespace UimfApp.Infrastructure
 	using UimfApp.Infrastructure.Forms.Typeahead;
 	using UimfApp.Infrastructure.Security;
 	using UimfApp.Infrastructure.User;
-	using UiMetadataFramework.Basic.Input;
-	using UiMetadataFramework.Basic.Input.Typeahead;
-	using UiMetadataFramework.Basic.Output;
-	using UiMetadataFramework.Basic.Response;
-	using UiMetadataFramework.Core;
-	using UiMetadataFramework.Core.Binding;
-	using UiMetadataFramework.MediatR;
 
 	public static class Extensions
 	{
@@ -258,11 +256,6 @@ namespace UimfApp.Infrastructure
 
 		public static DbConnection GetConnection(this DbContextOptions options)
 		{
-			if (options.Extensions.FirstOrDefault(t => t is MySqlOptionsExtension) is MySqlOptionsExtension ext)
-			{
-				return new MySqlConnection(ext.ConnectionString);
-			}
-
 			return new SqlConnection(options.FindExtension<SqlServerOptionsExtension>().ConnectionString);
 		}
 
@@ -385,7 +378,7 @@ namespace UimfApp.Infrastructure
 			return true;
 		}
 
-		public static string Join<T>(this IEnumerable<T> items, string separator)
+		public static string JoinStrings<T>(this IEnumerable<T> items, string separator)
 		{
 			return string.Join(separator, items);
 		}
@@ -544,11 +537,6 @@ namespace UimfApp.Infrastructure
 			response.Metadata.FunctionsToRun.Add(growlFunction);
 
 			return response;
-		}
-
-		internal static DbConnection GetConnection(this MySqlOptionsExtension extension)
-		{
-			return extension.Connection ?? new MySqlConnection(extension.ConnectionString);
 		}
 
 		internal static T GetCustomProperty<T>(this FormMetadata form, string propertyName)

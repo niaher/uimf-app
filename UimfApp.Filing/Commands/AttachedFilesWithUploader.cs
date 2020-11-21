@@ -100,7 +100,7 @@ namespace UimfApp.Filing.Commands
 
 				foreach (var fileId in documents)
 				{
-					await this.context.AttachFileToContexts(fileId, $"{message.ContextType}:{message.ContextId}");
+					await this.context.AttachFileToContextsAsync(fileId, $"{message.ContextType}:{message.ContextId}");
 				}
 			}
 

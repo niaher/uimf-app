@@ -128,7 +128,7 @@ namespace UimfApp.DependencyInjection
 			services.ConfigureApplicationCookie(options =>
 			{
 				// Cookie settings
-				options.Cookie.Expiration = TimeSpan.FromDays(150);
+				options.ExpireTimeSpan = TimeSpan.FromDays(14);
 				options.LoginPath = "/Account/LogIn";
 				options.LogoutPath = "/Account/LogOut";
 			});
@@ -290,7 +290,7 @@ namespace UimfApp.DependencyInjection
 			// Load all referenced assemblies that belong to the solution.
 			Assembly
 				.GetEntryAssembly()
-				.GetReferencedAssemblies()
+				?.GetReferencedAssemblies()
 				.Where(t => t.FullName.Contains("UimfApp"))
 				.ForEach(t => Assembly.Load(t));
 
@@ -328,7 +328,7 @@ namespace UimfApp.DependencyInjection
 			// Load all referenced assemblies that belong to the solution.
 			Assembly
 				.GetEntryAssembly()
-				.GetReferencedAssemblies()
+				?.GetReferencedAssemblies()
 				.Where(t => t.FullName.Contains("UimfApp"))
 				.ForEach(t => Assembly.Load(t));
 

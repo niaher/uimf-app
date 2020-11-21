@@ -11,7 +11,7 @@ namespace UimfApp.Infrastructure.Validation
 
 			if (!result.IsValid)
 			{
-				throw new BusinessException(errorMessageSummary + " Problems:\n" + result.Errors.Select(t => "* " + t.ErrorMessage).Join("\n"));
+				throw new BusinessException(errorMessageSummary + " Problems:\n" + result.Errors.Select(t => "* " + t.ErrorMessage).JoinStrings("\n"));
 			}
 		}
 	}

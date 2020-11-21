@@ -58,7 +58,7 @@ namespace UimfApp.Infrastructure.Tests
 			eventManager.Streams.Publish(new SomethingHappenedEvent());
 			eventManager.Streams.Publish(new SomethingHappenedEvent());
 
-			Logger.HashCodes.Count.ShouldBeEquivalentTo(2);
+			Logger.HashCodes.Count.Should().Be(2);
 			Logger.HashCodes["handlers"][0].Should().NotBe(Logger.HashCodes["handlers"][1]);
 		}
 
@@ -74,7 +74,7 @@ namespace UimfApp.Infrastructure.Tests
 			eventManager.Streams.Publish(new SomethingHappenedEvent());
 			eventManager.Streams.Publish(new SomethingHappenedEvent());
 
-			Logger.HashCodes.Count.ShouldBeEquivalentTo(2);
+			Logger.HashCodes.Count.Should().Be(2);
 			Logger.HashCodes["loggers"][0].Should().NotBe(Logger.HashCodes["loggers"][1]);
 		}
 	}

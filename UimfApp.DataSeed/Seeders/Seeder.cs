@@ -7,7 +7,7 @@ namespace UimfApp.DataSeed.Seeders
 	using MediatR;
 	using Microsoft.AspNetCore.Identity;
 	using Microsoft.EntityFrameworkCore;
-	using Microsoft.EntityFrameworkCore.Internal;
+	using UiMetadataFramework.Basic.Input;
 	using UimfApp.Core.Commands.WorkItems;
 	using UimfApp.Core.DataAccess;
 	using UimfApp.Core.Domain;
@@ -16,7 +16,6 @@ namespace UimfApp.DataSeed.Seeders
 	using UimfApp.Infrastructure.Security;
 	using UimfApp.Infrastructure.User;
 	using UimfApp.Users;
-	using UiMetadataFramework.Basic.Input;
 
 	public class Seeder
 	{
@@ -73,7 +72,8 @@ namespace UimfApp.DataSeed.Seeders
 			this.Tracker.RegisterEntity<TEntity, TEntityId>(entityName, id);
 		}
 
-		public Task<TResponse> RunMediatorCommand<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default(CancellationToken))
+		public Task<TResponse> RunMediatorCommand<TResponse>(IRequest<TResponse> request,
+			CancellationToken cancellationToken = default(CancellationToken))
 		{
 			return this.Container.Container.GetInstance<IMediator>().Send(request, cancellationToken);
 		}
@@ -95,7 +95,7 @@ namespace UimfApp.DataSeed.Seeders
 			if (dynamicRoles.Any())
 			{
 				throw new BusinessException(
-					$"Cannot assign dynamic roles {dynamicRoles.Select(t => $"'{t.Name}'").Join()} to a user.");
+					$"Cannot assign dynamic roles {dynamicRoles.Select(t => $"'{t.Name}'").JoinStrings(", ")} to a user.");
 			}
 
 			var userManager = this.Container.Container.GetInstance<UserManager<ApplicationUser>>();
@@ -110,7 +110,7 @@ namespace UimfApp.DataSeed.Seeders
 
 			if (!result.Succeeded)
 			{
-				var errors = result.Errors.Select(t => $"{t.Code}: {t.Description}").Join("\n");
+				var errors = result.Errors.Select(t => $"{t.Code}: {t.Description}").JoinStrings("\n");
 				throw new BusinessException(errors);
 			}
 

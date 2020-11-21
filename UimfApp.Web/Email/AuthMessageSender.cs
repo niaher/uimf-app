@@ -16,9 +16,9 @@ namespace UimfApp.Web.Email
 	public class AuthMessageSender : IEmailSender, ISmsSender
 	{
 		private readonly AppConfig appConfig;
-		private readonly IHostingEnvironment hostingEnvironment;
+		private readonly IWebHostEnvironment hostingEnvironment;
 
-		public AuthMessageSender(IOptions<AppConfig> appConfig, IHostingEnvironment hostingEnvironment)
+		public AuthMessageSender(IOptions<AppConfig> appConfig, IWebHostEnvironment hostingEnvironment)
 		{
 			this.hostingEnvironment = hostingEnvironment;
 			this.appConfig = appConfig.Value;

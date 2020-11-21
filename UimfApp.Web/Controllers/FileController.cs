@@ -98,14 +98,14 @@ namespace UimfApp.Web.Controllers
 				{
 					using (var fileStream = file.OpenReadStream())
 					{
-						var fileId = await this.fileManager.SaveFile(
+						var fileId = await this.fileManager.SaveFileAsync(
 							file.FileName,
 							file.ContentType,
 							ReadFully(fileStream),
 							CompressionFormat.None,
 							user.Id);
 
-						var entity = await this.fileManager.GetById(fileId);
+						var entity = await this.fileManager.GetByIdAsync(fileId);
 
 						filesResult.Add(entity.Id);
 					}
