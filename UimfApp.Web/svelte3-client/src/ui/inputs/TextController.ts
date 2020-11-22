@@ -1,30 +1,12 @@
-import { InputController, OutputControlConfiguration } from "core/framework";
-import type { InputFieldMetadata } from "core/server";
+import { OutputControlConfiguration, StringInputController } from "core/framework";
 import { controlRegister } from "../Register";
 import Text from "./Text.svelte";
 
-export default class StringInputController extends InputController<string> {
-	constructor(metadata: InputFieldMetadata) {
-		super(metadata);
-	}
-
-	public serializeValue(value: string): string {
-		// Ensure we don't return "undefined", but return null instead.
-		return value != null ? value.toString() : null;
-	}
-
-	public init(value: string): Promise<StringInputController> {
-		this.value = value;
-		return Promise.resolve(this);
-	}
-
-	public getValue(): Promise<string> {
-		return Promise.resolve(this.value);
-	}
+export default class TextInputController extends StringInputController {
 }
 
 controlRegister.registerInputFieldControl(
 	"text", 
 	Text, 
-	StringInputController, 
+	TextInputController, 
 	new OutputControlConfiguration(false, false));

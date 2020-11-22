@@ -18,7 +18,7 @@ namespace UimfApp.Users.Commands
 	using UimfApp.Infrastructure.Forms.CustomProperties;
 	using UimfApp.Infrastructure.Security;
 
-	[MyForm(Id = "login", Label = "Login", Menu = UserMenus.TopLevel)]
+	[MyForm(Id = "login", Label = "Login", Menu = UserMenus.TopLevel, SubmitButtonLabel = "Login")]
 	[Secure(typeof(UserActions), nameof(UserActions.Login))]
 	[CssClass(UiFormConstants.CardLayout)]
 	public class Login : AsyncForm<Login.Request, ReloadResponse>

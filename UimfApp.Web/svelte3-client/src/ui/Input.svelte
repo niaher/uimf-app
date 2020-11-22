@@ -1,4 +1,3 @@
-
 <!-- svelte-ignore a11y-label-has-associated-control -->
 <script>
     import type { FormInstance, InputController, UmfApp } from "core/framework";
