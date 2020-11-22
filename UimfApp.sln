@@ -12,13 +12,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UimfApp.Web", "UimfApp.Web\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UimfApp.DataSeed", "UimfApp.DataSeed\UimfApp.DataSeed.csproj", "{CBA6F7F2-46E6-432D-B77F-851CC72EBE32}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Various", "Various", "{E008CA1C-C881-4121-BA3E-373ADF7645B5}"
-	ProjectSection(SolutionItems) = preProject
-		.gitattributes = .gitattributes
-		.gitignore = .gitignore
-		readme.md = readme.md
-	EndProjectSection
-EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "UimfApp.Database", "UimfApp.Database\UimfApp.Database.sqlproj", "{5B1C73FB-ECE4-47EB-BA6C-FC37137AFAB1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UimfApp.Filing", "UimfApp.Filing\UimfApp.Filing.csproj", "{47093E66-597C-4626-8386-7FC08C44E073}"
@@ -40,6 +33,14 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UimfApp.App.EventNotification", "UimfApp.App.EventNotification\UimfApp.App.EventNotification.csproj", "{162D3877-45EF-4D25-BB17-68D908223EB3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UimfApp.IntegrationTests", "UimfApp.IntegrationTests\UimfApp.IntegrationTests.csproj", "{55CAE02D-6C90-4F0A-BF64-82FBC03FF6E1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{ADD3FCB7-6CBF-49F4-9FEF-46602D39F02A}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		readme.md = readme.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
