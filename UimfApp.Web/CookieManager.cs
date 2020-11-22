@@ -26,9 +26,9 @@ namespace UimfApp.Web
 			response.Cookies.Delete(AppCookieName);
 		}
 
-		public UserContextData GetUserContextData()
+		public UserContextData? GetUserContextData()
 		{
-			this.signInManager.Context.Request.Cookies.TryGetValue(AppCookieName, out string cookieValue);
+			this.signInManager.Context.Request.Cookies.TryGetValue(AppCookieName, out string? cookieValue);
 
 			if (cookieValue != null)
 			{
@@ -37,7 +37,7 @@ namespace UimfApp.Web
 					var json = this.protector.Unprotect(cookieValue);
 					var value = JsonConvert.DeserializeObject<UserContextData>(json);
 
-					return value.UserName != this.signInManager.Context.User.Identity.Name
+					return value.UserName != this.signInManager.Context.User.Identity?.Name
 						? null
 						: value;
 				}
@@ -51,16 +51,16 @@ namespace UimfApp.Web
 			return null;
 		}
 
-		public Infrastructure.User.UserSession GetUserSession()
+		public UserSession? GetUserSession()
 		{
-			this.signInManager.Context.Request.Cookies.TryGetValue(UserCookieName, out string cookieValue);
+			this.signInManager.Context.Request.Cookies.TryGetValue(UserCookieName, out string? cookieValue);
 
 			if (cookieValue != null)
 			{
 				try
 				{
 					var json = this.protector.Unprotect(cookieValue);
-					var value = JsonConvert.DeserializeObject<Infrastructure.User.UserSession>(json);
+					var value = JsonConvert.DeserializeObject<UserSession>(json);
 					return value;
 				}
 				catch (Exception)
@@ -73,13 +73,13 @@ namespace UimfApp.Web
 			var userContextData = this.GetUserContextData();
 			if (userContextData != null)
 			{
-				this.SetUserSessionData(new Infrastructure.User.UserSession(userContextData.UserId));
+				this.SetUserSessionData(new UserSession(userContextData.UserId));
 			}
 
 			return null;
 		}
 
-		public void SetUserContextData(UserContextData data)
+		public void SetUserContextData(UserContextData? data)
 		{
 			var json = JsonConvert.SerializeObject(data);
 			var encryptedJson = this.protector.Protect(json);
@@ -93,7 +93,7 @@ namespace UimfApp.Web
 			});
 		}
 
-		public void SetUserSessionData(Infrastructure.User.UserSession session)
+		public void SetUserSessionData(UserSession session)
 		{
 			var json = JsonConvert.SerializeObject(session);
 			var encryptedJson = this.protector.Protect(json);

@@ -40,7 +40,7 @@ namespace UimfApp.Web
 			return Path.Combine(environment.WebRootPath, virtualPath.TrimStart("~/"));
 		}
 
-		public static int? ToInt(this string value)
+		public static int? ToInt(this string? value)
 		{
 			if (!int.TryParse(value, out var result))
 			{
@@ -72,7 +72,7 @@ namespace UimfApp.Web
 			return result;
 		}
 
-		private static bool IsSet(this IPAddress address)
+		private static bool IsSet(this IPAddress? address)
 		{
 			return address != null && address.ToString() != NullIpAddress;
 		}

@@ -24,7 +24,7 @@ namespace UimfApp.Web.Controllers
 		}
 
 		[HttpGet("metadata/{id}")]
-		public FormMetadata Metadata(string id)
+		public FormMetadata? Metadata(string id)
 		{
 			this.Response.ContentType = ContentType;
 			return this.formRegister.GetFormInfo(id)?.Metadata;

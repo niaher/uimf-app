@@ -76,7 +76,7 @@ namespace UimfApp.Web
 			{
 				config.For<UserContextAccessor>().Use<AppUserContextAccessor>();
 				config.For<UserContext>().Use(ctx => ctx.GetInstance<UserContextAccessor>().GetUserContext());
-				config.For<UserSession>().Use(ctx => ctx.GetInstance<CookieManager>().GetUserSession()).AlwaysUnique();
+				config.For<UserSession?>().Use(ctx => ctx.GetInstance<CookieManager>().GetUserSession()).AlwaysUnique();
 
 				config.Scan(_ =>
 				{

@@ -5,7 +5,7 @@ namespace UimfApp.Web
 	using UimfApp.Infrastructure;
 	using UimfApp.Infrastructure.User;
 	using UimfApp.Users;
-
+	
 	public class AppUserContextAccessor : UserContextAccessor
 	{
 		private readonly CookieManager cookieManager;
@@ -35,11 +35,11 @@ namespace UimfApp.Web
 			return this.signInManager.Context.User;
 		}
 
-		protected override UserContextData GetUserContextData()
+		protected override UserContextData? GetUserContextData()
 		{
 			var principal = this.GetPrincipal();
 
-			if (!principal.Identity.IsAuthenticated)
+			if (principal.Identity?.IsAuthenticated != true)
 			{
 				return null;
 			}
@@ -69,7 +69,7 @@ namespace UimfApp.Web
 			return data;
 		}
 
-		private UserContextData GetUserContextDataFromDatabase(int userId)
+		private UserContextData? GetUserContextDataFromDatabase(int userId)
 		{
 			var user = this.signInManager.UserManager.Users.SingleOrException(t => t.Id == userId);
 

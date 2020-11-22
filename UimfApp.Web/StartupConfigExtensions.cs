@@ -2,7 +2,8 @@ namespace UimfApp.Web
 {
 	using Microsoft.Extensions.Configuration;
 	using Microsoft.Extensions.DependencyInjection;
-	using Newtonsoft.Json.Converters;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Converters;
 	using Newtonsoft.Json.Serialization;
 	using UimfApp.Infrastructure.Configuration;
 
@@ -18,7 +19,9 @@ namespace UimfApp.Web
 				.AddNewtonsoftJson(options =>
 				{
 					options.SerializerSettings.Converters.Add(new StringEnumConverter());
-					options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Include;
+					options.SerializerSettings.NullValueHandling = NullValueHandling.Include;
+                    options.SerializerSettings.ObjectCreationHandling = ObjectCreationHandling.Replace;
+
 					options.SerializerSettings.ContractResolver = new DefaultContractResolver
 					{
 						NamingStrategy = new CamelCaseNamingStrategy
