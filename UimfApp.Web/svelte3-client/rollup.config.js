@@ -2,6 +2,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
 import { terser } from 'rollup-plugin-terser';
+import multi from '@rollup/plugin-multi-entry';
 import scss from 'rollup-plugin-scss';
 import del from 'rollup-plugin-delete';
 import svelte from 'rollup-plugin-svelte';
@@ -15,7 +16,11 @@ const distDir = '../wwwroot';
 
 export default [
 	{
-		input: 'src/main.ts',
+		input: [
+			'src/main.ts',
+			'src/ui/inputs/**/*.ts',
+			'src/ui/outputs/**/*.ts'
+		],
 		output: {
 			sourcemap: true,
 			format: 'iife',
@@ -23,11 +28,13 @@ export default [
 			file: `${distDir}/build/bundle.js`
 		},
 		plugins: [
+			multi(),
 			svelte({
 				generate: 'dom',
 				dev: !production,
 				css: css => css.write('bundle.css'),
 				preprocess: svelteConfig.createPreprocessors(production),
+				onwarn: svelteConfig.onwarn
 			}),
 			resolve({
 				browser: true,
@@ -66,5 +73,13 @@ export default [
 				]),
 				sass: sass
 			})
-		]
+		],
+		onwarn: (warning, handler) => {
+			// Ignore some warnings.
+			if (warning.code === 'EMPTY_BUNDLE') {
+				return;
+			}
+			
+			handler(warning)
+		}
 	}];

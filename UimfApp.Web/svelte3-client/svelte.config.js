@@ -19,5 +19,13 @@ function createPreprocessors(production) {
 
 module.exports = {
     preprocess: createPreprocessors(false),
-    createPreprocessors: createPreprocessors
+    createPreprocessors: createPreprocessors,
+    onwarn: (warning, handler) => {
+        // Ignore some warnings.
+        if (warning.code === 'unused-export-let') {
+            return;
+        }
+        
+        handler(warning)
+    }
 };
