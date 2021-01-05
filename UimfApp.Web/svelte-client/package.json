@@ -52,7 +52,7 @@
     "@types/axios": "0.14.0",
     "alertifyjs": "^1.11.1",
     "awesomplete": "1.1.2",
-    "axios": "0.16.2",
+    "axios": "0.21.1",
     "choices.js": "^3.0.2",
     "humanize": "0.0.9",
     "moment": "^2.22.2",
