@@ -17,7 +17,7 @@
     "autoprefixer": "^10.0.2",
     "axios": "^0.21.0",
     "bootstrap": "^4.5.3",
-    "postcss": "^8.1.7",
+    "postcss": "^8.2.10",
     "rollup": "^2.3.4",
     "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-scss": "^2.6.1",
