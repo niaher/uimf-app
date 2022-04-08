@@ -55,7 +55,7 @@
     "axios": "0.16.2",
     "choices.js": "^3.0.2",
     "humanize": "0.0.9",
-    "moment": "^2.22.2",
+    "moment": "^2.29.2",
     "pikaday": "^1.7.0",
     "svelte-state-renderer": "^2.0.0",
     "uimf-core": "0.0.8"
